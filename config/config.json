@@ -1,0 +1,22 @@
+{
+  "server": {
+    "port": "8080",
+    "mode": "debug",
+    "read_timeout": "10s",
+    "write_timeout": "10s"
+  },
+  "database": {
+    "max_idle_conns": 10,
+    "max_open_conns": 100,
+    "conn_max_lifetime": "1h"
+  },
+  "logging": {
+    "level": "info",
+    "format": "json",
+    "file": "logs/app.log"
+  },
+  "fhir": {
+    "base_url": "/api/v1",
+    "version": "R4"
+  }
+}

@@ -1,0 +1,275 @@
+basePath: /api/v1
+definitions:
+  domain.FHIRAddress:
+    properties:
+      city:
+        type: string
+      country:
+        type: string
+      line:
+        items:
+          type: string
+        type: array
+      postalCode:
+        type: string
+      state:
+        type: string
+      use:
+        type: string
+    type: object
+  domain.FHIRContactPoint:
+    properties:
+      system:
+        type: string
+      use:
+        type: string
+      value:
+        type: string
+    type: object
+  domain.FHIRHumanName:
+    properties:
+      family:
+        type: string
+      given:
+        items:
+          type: string
+        type: array
+      use:
+        type: string
+    type: object
+  domain.FHIRPatient:
+    properties:
+      active:
+        type: boolean
+      address:
+        items:
+          $ref: '#/definitions/domain.FHIRAddress'
+        type: array
+      birthDate:
+        type: string
+      gender:
+        type: string
+      id:
+        type: string
+      name:
+        items:
+          $ref: '#/definitions/domain.FHIRHumanName'
+        type: array
+      resourceType:
+        type: string
+      telecom:
+        items:
+          $ref: '#/definitions/domain.FHIRContactPoint'
+        type: array
+    type: object
+info:
+  contact: {}
+  description: This is a sample FHIR Patient API server in Go using Gin.
+  title: Go FHIR Demo API
+  version: "1.0"
+paths:
+  /patients:
+    get:
+      description: Get a list of FHIR Patient resources
+      parameters:
+      - description: Number of patients to return
+        in: query
+        name: _count
+        type: integer
+      - description: Offset for pagination
+        in: query
+        name: _offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: List Patients
+      tags:
+      - Patient
+    post:
+      consumes:
+      - application/json
+      description: Create a new FHIR Patient resource
+      parameters:
+      - description: FHIR Patient resource
+        in: body
+        name: patient
+        required: true
+        schema:
+          $ref: '#/definitions/domain.FHIRPatient'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/domain.FHIRPatient'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Create a new Patient
+      tags:
+      - Patient
+  /patients/{id}:
+    delete:
+      description: Delete a FHIR Patient resource by its ID
+      parameters:
+      - description: Patient ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Delete a Patient
+      tags:
+      - Patient
+    get:
+      description: Get a FHIR Patient resource by its ID
+      parameters:
+      - description: Patient ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.FHIRPatient'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Get a Patient by ID
+      tags:
+      - Patient
+    patch:
+      consumes:
+      - application/json
+      description: Partially update a FHIR Patient resource by its ID
+      parameters:
+      - description: Patient ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Partial update fields
+        in: body
+        name: patch
+        required: true
+        schema:
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.FHIRPatient'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Partially update a Patient
+      tags:
+      - Patient
+    put:
+      consumes:
+      - application/json
+      description: Update a FHIR Patient resource by its ID
+      parameters:
+      - description: Patient ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: FHIR Patient resource
+        in: body
+        name: patient
+        required: true
+        schema:
+          $ref: '#/definitions/domain.FHIRPatient'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.FHIRPatient'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Update a Patient
+      tags:
+      - Patient
+swagger: "2.0"

@@ -1,0 +1,10 @@
+DROP TRIGGER IF EXISTS update_patients_updated_at ON patients;
+DROP FUNCTION IF EXISTS update_updated_at_column();
+DROP INDEX IF EXISTS idx_patients_fhir_data;
+DROP INDEX IF EXISTS idx_patients_deleted_at;
+DROP INDEX IF EXISTS idx_patients_birth_date;
+DROP INDEX IF EXISTS idx_patients_gender;
+DROP INDEX IF EXISTS idx_patients_given;
+DROP INDEX IF EXISTS idx_patients_family;
+DROP INDEX IF EXISTS idx_patients_active;
+DROP TABLE IF EXISTS patients;
