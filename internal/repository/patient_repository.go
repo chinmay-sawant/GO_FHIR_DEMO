@@ -20,6 +20,8 @@ func NewPatientRepository(db *gorm.DB) domain.PatientRepository {
 
 // Create creates a new patient record
 func (r *patientRepository) Create(patient *domain.Patient) error {
+	// Ensure FHIRData is valid UTF-8 and does not contain null bytes
+
 	if err := r.db.Create(patient).Error; err != nil {
 		logger.Errorf("Failed to create patient: %v", err)
 		return err

@@ -7,7 +7,9 @@ import (
 
 	"go-fhir-demo/internal/domain"
 	"go-fhir-demo/pkg/logger"
-	"strconv"
+	"go-fhir-demo/pkg/utils"
+
+	"github.com/samply/golang-fhir-models/fhir-models/fhir"
 )
 
 type patientService struct {
@@ -22,7 +24,7 @@ func NewPatientService(repo domain.PatientRepository) domain.PatientService {
 }
 
 // CreatePatient creates a new patient from FHIR data
-func (s *patientService) CreatePatient(fhirPatient *domain.FHIRPatient) (*domain.Patient, error) {
+func (s *patientService) CreatePatient(fhirPatient *fhir.Patient) (*domain.Patient, error) {
 	patient, err := s.ConvertFromFHIR(fhirPatient)
 	if err != nil {
 		logger.Errorf("Failed to convert FHIR patient: %v", err)
@@ -57,7 +59,7 @@ func (s *patientService) GetPatients(limit, offset int) ([]*domain.Patient, int6
 }
 
 // UpdatePatient updates an existing patient
-func (s *patientService) UpdatePatient(id uint, fhirPatient *domain.FHIRPatient) (*domain.Patient, error) {
+func (s *patientService) UpdatePatient(id uint, fhirPatient *fhir.Patient) (*domain.Patient, error) {
 	existingPatient, err := s.repo.GetByID(id)
 	if err != nil {
 		return nil, err
@@ -86,19 +88,20 @@ func (s *patientService) PatchPatient(id uint, updates map[string]interface{}) (
 	if err != nil {
 		return nil, err
 	}
+
 	// Parse existing FHIR data
-	var fhirPatient domain.FHIRPatient
-	if err := json.Unmarshal([]byte(patient.FHIRData), &fhirPatient); err != nil {
+	fhirPatient, err := s.ConvertToFHIR(patient)
+	if err != nil {
 		return nil, fmt.Errorf("failed to parse existing FHIR data: %w", err)
 	}
 
 	// Apply updates to FHIR patient
-	if err := s.applyUpdatesToFHIR(&fhirPatient, updates); err != nil {
+	if err := s.applyUpdatesToFHIR(fhirPatient, updates); err != nil {
 		return nil, err
 	}
 
 	// Convert back to domain model
-	updatedPatient, err := s.ConvertFromFHIR(&fhirPatient)
+	updatedPatient, err := s.ConvertFromFHIR(fhirPatient)
 	if err != nil {
 		return nil, err
 	}
@@ -120,8 +123,8 @@ func (s *patientService) DeletePatient(id uint) error {
 }
 
 // ConvertToFHIR converts a domain patient to FHIR format
-func (s *patientService) ConvertToFHIR(patient *domain.Patient) (*domain.FHIRPatient, error) {
-	var fhirPatient domain.FHIRPatient
+func (s *patientService) ConvertToFHIR(patient *domain.Patient) (*fhir.Patient, error) {
+	var fhirPatient fhir.Patient
 	if err := json.Unmarshal([]byte(patient.FHIRData), &fhirPatient); err != nil {
 		return nil, fmt.Errorf("failed to unmarshal FHIR data: %w", err)
 	}
@@ -129,18 +132,23 @@ func (s *patientService) ConvertToFHIR(patient *domain.Patient) (*domain.FHIRPat
 }
 
 // ConvertFromFHIR converts a FHIR patient to domain format
-func (s *patientService) ConvertFromFHIR(fhirPatient *domain.FHIRPatient) (*domain.Patient, error) {
-	// Ensure resource type is set
-	fhirPatient.ResourceType = "Patient"
-
+func (s *patientService) ConvertFromFHIR(fhirPatient *fhir.Patient) (*domain.Patient, error) {
 	// Marshal FHIR patient to JSON
 	fhirJSON, err := json.Marshal(fhirPatient)
 	if err != nil {
 		return nil, fmt.Errorf("failed to marshal FHIR patient: %w", err)
 	}
 
+	// Remove any invalid UTF-8 byte 0x00 from the JSON
+	cleaned := make([]byte, 0, len(fhirJSON))
+	for _, b := range fhirJSON {
+		if b != 0x00 {
+			cleaned = append(cleaned, b)
+		}
+	}
+
 	patient := &domain.Patient{
-		FHIRData: string(fhirJSON),
+		FHIRData: cleaned,
 	}
 
 	// Extract searchable fields
@@ -151,18 +159,22 @@ func (s *patientService) ConvertFromFHIR(fhirPatient *domain.FHIRPatient) (*doma
 	// Extract name information
 	if len(fhirPatient.Name) > 0 {
 		name := fhirPatient.Name[0]
-		patient.Family = name.Family
+		if name.Family != nil {
+			patient.Family = *name.Family
+		}
 		if len(name.Given) > 0 {
 			patient.Given = name.Given[0]
 		}
 	}
 
 	// Extract gender
-	patient.Gender = fhirPatient.Gender
+	if fhirPatient.Gender != nil {
+		patient.Gender = fhirPatient.Gender.String()
+	}
 
 	// Extract birth date
-	if fhirPatient.BirthDate != "" {
-		if birthDate, err := time.Parse("2006-01-02", fhirPatient.BirthDate); err == nil {
+	if fhirPatient.BirthDate != nil {
+		if birthDate, err := time.Parse("2006-01-02", *fhirPatient.BirthDate); err == nil {
 			patient.BirthDate = &birthDate
 		}
 	}
@@ -171,7 +183,7 @@ func (s *patientService) ConvertFromFHIR(fhirPatient *domain.FHIRPatient) (*doma
 }
 
 // applyUpdatesToFHIR applies partial updates to a FHIR patient
-func (s *patientService) applyUpdatesToFHIR(fhirPatient *domain.FHIRPatient, updates map[string]interface{}) error {
+func (s *patientService) applyUpdatesToFHIR(fhirPatient *fhir.Patient, updates map[string]interface{}) error {
 	for key, value := range updates {
 		switch key {
 		case "active":
@@ -181,52 +193,37 @@ func (s *patientService) applyUpdatesToFHIR(fhirPatient *domain.FHIRPatient, upd
 		case "family":
 			if family, ok := value.(string); ok {
 				if len(fhirPatient.Name) == 0 {
-					fhirPatient.Name = []domain.FHIRHumanName{{}}
+					fhirPatient.Name = []fhir.HumanName{{}}
 				}
-				fhirPatient.Name[0].Family = family
+				fhirPatient.Name[0].Family = &family
 			}
 		case "given":
 			if given, ok := value.(string); ok {
 				if len(fhirPatient.Name) == 0 {
-					fhirPatient.Name = []domain.FHIRHumanName{{}}
+					fhirPatient.Name = []fhir.HumanName{{}}
 				}
-				fhirPatient.Name[0].Given = []string{given}
+				if fhirPatient.Name[0].Given == nil {
+					fhirPatient.Name[0].Given = []string{given}
+				} else {
+					fhirPatient.Name[0].Given = []string{given}
+				}
 			}
 		case "gender":
 			if gender, ok := value.(string); ok {
 				// Validate gender values according to FHIR spec
 				if gender == "male" || gender == "female" || gender == "other" || gender == "unknown" {
-					fhirPatient.Gender = gender
+					gender := fhir.AdministrativeGender(*utils.GenderPtr(gender))
+					fhirPatient.Gender = &gender
 				}
 			}
 		case "birthDate":
 			if birthDate, ok := value.(string); ok {
 				// Validate date format
 				if _, err := time.Parse("2006-01-02", birthDate); err == nil {
-					fhirPatient.BirthDate = birthDate
+					fhirPatient.BirthDate = &birthDate
 				}
 			}
 		}
-	}
-
-	// Convert back to domain model
-	updatedPatient, err := s.ConvertFromFHIR(fhirPatient)
-	if err != nil {
-		return err
-	}
-
-	//Preserve ID and timestamps
-	// Convert the ID to uint
-	idUint, err := strconv.ParseInt(fhirPatient.ID, 10, 64)
-	if err != nil {
-		return err
-	}
-	updatedPatient.ID = uint(idUint)
-
-	// updatedPatient.CreatedAt = fhirPatient.
-
-	if err := s.repo.Update(updatedPatient); err != nil {
-		return err
 	}
 
 	return nil
