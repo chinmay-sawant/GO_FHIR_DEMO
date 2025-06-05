@@ -16,6 +16,7 @@ import (
 	"go-fhir-demo/internal/repository"
 	"go-fhir-demo/internal/service"
 	"go-fhir-demo/pkg/database"
+	"go-fhir-demo/pkg/fhirclient" // Import the new fhirclient package
 	"go-fhir-demo/pkg/logger"
 	"go-fhir-demo/pkg/utils"
 
@@ -70,6 +71,12 @@ func main() {
 
 	// Initialize services
 	patientService := service.NewPatientService(patientRepo)
+
+	// Initialize FHIR client
+	fhirClient := fhirclient.NewClient(cfg.Server.ExternalFHIRServerBaseURL)
+
+	// Initialize external patient service
+	externalPatientService := service.NewExternalPatientService(fhirClient)
 
 	// --- Seed dummy patients if not present ---
 	dummyPatients := []fhir.Patient{
@@ -189,12 +196,13 @@ func main() {
 
 	// Initialize handlers
 	patientHandler := handlers.NewPatientHandler(patientService)
+	externalPatientHandler := handlers.NewExternalPatientHandler(externalPatientService) // Initialize new handler
 
 	// Set Gin mode
 	gin.SetMode(cfg.Server.Mode)
 
 	// Setup routes
-	router := routes.SetupRoutes(patientHandler)
+	router := routes.SetupRoutes(patientHandler, externalPatientHandler) // Pass new handler to SetupRoutes
 
 	// Swagger endpoint
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))

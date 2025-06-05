@@ -8,7 +8,7 @@ import (
 )
 
 // SetupRoutes configures all the routes for the application
-func SetupRoutes(patientHandler *handlers.PatientHandler) *gin.Engine {
+func SetupRoutes(patientHandler *handlers.PatientHandler, externalPatientHandler *handlers.ExternalPatientHandler) *gin.Engine {
 	router := gin.New()
 
 	// Global middleware
@@ -39,6 +39,13 @@ func SetupRoutes(patientHandler *handlers.PatientHandler) *gin.Engine {
 			patients.PUT("/:id", patientHandler.UpdatePatient)
 			patients.PATCH("/:id", patientHandler.PatchPatient)
 			patients.DELETE("/:id", patientHandler.DeletePatient)
+		}
+
+		// External Patient routes
+		externalPatients := v1.Group("/external-patients")
+		{
+			externalPatients.GET("/:id", externalPatientHandler.GetExternalPatientByID)
+			externalPatients.GET("", externalPatientHandler.SearchExternalPatients)
 		}
 	}
 

@@ -3,7 +3,8 @@
     "port": "8080",
     "mode": "debug",
     "read_timeout": "10s",
-    "write_timeout": "10s"
+    "write_timeout": "10s",
+    "externalFHIRServerBaseURL": "http://hapi.fhir.org/baseR4"
   },
   "database": {
     "max_idle_conns": 10,
