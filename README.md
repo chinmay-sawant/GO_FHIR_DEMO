@@ -1,108 +1,520 @@
 # Go FHIR Demo Application
 
-A Go Gin framework application with FHIR (Fast Healthcare Interoperability Resources) support using PostgreSQL database.
+A comprehensive Go Gin framework application with FHIR (Fast Healthcare Interoperability Resources) R4 support, featuring a PostgreSQL database, automatic API documentation with Swagger, and production-ready architecture.
 
-## Features
+## 🚀 Features
 
-- RESTful API for Patient resources (GET, POST, PUT, DELETE, PATCH)
-- FHIR R4 compliance using official FHIR Go library
-- PostgreSQL database with GORM
-- Database migrations using [golang-migrate](https://github.com/golang-migrate/migrate) (see below for Windows install instructions)
-- Structured logging with Logrus
-- Configuration management with Viper
-- Request/Response time tracking middleware
-- Clean architecture with interfaces
+### Core Features
+- **RESTful API** for Patient resources (GET, POST, PUT, DELETE, PATCH)
+- **FHIR R4 Compliance** with custom FHIR data structures using standard JSON
+- **PostgreSQL Database** with GORM ORM for robust data persistence
+- **Database Migrations** using [golang-migrate](https://github.com/golang-migrate/migrate)
+- **Swagger/OpenAPI Documentation** with interactive UI
+- **Automatic Data Seeding** with sample FHIR patient records
+- **Structured Logging** with Logrus
+- **Configuration Management** with Viper and environment variables
+- **Request/Response Middleware** for performance monitoring
+- **Clean Architecture** with proper separation of concerns
 
-## Project Structure
+### Technical Features
+- Docker support with docker-compose
+- Makefile for common development tasks
+- Environment-based configuration with `.env` file support
+- JSONB storage for efficient FHIR data querying
+- Comprehensive error handling and validation
+- Production-ready logging and monitoring
+
+## 🏗️ Architecture & Project Structure
 
 ```
-├── config/           # Configuration files
-├── internal/
-│   ├── api/         # HTTP handlers and routes
-│   ├── domain/      # Domain models and interfaces
-│   ├── repository/  # Data access layer
-│   ├── service/     # Business logic layer
-│   └── middleware/  # Custom middleware
-├── pkg/             # Shared packages
-├── migrations/      # Database migration files
-├── logs/           # Log files
-└── main.go         # Application entry point
+├── config/                    # Configuration management
+│   ├── config.go             # Configuration loader with Viper
+│   └── config.json           # Default configuration
+├── docs/                     # Auto-generated Swagger documentation
+│   ├── docs.go
+│   ├── swagger.json
+│   └── swagger.yaml
+├── examples/                 # Sample FHIR data
+│   └── sample_patient.json   # Example patient resource
+├── internal/                 # Private application code
+│   ├── api/
+│   │   ├── handlers/         # HTTP request handlers
+│   │   │   └── patient_handler.go
+│   │   └── routes/           # Route definitions
+│   │       └── routes.go
+│   ├── domain/               # Domain models and business entities
+│   │   └── patient.go        # FHIR Patient domain model
+│   ├── middleware/           # HTTP middleware
+│   │   └── middleware.go     # Logging and timing middleware
+│   ├── repository/           # Data access layer
+│   │   └── patient_repository.go
+│   └── service/              # Business logic layer
+│       └── patient_service.go
+├── logs/                     # Application logs
+├── migrations/               # Database schema migrations
+│   ├── 000001_create_patients_table.up.sql
+│   └── 000001_create_patients_table.down.sql
+├── pkg/                      # Shared/reusable packages
+│   ├── database/             # Database connection utilities
+│   ├── logger/               # Logging utilities
+│   └── utils/                # Common utility functions
+├── docker-compose.yml        # Docker services definition
+├── Dockerfile               # Container build instructions
+├── Makefile                 # Development automation
+└── main.go                  # Application entry point
 ```
 
-## Setup
+## 🛠️ Technologies Used
 
-## Swagger/OpenAPI Documentation
+### Backend Framework & Language
+- **Go 1.23** - Programming language
+- **Gin Web Framework** - HTTP web framework
+- **GORM** - Object-relational mapping library
 
-After running the application, you can access the interactive Swagger UI at:
+### Database & Storage
+- **PostgreSQL** - Primary database with JSONB support
+- **golang-migrate** - Database migration tool
 
-    http://localhost:8080/swagger/index.html
+### Documentation & API
+- **Swagger/OpenAPI 3.0** - API documentation
+- **gin-swagger** - Swagger middleware integration
+- **swaggo/swag** - Swagger documentation generator
 
-This provides a browsable interface for all API endpoints and models.
+### Configuration & Environment
+- **Viper** - Configuration management
+- **godotenv** - Environment variable loading
+- **Logrus** - Structured logging
 
+### Development & Deployment
+- **Docker & Docker Compose** - Containerization
+- **Makefile** - Build automation
+- **Air** (optional) - Live reloading for development
 
-1. Install dependencies:
-```bash
+## 📋 Prerequisites
+
+Before you begin, ensure you have the following installed on your Windows system:
+
+- **Go 1.21+** - [Download from golang.org](https://golang.org/downloads/)
+- **PostgreSQL 12+** - [Download from postgresql.org](https://www.postgresql.org/downloads/)
+- **Git** - [Download from git-scm.com](https://git-scm.com/)
+- **Make** (optional) - [Install via Chocolatey](https://chocolatey.org/) or use the provided batch scripts
+
+## 🚀 Quick Start
+
+### 1. Clone the Repository
+```cmd
+git clone <repository-url>
+cd Go_FHIR_Demo
+```
+
+### 2. Environment Setup
+
+Copy the example environment file and configure your settings:
+```cmd
+copy .env.example .env
+```
+
+Edit the `.env` file with your database credentials:
+```env
+# Database Configuration
+DB_HOST=localhost
+DB_PORT=5432
+DB_USER=fhir_user
+DB_PASSWORD=fhir_password
+DB_NAME=fhir_demo
+DB_SSLMODE=disable
+
+# Server Configuration
+SERVER_PORT=8080
+GIN_MODE=debug
+
+# Logging Configuration
+LOG_LEVEL=info
+```
+
+### 3. Database Setup
+
+#### Option A: Using Docker (Recommended)
+```cmd
+docker-compose up -d postgres
+```
+
+#### Option B: Manual PostgreSQL Setup
+1. Create a PostgreSQL database named `fhir_demo`
+2. Create a user with appropriate permissions
+```sql
+CREATE DATABASE fhir_demo;
+CREATE USER fhir_user WITH PASSWORD 'fhir_password';
+GRANT ALL PRIVILEGES ON DATABASE fhir_demo TO fhir_user;
+```
+
+### 4. Install Dependencies
+```cmd
 go mod tidy
 ```
 
-2. Set environment variables:
-```bash
-export DB_HOST=localhost
-export DB_PORT=5432
-export DB_USER=your_username
-export DB_PASSWORD=your_password
-export DB_NAME=fhir_demo
-export GIN_MODE=debug
-export LOG_LEVEL=info
+### 5. Install Migration Tool
+
+**Option A: Using Go Install (Recommended)**
+```cmd
+go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@latest
 ```
 
-
-3. Install golang-migrate (migration tool):
-
-**On Windows:**
+**Option B: Download Binary (Windows)**
 1. Download the latest Windows release from: https://github.com/golang-migrate/migrate/releases
-2. Extract `migrate.exe` and place it in a folder (e.g., `C:\tools\migrate.exe`).
-3. Add that folder to your system PATH (so you can run `migrate` from any terminal).
-4. Open a new terminal and run:
-   ```cmd
-   migrate --version
-   ```
-   You should see the version output.
+2. Extract `migrate.exe` and place it in a folder (e.g., `C:\tools\migrate.exe`)
+3. Add that folder to your system PATH
+4. Verify installation:
+```cmd
+migrate --version
+```
 
-4. Run database migrations:
+### 6. Run Database Migrations
 ```cmd
 migrate -path migrations -database "postgres://fhir_user:fhir_password@localhost:5432/fhir_demo?sslmode=disable" up
-migrate -path migrations -database "postgres://username:password@localhost:5432/fhir_demo?sslmode=disable" up
 ```
 
-4. Run the application:
-```bash
+### 7. Run the Application
+```cmd
 go run main.go
 ```
 
-5. (Optional) Regenerate Swagger docs after editing annotations:
-```bash
+The application will start on `http://localhost:8080` and automatically seed sample patient data.
+
+## 📖 API Documentation
+
+### Swagger UI
+After running the application, access the interactive Swagger UI at:
+```
+http://localhost:8080/swagger/index.html
+```
+
+This provides a complete browsable interface for all API endpoints, request/response schemas, and allows you to test the API directly from the browser.
+
+### Regenerating Documentation
+After making changes to API annotations, regenerate the Swagger docs:
+```cmd
 swag init
 ```
 
-## API Endpoints
+## 🔗 API Endpoints
 
-- `GET /api/v1/patients` - Get all patients
-- `GET /api/v1/patients/:id` - Get patient by ID
-- `POST /api/v1/patients` - Create new patient
-- `PUT /api/v1/patients/:id` - Update patient
-- `PATCH /api/v1/patients/:id` - Partially update patient
-- `DELETE /api/v1/patients/:id` - Delete patient
+### Patient Resource Endpoints
 
-## Environment Variables
+| Method | Endpoint | Description | Request Body |
+|--------|----------|-------------|--------------|
+| `GET` | `/api/v1/patients` | Get all patients with pagination | - |
+| `GET` | `/api/v1/patients/{id}` | Get patient by ID | - |
+| `POST` | `/api/v1/patients` | Create new patient | FHIR Patient JSON |
+| `PUT` | `/api/v1/patients/{id}` | Update entire patient resource | FHIR Patient JSON |
+| `PATCH` | `/api/v1/patients/{id}` | Partially update patient | Partial FHIR Patient JSON |
+| `DELETE` | `/api/v1/patients/{id}` | Delete patient (soft delete) | - |
 
-| Variable | Description | Default |
-|----------|-------------|---------|
-| DB_HOST | Database host | localhost |
-| DB_PORT | Database port | 5432 |
-| DB_USER | Database user | - |
-| DB_PASSWORD | Database password | - |
-| DB_NAME | Database name | - |
-| GIN_MODE | Gin mode (debug/release) | debug |
-| LOG_LEVEL | Log level | info |
-| SERVER_PORT | Server port | 8080 |
+### Health Check Endpoints
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/health` | Application health status |
+| `GET` | `/swagger/index.html` | Interactive API documentation |
+
+### Example Usage
+
+#### Create a New Patient
+```bash
+curl -X POST http://localhost:8080/api/v1/patients \
+  -H "Content-Type: application/json" \
+  -d @examples/sample_patient.json
+```
+
+#### Get All Patients
+```bash
+curl -X GET http://localhost:8080/api/v1/patients
+```
+
+#### Get Patient by ID
+```bash
+curl -X GET http://localhost:8080/api/v1/patients/1
+```
+
+## ⚙️ Configuration
+
+### Environment Variables
+
+| Variable | Description | Default | Required |
+|----------|-------------|---------|----------|
+| `DB_HOST` | Database host address | `localhost` | Yes |
+| `DB_PORT` | Database port | `5432` | Yes |
+| `DB_USER` | Database username | - | Yes |
+| `DB_PASSWORD` | Database password | - | Yes |
+| `DB_NAME` | Database name | - | Yes |
+| `DB_SSLMODE` | SSL mode for database connection | `disable` | No |
+| `SERVER_PORT` | HTTP server port | `8080` | No |
+| `GIN_MODE` | Gin framework mode (`debug`/`release`) | `debug` | No |
+| `LOG_LEVEL` | Logging level (`trace`/`debug`/`info`/`warn`/`error`) | `info` | No |
+
+### Configuration File
+The application also supports JSON configuration via `config/config.json` for default values. Environment variables take precedence over configuration file settings.
+
+## 🗄️ Database Schema
+
+### Patients Table
+```sql
+CREATE TABLE patients (
+    id SERIAL PRIMARY KEY,
+    fhir_data JSONB NOT NULL,           -- Complete FHIR Patient resource
+    active BOOLEAN,                      -- Patient active status
+    family VARCHAR(255),                 -- Family name (for indexing)
+    given VARCHAR(255),                  -- Given name (for indexing)
+    gender VARCHAR(20),                  -- Patient gender
+    birth_date DATE,                     -- Date of birth
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    deleted_at TIMESTAMP WITH TIME ZONE -- Soft delete support
+);
+```
+
+### Indexes
+- Performance indexes on `active`, `family`, `given`, `gender`, `birth_date`
+- GIN index on `fhir_data` JSONB column for efficient JSON querying
+- Soft delete index on `deleted_at`
+
+## 🧪 Database Migrations
+
+### Available Migration Commands
+
+```cmd
+# Run all pending migrations
+migrate -path migrations -database "postgres://user:pass@localhost:5432/dbname?sslmode=disable" up
+
+# Rollback the last migration
+migrate -path migrations -database "postgres://user:pass@localhost:5432/dbname?sslmode=disable" down 1
+
+# Check migration status
+migrate -path migrations -database "postgres://user:pass@localhost:5432/dbname?sslmode=disable" version
+
+# Create a new migration
+migrate create -ext sql -dir migrations -seq add_new_table
+```
+
+### Migration Files
+- `000001_create_patients_table.up.sql` - Creates the patients table with indexes
+- `000001_create_patients_table.down.sql` - Drops the patients table
+
+## 🔨 Makefile Usage
+
+The project includes a comprehensive Makefile for common development tasks:
+
+### Build Commands
+```cmd
+# Build the application
+make build
+
+# Build for Windows specifically
+make build-windows
+
+# Clean build artifacts
+make clean
+```
+
+### Development Commands
+```cmd
+# Download dependencies
+make deps
+
+# Run the application
+make run
+
+# Run tests
+make test
+
+# Setup development environment (copies .env.example to .env)
+make setup
+```
+
+### Database Commands
+```cmd
+# Run database migrations up
+make migrate-up
+
+# Run database migrations down
+make migrate-down
+
+# Create a new migration file
+make migrate-create name=your_migration_name
+
+# Install migration tools
+make install-migrate
+```
+
+### Help
+```cmd
+# Display all available commands
+make help
+```
+
+**Note:** If you don't have `make` installed on Windows, you can install it via:
+- **Chocolatey:** `choco install make`
+- **Manual:** Download from [GnuWin32](http://gnuwin32.sourceforge.net/packages/make.htm)
+
+## 🐳 Docker Deployment
+
+### Using Docker Compose (Recommended)
+```cmd
+# Start all services (PostgreSQL + Application)
+docker-compose up -d
+
+# View logs
+docker-compose logs -f
+
+# Stop all services
+docker-compose down
+```
+
+### Manual Docker Build
+```cmd
+# Build the Docker image
+docker build -t go-fhir-demo .
+
+# Run the container
+docker run -p 8080:8080 --env-file .env go-fhir-demo
+```
+
+### Docker Environment
+The `docker-compose.yml` includes:
+- PostgreSQL database with persistent volume
+- Application service with environment variables
+- Network configuration for service communication
+
+## 🛠️ Development Guide
+
+### Project Development Setup
+1. **Fork and clone** the repository
+2. **Install dependencies** with `go mod tidy`
+3. **Setup environment** with `make setup`
+4. **Configure database** connection in `.env`
+5. **Run migrations** with `make migrate-up`
+6. **Start development** with `make run`
+
+### Code Structure Guidelines
+- **Handlers** - HTTP request/response logic only
+- **Services** - Business logic and orchestration
+- **Repositories** - Data access layer
+- **Domain** - Business entities and interfaces
+- **Config** - Configuration management
+- **Middleware** - Cross-cutting concerns
+
+### Adding New Features
+1. **Domain Model** - Define entities in `internal/domain/`
+2. **Repository** - Add data access in `internal/repository/`
+3. **Service** - Implement business logic in `internal/service/`
+4. **Handler** - Add HTTP endpoints in `internal/api/handlers/`
+5. **Routes** - Register routes in `internal/api/routes/`
+6. **Migration** - Create database changes in `migrations/`
+7. **Documentation** - Add Swagger annotations
+
+### Testing
+```cmd
+# Run all tests
+go test ./...
+
+# Run tests with verbose output
+go test -v ./...
+
+# Run tests with coverage
+go test -cover ./...
+```
+
+## 🔧 Troubleshooting
+
+### Common Issues
+
+#### Database Connection Issues
+```
+Error: failed to connect to database
+```
+**Solution:**
+1. Verify PostgreSQL is running
+2. Check database credentials in `.env`
+3. Ensure database `fhir_demo` exists
+4. Verify user permissions
+
+#### Migration Errors
+```
+Error: migration failed
+```
+**Solution:**
+1. Check database connection
+2. Verify migration files exist in `migrations/`
+3. Ensure migration tool is installed
+4. Check migration version with `migrate version`
+
+#### Port Already in Use
+```
+Error: bind: address already in use
+```
+**Solution:**
+1. Change `SERVER_PORT` in `.env`
+2. Kill existing process: `netstat -ano | findstr :8080`
+3. Use `taskkill /PID <process_id> /F`
+
+#### Swagger Documentation Not Loading
+**Solution:**
+1. Regenerate docs: `swag init`
+2. Verify swagger imports in `main.go`
+3. Check swagger annotations in handlers
+
+### Debug Mode
+Enable debug logging by setting:
+```env
+LOG_LEVEL=debug
+GIN_MODE=debug
+```
+
+## 📚 Additional Resources
+
+### FHIR Resources
+- [FHIR R4 Specification](https://hl7.org/fhir/R4/)
+- [FHIR Patient Resource](https://hl7.org/fhir/R4/patient.html)
+- [FHIR RESTful API](https://hl7.org/fhir/R4/http.html)
+
+### Go Resources
+- [Gin Web Framework](https://gin-gonic.com/)
+- [GORM Documentation](https://gorm.io/)
+- [Swagger Go Documentation](https://github.com/swaggo/swag)
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+### Code Standards
+- Follow Go best practices and idioms
+- Add comprehensive tests for new features
+- Update documentation for API changes
+- Add Swagger annotations for new endpoints
+- Follow the existing code structure
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🙏 Acknowledgments
+
+- [HL7 FHIR](https://hl7.org/fhir/) for healthcare interoperability standards
+- [Gin Web Framework](https://gin-gonic.com/) for HTTP routing
+- [GORM](https://gorm.io/) for database ORM
+- [Swagger](https://swagger.io/) for API documentation
+
+---
+
+## 📞 Support
+
+For questions, issues, or contributions:
+- **Issues:** [GitHub Issues](https://github.com/your-repo/go-fhir-demo/issues)
+- **Discussions:** [GitHub Discussions](https://github.com/your-repo/go-fhir-demo/discussions)
+- **Documentation:** [Wiki](https://github.com/your-repo/go-fhir-demo/wiki)
+
+**Built with ❤️ for Healthcare Interoperability**
