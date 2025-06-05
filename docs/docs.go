@@ -15,27 +15,131 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/external-patients": {
+            "get": {
+                "description": "Searches for patient resources on an external FHIR server based on query parameters",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "ExternalPatients"
+                ],
+                "summary": "Search for external patients",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "FHIR search parameters (e.g., name=John,birthdate=1990-01-01)",
+                        "name": "_query",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successfully retrieved search results",
+                        "schema": {
+                            "$ref": "#/definitions/fhir.Bundle"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/external-patients/{id}": {
+            "get": {
+                "description": "Retrieves a patient resource from an external FHIR server by its ID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "ExternalPatients"
+                ],
+                "summary": "Get an external patient by ID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Patient ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successfully retrieved patient",
+                        "schema": {
+                            "$ref": "#/definitions/fhir.Patient"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Patient not found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/patients": {
             "get": {
-                "description": "Get a list of FHIR Patient resources",
+                "description": "Get all FHIR Patient resources with pagination",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "Patient"
                 ],
-                "summary": "List Patients",
+                "summary": "Get all Patients",
                 "parameters": [
                     {
                         "type": "integer",
-                        "description": "Number of patients to return",
-                        "name": "_count",
+                        "default": 10,
+                        "description": "Limit",
+                        "name": "limit",
                         "in": "query"
                     },
                     {
                         "type": "integer",
-                        "description": "Offset for pagination",
-                        "name": "_offset",
+                        "default": 0,
+                        "description": "Offset",
+                        "name": "offset",
                         "in": "query"
                     }
                 ],
@@ -75,7 +179,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/domain.FHIRPatient"
+                            "$ref": "#/definitions/fhir.Patient"
                         }
                     }
                 ],
@@ -83,7 +187,7 @@ const docTemplate = `{
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/domain.FHIRPatient"
+                            "$ref": "#/definitions/fhir.Patient"
                         }
                     },
                     "400": {
@@ -126,7 +230,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/domain.FHIRPatient"
+                            "$ref": "#/definitions/fhir.Patient"
                         }
                     },
                     "400": {
@@ -153,7 +257,7 @@ const docTemplate = `{
                 }
             },
             "put": {
-                "description": "Update a FHIR Patient resource by its ID",
+                "description": "Update an existing FHIR Patient resource",
                 "consumes": [
                     "application/json"
                 ],
@@ -178,7 +282,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/domain.FHIRPatient"
+                            "$ref": "#/definitions/fhir.Patient"
                         }
                     }
                 ],
@@ -186,7 +290,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/domain.FHIRPatient"
+                            "$ref": "#/definitions/fhir.Patient"
                         }
                     },
                     "400": {
@@ -213,7 +317,10 @@ const docTemplate = `{
                 }
             },
             "delete": {
-                "description": "Delete a FHIR Patient resource by its ID",
+                "description": "Delete an existing FHIR Patient resource",
+                "produces": [
+                    "application/json"
+                ],
                 "tags": [
                     "Patient"
                 ],
@@ -238,13 +345,6 @@ const docTemplate = `{
                             "additionalProperties": true
                         }
                     },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
@@ -255,7 +355,7 @@ const docTemplate = `{
                 }
             },
             "patch": {
-                "description": "Partially update a FHIR Patient resource by its ID",
+                "description": "Partially update an existing FHIR Patient resource",
                 "consumes": [
                     "application/json"
                 ],
@@ -275,12 +375,13 @@ const docTemplate = `{
                         "required": true
                     },
                     {
-                        "description": "Partial update fields",
-                        "name": "patch",
+                        "description": "Partial updates",
+                        "name": "patches",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "type": "object"
+                            "type": "object",
+                            "additionalProperties": true
                         }
                     }
                 ],
@@ -288,7 +389,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/domain.FHIRPatient"
+                            "$ref": "#/definitions/fhir.Patient"
                         }
                     },
                     "400": {
@@ -317,7 +418,7 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "domain.FHIRAddress": {
+        "fhir.Address": {
             "type": "object",
             "properties": {
                 "city": {
@@ -326,11 +427,26 @@ const docTemplate = `{
                 "country": {
                     "type": "string"
                 },
+                "district": {
+                    "type": "string"
+                },
+                "extension": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/fhir.Extension"
+                    }
+                },
+                "id": {
+                    "type": "string"
+                },
                 "line": {
                     "type": "array",
                     "items": {
                         "type": "string"
                     }
+                },
+                "period": {
+                    "$ref": "#/definitions/fhir.Period"
                 },
                 "postalCode": {
                     "type": "string"
@@ -338,18 +454,84 @@ const docTemplate = `{
                 "state": {
                     "type": "string"
                 },
-                "use": {
+                "text": {
                     "type": "string"
+                },
+                "type": {
+                    "$ref": "#/definitions/fhir.AddressType"
+                },
+                "use": {
+                    "$ref": "#/definitions/fhir.AddressUse"
                 }
             }
         },
-        "domain.FHIRContactPoint": {
+        "fhir.AddressType": {
+            "type": "integer",
+            "enum": [
+                0,
+                1,
+                2
+            ],
+            "x-enum-varnames": [
+                "AddressTypePostal",
+                "AddressTypePhysical",
+                "AddressTypeBoth"
+            ]
+        },
+        "fhir.AddressUse": {
+            "type": "integer",
+            "enum": [
+                0,
+                1,
+                2,
+                3,
+                4
+            ],
+            "x-enum-varnames": [
+                "AddressUseHome",
+                "AddressUseWork",
+                "AddressUseTemp",
+                "AddressUseOld",
+                "AddressUseBilling"
+            ]
+        },
+        "fhir.AdministrativeGender": {
+            "type": "integer",
+            "enum": [
+                0,
+                1,
+                2,
+                3
+            ],
+            "x-enum-varnames": [
+                "AdministrativeGenderMale",
+                "AdministrativeGenderFemale",
+                "AdministrativeGenderOther",
+                "AdministrativeGenderUnknown"
+            ]
+        },
+        "fhir.Age": {
             "type": "object",
             "properties": {
+                "code": {
+                    "type": "string"
+                },
+                "comparator": {
+                    "$ref": "#/definitions/fhir.QuantityComparator"
+                },
+                "extension": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/fhir.Extension"
+                    }
+                },
+                "id": {
+                    "type": "string"
+                },
                 "system": {
                     "type": "string"
                 },
-                "use": {
+                "unit": {
                     "type": "string"
                 },
                 "value": {
@@ -357,9 +539,1060 @@ const docTemplate = `{
                 }
             }
         },
-        "domain.FHIRHumanName": {
+        "fhir.Annotation": {
             "type": "object",
             "properties": {
+                "authorReference": {
+                    "$ref": "#/definitions/fhir.Reference"
+                },
+                "authorString": {
+                    "type": "string"
+                },
+                "extension": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/fhir.Extension"
+                    }
+                },
+                "id": {
+                    "type": "string"
+                },
+                "text": {
+                    "type": "string"
+                },
+                "time": {
+                    "type": "string"
+                }
+            }
+        },
+        "fhir.Attachment": {
+            "type": "object",
+            "properties": {
+                "contentType": {
+                    "type": "string"
+                },
+                "creation": {
+                    "type": "string"
+                },
+                "data": {
+                    "type": "string"
+                },
+                "extension": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/fhir.Extension"
+                    }
+                },
+                "hash": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "language": {
+                    "type": "string"
+                },
+                "size": {
+                    "type": "integer"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "url": {
+                    "type": "string"
+                }
+            }
+        },
+        "fhir.Bundle": {
+            "type": "object",
+            "properties": {
+                "entry": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/fhir.BundleEntry"
+                    }
+                },
+                "id": {
+                    "type": "string"
+                },
+                "identifier": {
+                    "$ref": "#/definitions/fhir.Identifier"
+                },
+                "implicitRules": {
+                    "type": "string"
+                },
+                "language": {
+                    "type": "string"
+                },
+                "link": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/fhir.BundleLink"
+                    }
+                },
+                "meta": {
+                    "$ref": "#/definitions/fhir.Meta"
+                },
+                "signature": {
+                    "$ref": "#/definitions/fhir.Signature"
+                },
+                "timestamp": {
+                    "type": "string"
+                },
+                "total": {
+                    "type": "integer"
+                },
+                "type": {
+                    "$ref": "#/definitions/fhir.BundleType"
+                }
+            }
+        },
+        "fhir.BundleEntry": {
+            "type": "object",
+            "properties": {
+                "extension": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/fhir.Extension"
+                    }
+                },
+                "fullUrl": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "link": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/fhir.BundleLink"
+                    }
+                },
+                "modifierExtension": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/fhir.Extension"
+                    }
+                },
+                "request": {
+                    "$ref": "#/definitions/fhir.BundleEntryRequest"
+                },
+                "resource": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "response": {
+                    "$ref": "#/definitions/fhir.BundleEntryResponse"
+                },
+                "search": {
+                    "$ref": "#/definitions/fhir.BundleEntrySearch"
+                }
+            }
+        },
+        "fhir.BundleEntryRequest": {
+            "type": "object",
+            "properties": {
+                "extension": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/fhir.Extension"
+                    }
+                },
+                "id": {
+                    "type": "string"
+                },
+                "ifMatch": {
+                    "type": "string"
+                },
+                "ifModifiedSince": {
+                    "type": "string"
+                },
+                "ifNoneExist": {
+                    "type": "string"
+                },
+                "ifNoneMatch": {
+                    "type": "string"
+                },
+                "method": {
+                    "$ref": "#/definitions/fhir.HTTPVerb"
+                },
+                "modifierExtension": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/fhir.Extension"
+                    }
+                },
+                "url": {
+                    "type": "string"
+                }
+            }
+        },
+        "fhir.BundleEntryResponse": {
+            "type": "object",
+            "properties": {
+                "etag": {
+                    "type": "string"
+                },
+                "extension": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/fhir.Extension"
+                    }
+                },
+                "id": {
+                    "type": "string"
+                },
+                "lastModified": {
+                    "type": "string"
+                },
+                "location": {
+                    "type": "string"
+                },
+                "modifierExtension": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/fhir.Extension"
+                    }
+                },
+                "outcome": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "status": {
+                    "type": "string"
+                }
+            }
+        },
+        "fhir.BundleEntrySearch": {
+            "type": "object",
+            "properties": {
+                "extension": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/fhir.Extension"
+                    }
+                },
+                "id": {
+                    "type": "string"
+                },
+                "mode": {
+                    "$ref": "#/definitions/fhir.SearchEntryMode"
+                },
+                "modifierExtension": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/fhir.Extension"
+                    }
+                },
+                "score": {
+                    "type": "string"
+                }
+            }
+        },
+        "fhir.BundleLink": {
+            "type": "object",
+            "properties": {
+                "extension": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/fhir.Extension"
+                    }
+                },
+                "id": {
+                    "type": "string"
+                },
+                "modifierExtension": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/fhir.Extension"
+                    }
+                },
+                "relation": {
+                    "type": "string"
+                },
+                "url": {
+                    "type": "string"
+                }
+            }
+        },
+        "fhir.BundleType": {
+            "type": "integer",
+            "enum": [
+                0,
+                1,
+                2,
+                3,
+                4,
+                5,
+                6,
+                7,
+                8
+            ],
+            "x-enum-varnames": [
+                "BundleTypeDocument",
+                "BundleTypeMessage",
+                "BundleTypeTransaction",
+                "BundleTypeTransactionResponse",
+                "BundleTypeBatch",
+                "BundleTypeBatchResponse",
+                "BundleTypeHistory",
+                "BundleTypeSearchset",
+                "BundleTypeCollection"
+            ]
+        },
+        "fhir.CodeableConcept": {
+            "type": "object",
+            "properties": {
+                "coding": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/fhir.Coding"
+                    }
+                },
+                "extension": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/fhir.Extension"
+                    }
+                },
+                "id": {
+                    "type": "string"
+                },
+                "text": {
+                    "type": "string"
+                }
+            }
+        },
+        "fhir.Coding": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "string"
+                },
+                "display": {
+                    "type": "string"
+                },
+                "extension": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/fhir.Extension"
+                    }
+                },
+                "id": {
+                    "type": "string"
+                },
+                "system": {
+                    "type": "string"
+                },
+                "userSelected": {
+                    "type": "boolean"
+                },
+                "version": {
+                    "type": "string"
+                }
+            }
+        },
+        "fhir.ContactDetail": {
+            "type": "object",
+            "properties": {
+                "extension": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/fhir.Extension"
+                    }
+                },
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "telecom": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/fhir.ContactPoint"
+                    }
+                }
+            }
+        },
+        "fhir.ContactPoint": {
+            "type": "object",
+            "properties": {
+                "extension": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/fhir.Extension"
+                    }
+                },
+                "id": {
+                    "type": "string"
+                },
+                "period": {
+                    "$ref": "#/definitions/fhir.Period"
+                },
+                "rank": {
+                    "type": "integer"
+                },
+                "system": {
+                    "$ref": "#/definitions/fhir.ContactPointSystem"
+                },
+                "use": {
+                    "$ref": "#/definitions/fhir.ContactPointUse"
+                },
+                "value": {
+                    "type": "string"
+                }
+            }
+        },
+        "fhir.ContactPointSystem": {
+            "type": "integer",
+            "enum": [
+                0,
+                1,
+                2,
+                3,
+                4,
+                5,
+                6
+            ],
+            "x-enum-varnames": [
+                "ContactPointSystemPhone",
+                "ContactPointSystemFax",
+                "ContactPointSystemEmail",
+                "ContactPointSystemPager",
+                "ContactPointSystemUrl",
+                "ContactPointSystemSms",
+                "ContactPointSystemOther"
+            ]
+        },
+        "fhir.ContactPointUse": {
+            "type": "integer",
+            "enum": [
+                0,
+                1,
+                2,
+                3,
+                4
+            ],
+            "x-enum-varnames": [
+                "ContactPointUseHome",
+                "ContactPointUseWork",
+                "ContactPointUseTemp",
+                "ContactPointUseOld",
+                "ContactPointUseMobile"
+            ]
+        },
+        "fhir.Contributor": {
+            "type": "object",
+            "properties": {
+                "contact": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/fhir.ContactDetail"
+                    }
+                },
+                "extension": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/fhir.Extension"
+                    }
+                },
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "type": {
+                    "$ref": "#/definitions/fhir.ContributorType"
+                }
+            }
+        },
+        "fhir.ContributorType": {
+            "type": "integer",
+            "enum": [
+                0,
+                1,
+                2,
+                3
+            ],
+            "x-enum-varnames": [
+                "ContributorTypeAuthor",
+                "ContributorTypeEditor",
+                "ContributorTypeReviewer",
+                "ContributorTypeEndorser"
+            ]
+        },
+        "fhir.Count": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "string"
+                },
+                "comparator": {
+                    "$ref": "#/definitions/fhir.QuantityComparator"
+                },
+                "extension": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/fhir.Extension"
+                    }
+                },
+                "id": {
+                    "type": "string"
+                },
+                "system": {
+                    "type": "string"
+                },
+                "unit": {
+                    "type": "string"
+                },
+                "value": {
+                    "type": "string"
+                }
+            }
+        },
+        "fhir.DataRequirement": {
+            "type": "object",
+            "properties": {
+                "codeFilter": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/fhir.DataRequirementCodeFilter"
+                    }
+                },
+                "dateFilter": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/fhir.DataRequirementDateFilter"
+                    }
+                },
+                "extension": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/fhir.Extension"
+                    }
+                },
+                "id": {
+                    "type": "string"
+                },
+                "limit": {
+                    "type": "integer"
+                },
+                "mustSupport": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "profile": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "sort": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/fhir.DataRequirementSort"
+                    }
+                },
+                "subjectCodeableConcept": {
+                    "$ref": "#/definitions/fhir.CodeableConcept"
+                },
+                "subjectReference": {
+                    "$ref": "#/definitions/fhir.Reference"
+                },
+                "type": {
+                    "type": "string"
+                }
+            }
+        },
+        "fhir.DataRequirementCodeFilter": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/fhir.Coding"
+                    }
+                },
+                "extension": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/fhir.Extension"
+                    }
+                },
+                "id": {
+                    "type": "string"
+                },
+                "path": {
+                    "type": "string"
+                },
+                "searchParam": {
+                    "type": "string"
+                },
+                "valueSet": {
+                    "type": "string"
+                }
+            }
+        },
+        "fhir.DataRequirementDateFilter": {
+            "type": "object",
+            "properties": {
+                "extension": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/fhir.Extension"
+                    }
+                },
+                "id": {
+                    "type": "string"
+                },
+                "path": {
+                    "type": "string"
+                },
+                "searchParam": {
+                    "type": "string"
+                },
+                "valueDateTime": {
+                    "type": "string"
+                },
+                "valueDuration": {
+                    "$ref": "#/definitions/fhir.Duration"
+                },
+                "valuePeriod": {
+                    "$ref": "#/definitions/fhir.Period"
+                }
+            }
+        },
+        "fhir.DataRequirementSort": {
+            "type": "object",
+            "properties": {
+                "direction": {
+                    "$ref": "#/definitions/fhir.SortDirection"
+                },
+                "extension": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/fhir.Extension"
+                    }
+                },
+                "id": {
+                    "type": "string"
+                },
+                "path": {
+                    "type": "string"
+                }
+            }
+        },
+        "fhir.DaysOfWeek": {
+            "type": "integer",
+            "enum": [
+                0,
+                1,
+                2,
+                3,
+                4,
+                5,
+                6
+            ],
+            "x-enum-varnames": [
+                "DaysOfWeekMon",
+                "DaysOfWeekTue",
+                "DaysOfWeekWed",
+                "DaysOfWeekThu",
+                "DaysOfWeekFri",
+                "DaysOfWeekSat",
+                "DaysOfWeekSun"
+            ]
+        },
+        "fhir.Distance": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "string"
+                },
+                "comparator": {
+                    "$ref": "#/definitions/fhir.QuantityComparator"
+                },
+                "extension": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/fhir.Extension"
+                    }
+                },
+                "id": {
+                    "type": "string"
+                },
+                "system": {
+                    "type": "string"
+                },
+                "unit": {
+                    "type": "string"
+                },
+                "value": {
+                    "type": "string"
+                }
+            }
+        },
+        "fhir.Dosage": {
+            "type": "object",
+            "properties": {
+                "additionalInstruction": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/fhir.CodeableConcept"
+                    }
+                },
+                "asNeededBoolean": {
+                    "type": "boolean"
+                },
+                "asNeededCodeableConcept": {
+                    "$ref": "#/definitions/fhir.CodeableConcept"
+                },
+                "doseAndRate": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/fhir.DosageDoseAndRate"
+                    }
+                },
+                "extension": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/fhir.Extension"
+                    }
+                },
+                "id": {
+                    "type": "string"
+                },
+                "maxDosePerAdministration": {
+                    "$ref": "#/definitions/fhir.Quantity"
+                },
+                "maxDosePerLifetime": {
+                    "$ref": "#/definitions/fhir.Quantity"
+                },
+                "maxDosePerPeriod": {
+                    "$ref": "#/definitions/fhir.Ratio"
+                },
+                "method": {
+                    "$ref": "#/definitions/fhir.CodeableConcept"
+                },
+                "modifierExtension": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/fhir.Extension"
+                    }
+                },
+                "patientInstruction": {
+                    "type": "string"
+                },
+                "route": {
+                    "$ref": "#/definitions/fhir.CodeableConcept"
+                },
+                "sequence": {
+                    "type": "integer"
+                },
+                "site": {
+                    "$ref": "#/definitions/fhir.CodeableConcept"
+                },
+                "text": {
+                    "type": "string"
+                },
+                "timing": {
+                    "$ref": "#/definitions/fhir.Timing"
+                }
+            }
+        },
+        "fhir.DosageDoseAndRate": {
+            "type": "object",
+            "properties": {
+                "doseQuantity": {
+                    "$ref": "#/definitions/fhir.Quantity"
+                },
+                "doseRange": {
+                    "$ref": "#/definitions/fhir.Range"
+                },
+                "extension": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/fhir.Extension"
+                    }
+                },
+                "id": {
+                    "type": "string"
+                },
+                "rateQuantity": {
+                    "$ref": "#/definitions/fhir.Quantity"
+                },
+                "rateRange": {
+                    "$ref": "#/definitions/fhir.Range"
+                },
+                "rateRatio": {
+                    "$ref": "#/definitions/fhir.Ratio"
+                },
+                "type": {
+                    "$ref": "#/definitions/fhir.CodeableConcept"
+                }
+            }
+        },
+        "fhir.Duration": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "string"
+                },
+                "comparator": {
+                    "$ref": "#/definitions/fhir.QuantityComparator"
+                },
+                "extension": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/fhir.Extension"
+                    }
+                },
+                "id": {
+                    "type": "string"
+                },
+                "system": {
+                    "type": "string"
+                },
+                "unit": {
+                    "type": "string"
+                },
+                "value": {
+                    "type": "string"
+                }
+            }
+        },
+        "fhir.Expression": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "expression": {
+                    "type": "string"
+                },
+                "extension": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/fhir.Extension"
+                    }
+                },
+                "id": {
+                    "type": "string"
+                },
+                "language": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "reference": {
+                    "type": "string"
+                }
+            }
+        },
+        "fhir.Extension": {
+            "type": "object",
+            "properties": {
+                "extension": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/fhir.Extension"
+                    }
+                },
+                "id": {
+                    "type": "string"
+                },
+                "url": {
+                    "type": "string"
+                },
+                "valueAddress": {
+                    "$ref": "#/definitions/fhir.Address"
+                },
+                "valueAge": {
+                    "$ref": "#/definitions/fhir.Age"
+                },
+                "valueAnnotation": {
+                    "$ref": "#/definitions/fhir.Annotation"
+                },
+                "valueAttachment": {
+                    "$ref": "#/definitions/fhir.Attachment"
+                },
+                "valueBase64Binary": {
+                    "type": "string"
+                },
+                "valueBoolean": {
+                    "type": "boolean"
+                },
+                "valueCanonical": {
+                    "type": "string"
+                },
+                "valueCode": {
+                    "type": "string"
+                },
+                "valueCodeableConcept": {
+                    "$ref": "#/definitions/fhir.CodeableConcept"
+                },
+                "valueCoding": {
+                    "$ref": "#/definitions/fhir.Coding"
+                },
+                "valueContactDetail": {
+                    "$ref": "#/definitions/fhir.ContactDetail"
+                },
+                "valueContactPoint": {
+                    "$ref": "#/definitions/fhir.ContactPoint"
+                },
+                "valueContributor": {
+                    "$ref": "#/definitions/fhir.Contributor"
+                },
+                "valueCount": {
+                    "$ref": "#/definitions/fhir.Count"
+                },
+                "valueDataRequirement": {
+                    "$ref": "#/definitions/fhir.DataRequirement"
+                },
+                "valueDate": {
+                    "type": "string"
+                },
+                "valueDateTime": {
+                    "type": "string"
+                },
+                "valueDecimal": {
+                    "type": "string"
+                },
+                "valueDistance": {
+                    "$ref": "#/definitions/fhir.Distance"
+                },
+                "valueDosage": {
+                    "$ref": "#/definitions/fhir.Dosage"
+                },
+                "valueDuration": {
+                    "$ref": "#/definitions/fhir.Duration"
+                },
+                "valueExpression": {
+                    "$ref": "#/definitions/fhir.Expression"
+                },
+                "valueHumanName": {
+                    "$ref": "#/definitions/fhir.HumanName"
+                },
+                "valueId": {
+                    "type": "string"
+                },
+                "valueIdentifier": {
+                    "$ref": "#/definitions/fhir.Identifier"
+                },
+                "valueInstant": {
+                    "type": "string"
+                },
+                "valueInteger": {
+                    "type": "integer"
+                },
+                "valueMarkdown": {
+                    "type": "string"
+                },
+                "valueMeta": {
+                    "$ref": "#/definitions/fhir.Meta"
+                },
+                "valueMoney": {
+                    "$ref": "#/definitions/fhir.Money"
+                },
+                "valueOid": {
+                    "type": "string"
+                },
+                "valueParameterDefinition": {
+                    "$ref": "#/definitions/fhir.ParameterDefinition"
+                },
+                "valuePeriod": {
+                    "$ref": "#/definitions/fhir.Period"
+                },
+                "valuePositiveInt": {
+                    "type": "integer"
+                },
+                "valueQuantity": {
+                    "$ref": "#/definitions/fhir.Quantity"
+                },
+                "valueRange": {
+                    "$ref": "#/definitions/fhir.Range"
+                },
+                "valueRatio": {
+                    "$ref": "#/definitions/fhir.Ratio"
+                },
+                "valueReference": {
+                    "$ref": "#/definitions/fhir.Reference"
+                },
+                "valueRelatedArtifact": {
+                    "$ref": "#/definitions/fhir.RelatedArtifact"
+                },
+                "valueSampledData": {
+                    "$ref": "#/definitions/fhir.SampledData"
+                },
+                "valueSignature": {
+                    "$ref": "#/definitions/fhir.Signature"
+                },
+                "valueString": {
+                    "type": "string"
+                },
+                "valueTime": {
+                    "type": "string"
+                },
+                "valueTiming": {
+                    "$ref": "#/definitions/fhir.Timing"
+                },
+                "valueTriggerDefinition": {
+                    "$ref": "#/definitions/fhir.TriggerDefinition"
+                },
+                "valueUnsignedInt": {
+                    "type": "integer"
+                },
+                "valueUri": {
+                    "type": "string"
+                },
+                "valueUrl": {
+                    "type": "string"
+                },
+                "valueUsageContext": {
+                    "$ref": "#/definitions/fhir.UsageContext"
+                },
+                "valueUuid": {
+                    "type": "string"
+                }
+            }
+        },
+        "fhir.HTTPVerb": {
+            "type": "integer",
+            "enum": [
+                0,
+                1,
+                2,
+                3,
+                4,
+                5
+            ],
+            "x-enum-varnames": [
+                "HTTPVerbGET",
+                "HTTPVerbHEAD",
+                "HTTPVerbPOST",
+                "HTTPVerbPUT",
+                "HTTPVerbDELETE",
+                "HTTPVerbPATCH"
+            ]
+        },
+        "fhir.HumanName": {
+            "type": "object",
+            "properties": {
+                "extension": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/fhir.Extension"
+                    }
+                },
                 "family": {
                     "type": "string"
                 },
@@ -369,12 +1602,260 @@ const docTemplate = `{
                         "type": "string"
                     }
                 },
+                "id": {
+                    "type": "string"
+                },
+                "period": {
+                    "$ref": "#/definitions/fhir.Period"
+                },
+                "prefix": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "suffix": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "text": {
+                    "type": "string"
+                },
                 "use": {
+                    "$ref": "#/definitions/fhir.NameUse"
+                }
+            }
+        },
+        "fhir.Identifier": {
+            "type": "object",
+            "properties": {
+                "assigner": {
+                    "$ref": "#/definitions/fhir.Reference"
+                },
+                "extension": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/fhir.Extension"
+                    }
+                },
+                "id": {
+                    "type": "string"
+                },
+                "period": {
+                    "$ref": "#/definitions/fhir.Period"
+                },
+                "system": {
+                    "type": "string"
+                },
+                "type": {
+                    "$ref": "#/definitions/fhir.CodeableConcept"
+                },
+                "use": {
+                    "$ref": "#/definitions/fhir.IdentifierUse"
+                },
+                "value": {
                     "type": "string"
                 }
             }
         },
-        "domain.FHIRPatient": {
+        "fhir.IdentifierUse": {
+            "type": "integer",
+            "enum": [
+                0,
+                1,
+                2,
+                3,
+                4
+            ],
+            "x-enum-varnames": [
+                "IdentifierUseUsual",
+                "IdentifierUseOfficial",
+                "IdentifierUseTemp",
+                "IdentifierUseSecondary",
+                "IdentifierUseOld"
+            ]
+        },
+        "fhir.LinkType": {
+            "type": "integer",
+            "enum": [
+                0,
+                1,
+                2,
+                3
+            ],
+            "x-enum-varnames": [
+                "LinkTypeReplacedBy",
+                "LinkTypeReplaces",
+                "LinkTypeRefer",
+                "LinkTypeSeealso"
+            ]
+        },
+        "fhir.Meta": {
+            "type": "object",
+            "properties": {
+                "extension": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/fhir.Extension"
+                    }
+                },
+                "id": {
+                    "type": "string"
+                },
+                "lastUpdated": {
+                    "type": "string"
+                },
+                "profile": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "security": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/fhir.Coding"
+                    }
+                },
+                "source": {
+                    "type": "string"
+                },
+                "tag": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/fhir.Coding"
+                    }
+                },
+                "versionId": {
+                    "type": "string"
+                }
+            }
+        },
+        "fhir.Money": {
+            "type": "object",
+            "properties": {
+                "currency": {
+                    "type": "string"
+                },
+                "extension": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/fhir.Extension"
+                    }
+                },
+                "id": {
+                    "type": "string"
+                },
+                "value": {
+                    "type": "string"
+                }
+            }
+        },
+        "fhir.NameUse": {
+            "type": "integer",
+            "enum": [
+                0,
+                1,
+                2,
+                3,
+                4,
+                5,
+                6
+            ],
+            "x-enum-varnames": [
+                "NameUseUsual",
+                "NameUseOfficial",
+                "NameUseTemp",
+                "NameUseNickname",
+                "NameUseAnonymous",
+                "NameUseOld",
+                "NameUseMaiden"
+            ]
+        },
+        "fhir.Narrative": {
+            "type": "object",
+            "properties": {
+                "div": {
+                    "type": "string"
+                },
+                "extension": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/fhir.Extension"
+                    }
+                },
+                "id": {
+                    "type": "string"
+                },
+                "status": {
+                    "$ref": "#/definitions/fhir.NarrativeStatus"
+                }
+            }
+        },
+        "fhir.NarrativeStatus": {
+            "type": "integer",
+            "enum": [
+                0,
+                1,
+                2,
+                3
+            ],
+            "x-enum-varnames": [
+                "NarrativeStatusGenerated",
+                "NarrativeStatusExtensions",
+                "NarrativeStatusAdditional",
+                "NarrativeStatusEmpty"
+            ]
+        },
+        "fhir.OperationParameterUse": {
+            "type": "integer",
+            "enum": [
+                0,
+                1
+            ],
+            "x-enum-varnames": [
+                "OperationParameterUseIn",
+                "OperationParameterUseOut"
+            ]
+        },
+        "fhir.ParameterDefinition": {
+            "type": "object",
+            "properties": {
+                "documentation": {
+                    "type": "string"
+                },
+                "extension": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/fhir.Extension"
+                    }
+                },
+                "id": {
+                    "type": "string"
+                },
+                "max": {
+                    "type": "string"
+                },
+                "min": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "profile": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string"
+                },
+                "use": {
+                    "$ref": "#/definitions/fhir.OperationParameterUse"
+                }
+            }
+        },
+        "fhir.Patient": {
             "type": "object",
             "properties": {
                 "active": {
@@ -383,32 +1864,690 @@ const docTemplate = `{
                 "address": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/domain.FHIRAddress"
+                        "$ref": "#/definitions/fhir.Address"
                     }
                 },
                 "birthDate": {
                     "type": "string"
                 },
+                "communication": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/fhir.PatientCommunication"
+                    }
+                },
+                "contact": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/fhir.PatientContact"
+                    }
+                },
+                "deceasedBoolean": {
+                    "type": "boolean"
+                },
+                "deceasedDateTime": {
+                    "type": "string"
+                },
+                "extension": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/fhir.Extension"
+                    }
+                },
                 "gender": {
+                    "$ref": "#/definitions/fhir.AdministrativeGender"
+                },
+                "generalPractitioner": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/fhir.Reference"
+                    }
+                },
+                "id": {
+                    "type": "string"
+                },
+                "identifier": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/fhir.Identifier"
+                    }
+                },
+                "implicitRules": {
+                    "type": "string"
+                },
+                "language": {
+                    "type": "string"
+                },
+                "link": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/fhir.PatientLink"
+                    }
+                },
+                "managingOrganization": {
+                    "$ref": "#/definitions/fhir.Reference"
+                },
+                "maritalStatus": {
+                    "$ref": "#/definitions/fhir.CodeableConcept"
+                },
+                "meta": {
+                    "$ref": "#/definitions/fhir.Meta"
+                },
+                "modifierExtension": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/fhir.Extension"
+                    }
+                },
+                "multipleBirthBoolean": {
+                    "type": "boolean"
+                },
+                "multipleBirthInteger": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/fhir.HumanName"
+                    }
+                },
+                "photo": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/fhir.Attachment"
+                    }
+                },
+                "telecom": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/fhir.ContactPoint"
+                    }
+                },
+                "text": {
+                    "$ref": "#/definitions/fhir.Narrative"
+                }
+            }
+        },
+        "fhir.PatientCommunication": {
+            "type": "object",
+            "properties": {
+                "extension": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/fhir.Extension"
+                    }
+                },
+                "id": {
+                    "type": "string"
+                },
+                "language": {
+                    "$ref": "#/definitions/fhir.CodeableConcept"
+                },
+                "modifierExtension": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/fhir.Extension"
+                    }
+                },
+                "preferred": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "fhir.PatientContact": {
+            "type": "object",
+            "properties": {
+                "address": {
+                    "$ref": "#/definitions/fhir.Address"
+                },
+                "extension": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/fhir.Extension"
+                    }
+                },
+                "gender": {
+                    "$ref": "#/definitions/fhir.AdministrativeGender"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "modifierExtension": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/fhir.Extension"
+                    }
+                },
+                "name": {
+                    "$ref": "#/definitions/fhir.HumanName"
+                },
+                "organization": {
+                    "$ref": "#/definitions/fhir.Reference"
+                },
+                "period": {
+                    "$ref": "#/definitions/fhir.Period"
+                },
+                "relationship": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/fhir.CodeableConcept"
+                    }
+                },
+                "telecom": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/fhir.ContactPoint"
+                    }
+                }
+            }
+        },
+        "fhir.PatientLink": {
+            "type": "object",
+            "properties": {
+                "extension": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/fhir.Extension"
+                    }
+                },
+                "id": {
+                    "type": "string"
+                },
+                "modifierExtension": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/fhir.Extension"
+                    }
+                },
+                "other": {
+                    "$ref": "#/definitions/fhir.Reference"
+                },
+                "type": {
+                    "$ref": "#/definitions/fhir.LinkType"
+                }
+            }
+        },
+        "fhir.Period": {
+            "type": "object",
+            "properties": {
+                "end": {
+                    "type": "string"
+                },
+                "extension": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/fhir.Extension"
+                    }
+                },
+                "id": {
+                    "type": "string"
+                },
+                "start": {
+                    "type": "string"
+                }
+            }
+        },
+        "fhir.Quantity": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "string"
+                },
+                "comparator": {
+                    "$ref": "#/definitions/fhir.QuantityComparator"
+                },
+                "extension": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/fhir.Extension"
+                    }
+                },
+                "id": {
+                    "type": "string"
+                },
+                "system": {
+                    "type": "string"
+                },
+                "unit": {
+                    "type": "string"
+                },
+                "value": {
+                    "type": "string"
+                }
+            }
+        },
+        "fhir.QuantityComparator": {
+            "type": "integer",
+            "enum": [
+                0,
+                1,
+                2,
+                3
+            ],
+            "x-enum-varnames": [
+                "QuantityComparatorLessThan",
+                "QuantityComparatorLessOrEquals",
+                "QuantityComparatorGreaterOrEquals",
+                "QuantityComparatorGreaterThan"
+            ]
+        },
+        "fhir.Range": {
+            "type": "object",
+            "properties": {
+                "extension": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/fhir.Extension"
+                    }
+                },
+                "high": {
+                    "$ref": "#/definitions/fhir.Quantity"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "low": {
+                    "$ref": "#/definitions/fhir.Quantity"
+                }
+            }
+        },
+        "fhir.Ratio": {
+            "type": "object",
+            "properties": {
+                "denominator": {
+                    "$ref": "#/definitions/fhir.Quantity"
+                },
+                "extension": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/fhir.Extension"
+                    }
+                },
+                "id": {
+                    "type": "string"
+                },
+                "numerator": {
+                    "$ref": "#/definitions/fhir.Quantity"
+                }
+            }
+        },
+        "fhir.Reference": {
+            "type": "object",
+            "properties": {
+                "display": {
+                    "type": "string"
+                },
+                "extension": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/fhir.Extension"
+                    }
+                },
+                "id": {
+                    "type": "string"
+                },
+                "identifier": {
+                    "$ref": "#/definitions/fhir.Identifier"
+                },
+                "reference": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string"
+                }
+            }
+        },
+        "fhir.RelatedArtifact": {
+            "type": "object",
+            "properties": {
+                "citation": {
+                    "type": "string"
+                },
+                "display": {
+                    "type": "string"
+                },
+                "document": {
+                    "$ref": "#/definitions/fhir.Attachment"
+                },
+                "extension": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/fhir.Extension"
+                    }
+                },
+                "id": {
+                    "type": "string"
+                },
+                "label": {
+                    "type": "string"
+                },
+                "resource": {
+                    "type": "string"
+                },
+                "type": {
+                    "$ref": "#/definitions/fhir.RelatedArtifactType"
+                },
+                "url": {
+                    "type": "string"
+                }
+            }
+        },
+        "fhir.RelatedArtifactType": {
+            "type": "integer",
+            "enum": [
+                0,
+                1,
+                2,
+                3,
+                4,
+                5,
+                6,
+                7
+            ],
+            "x-enum-varnames": [
+                "RelatedArtifactTypeDocumentation",
+                "RelatedArtifactTypeJustification",
+                "RelatedArtifactTypeCitation",
+                "RelatedArtifactTypePredecessor",
+                "RelatedArtifactTypeSuccessor",
+                "RelatedArtifactTypeDerivedFrom",
+                "RelatedArtifactTypeDependsOn",
+                "RelatedArtifactTypeComposedOf"
+            ]
+        },
+        "fhir.SampledData": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "string"
+                },
+                "dimensions": {
+                    "type": "integer"
+                },
+                "extension": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/fhir.Extension"
+                    }
+                },
+                "factor": {
                     "type": "string"
                 },
                 "id": {
                     "type": "string"
                 },
-                "name": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/domain.FHIRHumanName"
-                    }
-                },
-                "resourceType": {
+                "lowerLimit": {
                     "type": "string"
                 },
-                "telecom": {
+                "origin": {
+                    "$ref": "#/definitions/fhir.Quantity"
+                },
+                "period": {
+                    "type": "string"
+                },
+                "upperLimit": {
+                    "type": "string"
+                }
+            }
+        },
+        "fhir.SearchEntryMode": {
+            "type": "integer",
+            "enum": [
+                0,
+                1,
+                2
+            ],
+            "x-enum-varnames": [
+                "SearchEntryModeMatch",
+                "SearchEntryModeInclude",
+                "SearchEntryModeOutcome"
+            ]
+        },
+        "fhir.Signature": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "string"
+                },
+                "extension": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/domain.FHIRContactPoint"
+                        "$ref": "#/definitions/fhir.Extension"
                     }
+                },
+                "id": {
+                    "type": "string"
+                },
+                "onBehalfOf": {
+                    "$ref": "#/definitions/fhir.Reference"
+                },
+                "sigFormat": {
+                    "type": "string"
+                },
+                "targetFormat": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/fhir.Coding"
+                    }
+                },
+                "when": {
+                    "type": "string"
+                },
+                "who": {
+                    "$ref": "#/definitions/fhir.Reference"
+                }
+            }
+        },
+        "fhir.SortDirection": {
+            "type": "integer",
+            "enum": [
+                0,
+                1
+            ],
+            "x-enum-varnames": [
+                "SortDirectionAscending",
+                "SortDirectionDescending"
+            ]
+        },
+        "fhir.Timing": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "$ref": "#/definitions/fhir.CodeableConcept"
+                },
+                "event": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "extension": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/fhir.Extension"
+                    }
+                },
+                "id": {
+                    "type": "string"
+                },
+                "modifierExtension": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/fhir.Extension"
+                    }
+                },
+                "repeat": {
+                    "$ref": "#/definitions/fhir.TimingRepeat"
+                }
+            }
+        },
+        "fhir.TimingRepeat": {
+            "type": "object",
+            "properties": {
+                "boundsDuration": {
+                    "$ref": "#/definitions/fhir.Duration"
+                },
+                "boundsPeriod": {
+                    "$ref": "#/definitions/fhir.Period"
+                },
+                "boundsRange": {
+                    "$ref": "#/definitions/fhir.Range"
+                },
+                "count": {
+                    "type": "integer"
+                },
+                "countMax": {
+                    "type": "integer"
+                },
+                "dayOfWeek": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/fhir.DaysOfWeek"
+                    }
+                },
+                "duration": {
+                    "type": "string"
+                },
+                "durationMax": {
+                    "type": "string"
+                },
+                "durationUnit": {
+                    "type": "string"
+                },
+                "extension": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/fhir.Extension"
+                    }
+                },
+                "frequency": {
+                    "type": "integer"
+                },
+                "frequencyMax": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "offset": {
+                    "type": "integer"
+                },
+                "period": {
+                    "type": "string"
+                },
+                "periodMax": {
+                    "type": "string"
+                },
+                "periodUnit": {
+                    "type": "string"
+                },
+                "timeOfDay": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "when": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
+        "fhir.TriggerDefinition": {
+            "type": "object",
+            "properties": {
+                "condition": {
+                    "$ref": "#/definitions/fhir.Expression"
+                },
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/fhir.DataRequirement"
+                    }
+                },
+                "extension": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/fhir.Extension"
+                    }
+                },
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "timingDate": {
+                    "type": "string"
+                },
+                "timingDateTime": {
+                    "type": "string"
+                },
+                "timingReference": {
+                    "$ref": "#/definitions/fhir.Reference"
+                },
+                "timingTiming": {
+                    "$ref": "#/definitions/fhir.Timing"
+                },
+                "type": {
+                    "$ref": "#/definitions/fhir.TriggerType"
+                }
+            }
+        },
+        "fhir.TriggerType": {
+            "type": "integer",
+            "enum": [
+                0,
+                1,
+                2,
+                3,
+                4,
+                5,
+                6,
+                7
+            ],
+            "x-enum-varnames": [
+                "TriggerTypeNamedEvent",
+                "TriggerTypePeriodic",
+                "TriggerTypeDataChanged",
+                "TriggerTypeDataAdded",
+                "TriggerTypeDataModified",
+                "TriggerTypeDataRemoved",
+                "TriggerTypeDataAccessed",
+                "TriggerTypeDataAccessEnded"
+            ]
+        },
+        "fhir.UsageContext": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "$ref": "#/definitions/fhir.Coding"
+                },
+                "extension": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/fhir.Extension"
+                    }
+                },
+                "id": {
+                    "type": "string"
+                },
+                "valueCodeableConcept": {
+                    "$ref": "#/definitions/fhir.CodeableConcept"
+                },
+                "valueQuantity": {
+                    "$ref": "#/definitions/fhir.Quantity"
+                },
+                "valueRange": {
+                    "$ref": "#/definitions/fhir.Range"
+                },
+                "valueReference": {
+                    "$ref": "#/definitions/fhir.Reference"
                 }
             }
         }

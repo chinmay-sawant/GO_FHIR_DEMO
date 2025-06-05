@@ -1,12 +1,14 @@
 # Go FHIR Demo Application
 
-A comprehensive Go Gin framework application with FHIR (Fast Healthcare Interoperability Resources) R4 support, featuring a PostgreSQL database, automatic API documentation with Swagger, and production-ready architecture.
+A comprehensive Go Gin framework application with FHIR (Fast Healthcare Interoperability Resources) R4 support, featuring a PostgreSQL database, automatic API documentation with Swagger, **external FHIR server integration**, and production-ready architecture.
 
 ## 🚀 Features
 
 ### Core Features
 - **RESTful API** for Patient resources (GET, POST, PUT, DELETE, PATCH)
 - **FHIR R4 Compliance** with custom FHIR data structures using standard JSON
+- **External FHIR Server Integration** - Connect to and query external FHIR servers (like HAPI FHIR)
+- **FHIR Client Package** - Reusable client for external FHIR server communication
 - **PostgreSQL Database** with GORM ORM for robust data persistence
 - **Database Migrations** using [golang-migrate](https://github.com/golang-migrate/migrate)
 - **Swagger/OpenAPI Documentation** with interactive UI
@@ -21,6 +23,7 @@ A comprehensive Go Gin framework application with FHIR (Fast Healthcare Interope
 - Makefile for common development tasks
 - Environment-based configuration with `.env` file support
 - JSONB storage for efficient FHIR data querying
+- HTTP client with timeout and error handling for external FHIR servers
 - Comprehensive error handling and validation
 - Production-ready logging and monitoring
 
@@ -39,23 +42,28 @@ A comprehensive Go Gin framework application with FHIR (Fast Healthcare Interope
 ├── internal/                 # Private application code
 │   ├── api/
 │   │   ├── handlers/         # HTTP request handlers
-│   │   │   └── patient_handler.go
+│   │   │   ├── patient_handler.go
+│   │   │   └── external_patient_handler.go  # External FHIR server handlers
 │   │   └── routes/           # Route definitions
 │   │       └── routes.go
 │   ├── domain/               # Domain models and business entities
-│   │   └── patient.go        # FHIR Patient domain model
+│   │   ├── patient.go        # FHIR Patient domain model
+│   │   └── external_patient.go  # External patient service interface
 │   ├── middleware/           # HTTP middleware
 │   │   └── middleware.go     # Logging and timing middleware
 │   ├── repository/           # Data access layer
 │   │   └── patient_repository.go
 │   └── service/              # Business logic layer
-│       └── patient_service.go
+│       ├── patient_service.go
+│       └── external_patient_service.go  # External FHIR server service
 ├── logs/                     # Application logs
 ├── migrations/               # Database schema migrations
 │   ├── 000001_create_patients_table.up.sql
 │   └── 000001_create_patients_table.down.sql
 ├── pkg/                      # Shared/reusable packages
 │   ├── database/             # Database connection utilities
+│   ├── fhirclient/           # FHIR client for external servers
+│   │   └── client.go         # HTTP client for FHIR R4 servers
 │   ├── logger/               # Logging utilities
 │   └── utils/                # Common utility functions
 ├── docker-compose.yml        # Docker services definition
@@ -74,6 +82,11 @@ A comprehensive Go Gin framework application with FHIR (Fast Healthcare Interope
 ### Database & Storage
 - **PostgreSQL** - Primary database with JSONB support
 - **golang-migrate** - Database migration tool
+
+### FHIR Integration
+- **golang-fhir-models** - FHIR R4 data models
+- **Custom FHIR Client** - HTTP client for external FHIR servers
+- **FHIR R4 Compliance** - Full support for Patient resources
 
 ### Documentation & API
 - **Swagger/OpenAPI 3.0** - API documentation
@@ -114,7 +127,7 @@ Copy the example environment file and configure your settings:
 copy .env.example .env
 ```
 
-Edit the `.env` file with your database credentials:
+Edit the `.env` file with your database credentials and external FHIR server URL:
 ```env
 # Database Configuration
 DB_HOST=localhost
@@ -127,6 +140,9 @@ DB_SSLMODE=disable
 # Server Configuration
 SERVER_PORT=8080
 GIN_MODE=debug
+
+# External FHIR Server Configuration
+EXTERNAL_FHIR_SERVER_BASE_URL=http://hapi.fhir.org/baseR4
 
 # Logging Configuration
 LOG_LEVEL=info
@@ -194,12 +210,12 @@ This provides a complete browsable interface for all API endpoints, request/resp
 ### Regenerating Documentation
 After making changes to API annotations, regenerate the Swagger docs:
 ```cmd
-swag init
+swag init --parseDependency --parseDepth 99
 ```
 
 ## 🔗 API Endpoints
 
-### Patient Resource Endpoints
+### Local Patient Resource Endpoints
 
 | Method | Endpoint | Description | Request Body |
 |--------|----------|-------------|--------------|
@@ -210,6 +226,13 @@ swag init
 | `PATCH` | `/api/v1/patients/{id}` | Partially update patient | Partial FHIR Patient JSON |
 | `DELETE` | `/api/v1/patients/{id}` | Delete patient (soft delete) | - |
 
+### External FHIR Server Endpoints
+
+| Method | Endpoint | Description | Query Parameters |
+|--------|----------|-------------|------------------|
+| `GET` | `/api/v1/external-patients/{id}` | Get patient from external FHIR server by ID | - |
+| `GET` | `/api/v1/external-patients` | Search patients on external FHIR server | `name`, `family`, `given`, `birthdate`, `gender` |
+
 ### Health Check Endpoints
 
 | Method | Endpoint | Description |
@@ -219,14 +242,24 @@ swag init
 
 ### Example Usage
 
-#### Create a New Patient
+#### Create a New Patient (Local)
 ```bash
 curl -X POST http://localhost:8080/api/v1/patients \
   -H "Content-Type: application/json" \
   -d @examples/sample_patient.json
 ```
 
-#### Get All Patients
+#### Get Patient from External FHIR Server
+```bash
+curl -X GET "http://localhost:8080/api/v1/external-patients/123"
+```
+
+#### Search External FHIR Server
+```bash
+curl -X GET "http://localhost:8080/api/v1/external-patients?family=Smith&gender=female"
+```
+
+#### Get All Local Patients
 ```bash
 curl -X GET http://localhost:8080/api/v1/patients
 ```
@@ -251,9 +284,20 @@ curl -X GET http://localhost:8080/api/v1/patients/1
 | `SERVER_PORT` | HTTP server port | `8080` | No |
 | `GIN_MODE` | Gin framework mode (`debug`/`release`) | `debug` | No |
 | `LOG_LEVEL` | Logging level (`trace`/`debug`/`info`/`warn`/`error`) | `info` | No |
+| `EXTERNAL_FHIR_SERVER_BASE_URL` | Base URL for external FHIR server | - | Yes |
 
 ### Configuration File
 The application also supports JSON configuration via `config/config.json` for default values. Environment variables take precedence over configuration file settings.
+
+#### External FHIR Server Configuration
+Configure the base URL for the external FHIR server in your environment:
+```env
+EXTERNAL_FHIR_SERVER_BASE_URL=http://hapi.fhir.org/baseR4
+```
+
+Popular public FHIR servers for testing:
+- **HAPI FHIR R4:** `http://hapi.fhir.org/baseR4`
+- **SMART Health IT:** `https://r4.smarthealthit.org`
 
 ## 🗄️ Database Schema
 
@@ -462,6 +506,10 @@ Error: bind: address already in use
 1. Regenerate docs: `swag init`
 2. Verify swagger imports in `main.go`
 3. Check swagger annotations in handlers
+
+#### Swagger Init Failing
+**Solution:**
+swag init --parseDependency --parseDepth 99
 
 ### Debug Mode
 Enable debug logging by setting:

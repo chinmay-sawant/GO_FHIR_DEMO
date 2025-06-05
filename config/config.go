@@ -17,10 +17,11 @@ type Config struct {
 }
 
 type ServerConfig struct {
-	Port         string        `json:"port"`
-	Mode         string        `json:"mode"`
-	ReadTimeout  time.Duration `json:"read_timeout"`
-	WriteTimeout time.Duration `json:"write_timeout"`
+	Port                      string        `json:"port"`
+	Mode                      string        `json:"mode"`
+	ReadTimeout               time.Duration `json:"read_timeout"`
+	WriteTimeout              time.Duration `json:"write_timeout"`
+	ExternalFHIRServerBaseURL string        `json:"external_fhir_server_base_url"`
 }
 
 type DatabaseConfig struct {
