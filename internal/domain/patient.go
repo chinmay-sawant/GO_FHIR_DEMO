@@ -3,46 +3,14 @@ package domain
 import (
 	"time"
 
+	"github.com/samply/golang-fhir-models/fhir-models/fhir"
 	"gorm.io/gorm"
 )
-
-// FHIRPatient represents a simplified FHIR Patient resource
-type FHIRPatient struct {
-	ResourceType string             `json:"resourceType"`
-	ID           string             `json:"id,omitempty"`
-	Active       *bool              `json:"active,omitempty"`
-	Name         []FHIRHumanName    `json:"name,omitempty"`
-	Gender       string             `json:"gender,omitempty"`
-	BirthDate    string             `json:"birthDate,omitempty"`
-	Telecom      []FHIRContactPoint `json:"telecom,omitempty"`
-	Address      []FHIRAddress      `json:"address,omitempty"`
-}
-
-type FHIRHumanName struct {
-	Use    string   `json:"use,omitempty"`
-	Family string   `json:"family,omitempty"`
-	Given  []string `json:"given,omitempty"`
-}
-
-type FHIRContactPoint struct {
-	System string `json:"system,omitempty"`
-	Value  string `json:"value,omitempty"`
-	Use    string `json:"use,omitempty"`
-}
-
-type FHIRAddress struct {
-	Use        string   `json:"use,omitempty"`
-	Line       []string `json:"line,omitempty"`
-	City       string   `json:"city,omitempty"`
-	State      string   `json:"state,omitempty"`
-	PostalCode string   `json:"postalCode,omitempty"`
-	Country    string   `json:"country,omitempty"`
-}
 
 // Patient represents a FHIR Patient resource in the database
 type Patient struct {
 	ID        uint           `json:"id" gorm:"primaryKey"`
-	FHIRData  string         `json:"fhir_data" gorm:"type:jsonb;not null"` // Store FHIR JSON
+	FHIRData  []byte         `json:"fhir_data" gorm:"type:jsonb;not null"` // Store FHIR JSON as bytes to avoid invalid UTF-8
 	Active    *bool          `json:"active" gorm:"index"`
 	Family    string         `json:"family" gorm:"index"`
 	Given     string         `json:"given" gorm:"index"`
@@ -65,14 +33,14 @@ type PatientRepository interface {
 
 // PatientService defines the interface for patient business logic
 type PatientService interface {
-	CreatePatient(fhirPatient *FHIRPatient) (*Patient, error)
+	CreatePatient(fhirPatient *fhir.Patient) (*Patient, error)
 	GetPatient(id uint) (*Patient, error)
 	GetPatients(limit, offset int) ([]*Patient, int64, error)
-	UpdatePatient(id uint, fhirPatient *FHIRPatient) (*Patient, error)
+	UpdatePatient(id uint, fhirPatient *fhir.Patient) (*Patient, error)
 	PatchPatient(id uint, updates map[string]interface{}) (*Patient, error)
 	DeletePatient(id uint) error
-	ConvertToFHIR(patient *Patient) (*FHIRPatient, error)
-	ConvertFromFHIR(fhirPatient *FHIRPatient) (*Patient, error)
+	ConvertToFHIR(patient *Patient) (*fhir.Patient, error)
+	ConvertFromFHIR(fhirPatient *fhir.Patient) (*Patient, error)
 }
 
 // TableName specifies the table name for Patient model

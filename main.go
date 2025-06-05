@@ -17,10 +17,10 @@ import (
 	"go-fhir-demo/internal/service"
 	"go-fhir-demo/pkg/database"
 	"go-fhir-demo/pkg/logger"
-
 	"go-fhir-demo/pkg/utils"
 
 	"github.com/gin-gonic/gin"
+	"github.com/samply/golang-fhir-models/fhir-models/fhir"
 
 	// Swagger imports
 	swaggerFiles "github.com/swaggo/files"
@@ -72,44 +72,90 @@ func main() {
 	patientService := service.NewPatientService(patientRepo)
 
 	// --- Seed dummy patients if not present ---
-	dummyPatients := []domain.FHIRPatient{
+	dummyPatients := []fhir.Patient{
 		{
-			ResourceType: "Patient",
-			Active:       utils.PtrBool(true),
-			Name: []domain.FHIRHumanName{{
-				Use:    "official",
-				Family: "Doe",
-				Given:  []string{"John"},
-			}},
-			Gender:    "male",
-			BirthDate: "1980-01-01",
-			Telecom:   []domain.FHIRContactPoint{{System: "phone", Value: "1234567890", Use: "mobile"}},
-			Address: []domain.FHIRAddress{{
-				Line:       []string{"123 Main St"},
-				City:       "Metropolis",
-				State:      "NY",
-				PostalCode: "12345",
-				Country:    "USA",
-			}},
+			Active: utils.CreateBoolPtr(true),
+			Name: []fhir.HumanName{
+				{
+					Use:    utils.NameUseOfficialPtr(),
+					Family: utils.CreateStringPtr("Doe"),
+					Given:  []string{"John"},
+				},
+			},
+			Gender:    utils.GenderPtr("male"),
+			BirthDate: utils.CreateStringPtr("1980-01-01"),
+			Telecom: []fhir.ContactPoint{
+				{
+					System: utils.SystemPtr("phone"),
+					Value:  utils.CreateStringPtr("1234567890"),
+					Use:    utils.UsePtr("mobile"),
+				},
+			},
+			Address: []fhir.Address{
+				{
+					Line:       []string{"123 Main St"},
+					City:       utils.CreateStringPtr("Metropolis"),
+					State:      utils.CreateStringPtr("NY"),
+					PostalCode: utils.CreateStringPtr("12345"),
+					Country:    utils.CreateStringPtr("USA"),
+				},
+			},
 		},
 		{
-			ResourceType: "Patient",
-			Active:       utils.PtrBool(true),
-			Name: []domain.FHIRHumanName{{
-				Use:    "official",
-				Family: "Smith",
-				Given:  []string{"Jane"},
-			}},
-			Gender:    "female",
-			BirthDate: "1990-05-15",
-			Telecom:   []domain.FHIRContactPoint{{System: "email", Value: "jane.smith@example.com", Use: "home"}},
-			Address: []domain.FHIRAddress{{
-				Line:       []string{"456 Oak Ave"},
-				City:       "Gotham",
-				State:      "CA",
-				PostalCode: "67890",
-				Country:    "USA",
-			}},
+			Active: utils.CreateBoolPtr(true),
+			Name: []fhir.HumanName{
+				{
+					Use:    utils.NameUseOfficialPtr(),
+					Family: utils.CreateStringPtr("Smith"),
+					Given:  []string{"Jane"},
+				},
+			},
+			Gender:    utils.GenderPtr("female"),
+			BirthDate: utils.CreateStringPtr("1990-05-15"),
+			Telecom: []fhir.ContactPoint{
+				{
+					System: utils.SystemPtr("email"),
+					Value:  utils.CreateStringPtr("jane.smith@example.com"),
+					Use:    utils.UsePtr("home"),
+				},
+			},
+			Address: []fhir.Address{
+				{
+					Line:       []string{"456 Oak Ave"},
+					City:       utils.CreateStringPtr("Gotham"),
+					State:      utils.CreateStringPtr("CA"),
+					PostalCode: utils.CreateStringPtr("67890"),
+					Country:    utils.CreateStringPtr("USA"),
+				},
+			},
+		},
+		{
+			Active: utils.CreateBoolPtr(false),
+			Name: []fhir.HumanName{
+				{
+					Use:    utils.NameUseOfficialPtr(),
+					Family: utils.CreateStringPtr("Brown"),
+					Given:  []string{"Charlie"},
+				},
+			},
+			Gender:    utils.GenderPtr("other"),
+			BirthDate: utils.CreateStringPtr("2000-12-31"),
+			Telecom: []fhir.ContactPoint{
+				{
+					System: utils.SystemPtr("email"),
+					Value:  utils.CreateStringPtr("charlie.brown@example.com"),
+					Use:    utils.UsePtr("work"),
+				},
+			},
+			Address: []fhir.Address{
+				{
+					Line:       []string{"789 Pine Rd"},
+					City:       utils.CreateStringPtr("Star City"),
+					State:      utils.CreateStringPtr("WA"),
+					PostalCode: utils.CreateStringPtr("24680"),
+					Country:    utils.CreateStringPtr("USA"),
+				},
+			},
 		},
 	}
 
@@ -118,7 +164,7 @@ func main() {
 		var count int64
 		db.Model(&domain.Patient{}).
 			Where("family = ? AND given = ? AND gender = ? AND birth_date = ?",
-				dummy.Name[0].Family,
+				*dummy.Name[0].Family,
 				func() string {
 					if len(dummy.Name[0].Given) > 0 {
 						return dummy.Name[0].Given[0]
@@ -127,14 +173,14 @@ func main() {
 					}
 				}(),
 				dummy.Gender,
-				dummy.BirthDate,
+				*dummy.BirthDate,
 			).Count(&count)
 		if count == 0 {
 			_, err := patientService.CreatePatient(&dummy)
 			if err != nil {
 				logger.Warnf("Failed to seed dummy patient: %v", err)
 			} else {
-				logger.Infof("Seeded dummy patient: %s %s", dummy.Name[0].Given, dummy.Name[0].Family)
+				logger.Infof("Seeded dummy patient: %s %s", dummy.Name[0].Given[0], *dummy.Name[0].Family)
 			}
 		}
 	}
@@ -143,7 +189,7 @@ func main() {
 
 	// Initialize handlers
 	patientHandler := handlers.NewPatientHandler(patientService)
-	// Helper for pointer to bool
+
 	// Set Gin mode
 	gin.SetMode(cfg.Server.Mode)
 

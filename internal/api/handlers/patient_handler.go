@@ -8,6 +8,7 @@ import (
 	"go-fhir-demo/pkg/logger"
 
 	"github.com/gin-gonic/gin"
+	"github.com/samply/golang-fhir-models/fhir-models/fhir"
 )
 
 type PatientHandler struct {
@@ -27,13 +28,13 @@ func NewPatientHandler(service domain.PatientService) *PatientHandler {
 // @Tags Patient
 // @Accept json
 // @Produce json
-// @Param patient body domain.FHIRPatient true "FHIR Patient resource"
-// @Success 201 {object} domain.FHIRPatient
+// @Param patient body fhir.Patient true "FHIR Patient resource"
+// @Success 201 {object} fhir.Patient
 // @Failure 400 {object} map[string]interface{}
 // @Failure 500 {object} map[string]interface{}
 // @Router /patients [post]
 func (h *PatientHandler) CreatePatient(c *gin.Context) {
-	var fhirPatient domain.FHIRPatient
+	var fhirPatient fhir.Patient
 
 	if err := c.ShouldBindJSON(&fhirPatient); err != nil {
 		logger.Errorf("Failed to bind JSON: %v", err)
@@ -75,7 +76,7 @@ func (h *PatientHandler) CreatePatient(c *gin.Context) {
 // @Tags Patient
 // @Produce json
 // @Param id path int true "Patient ID"
-// @Success 200 {object} domain.FHIRPatient
+// @Success 200 {object} fhir.Patient
 // @Failure 400 {object} map[string]interface{}
 // @Failure 404 {object} map[string]interface{}
 // @Failure 500 {object} map[string]interface{}
@@ -101,37 +102,35 @@ func (h *PatientHandler) GetPatient(c *gin.Context) {
 		return
 	}
 
-	// Convert to FHIR for response
-	fhirResponse, err := h.service.ConvertToFHIR(patient)
+	fhirPatient, err := h.service.ConvertToFHIR(patient)
 	if err != nil {
 		logger.Errorf("Failed to convert to FHIR: %v", err)
 		c.JSON(http.StatusInternalServerError, gin.H{
-			"error":   "Failed to convert response",
+			"error":   "Failed to convert patient data",
 			"message": err.Error(),
 		})
 		return
 	}
 
-	c.JSON(http.StatusOK, fhirResponse)
+	c.JSON(http.StatusOK, fhirPatient)
 }
 
 // GetPatients handles GET /patients
-// @Summary List Patients
-// @Description Get a list of FHIR Patient resources
+// @Summary Get all Patients
+// @Description Get all FHIR Patient resources with pagination
 // @Tags Patient
 // @Produce json
-// @Param _count query int false "Number of patients to return"
-// @Param _offset query int false "Offset for pagination"
+// @Param limit query int false "Limit" default(10)
+// @Param offset query int false "Offset" default(0)
 // @Success 200 {object} map[string]interface{}
 // @Failure 500 {object} map[string]interface{}
 // @Router /patients [get]
 func (h *PatientHandler) GetPatients(c *gin.Context) {
-	// Parse query parameters
-	limitStr := c.DefaultQuery("_count", "10")
-	offsetStr := c.DefaultQuery("_offset", "0")
+	limitStr := c.DefaultQuery("limit", "10")
+	offsetStr := c.DefaultQuery("offset", "0")
 
 	limit, err := strconv.Atoi(limitStr)
-	if err != nil || limit <= 0 {
+	if err != nil || limit < 1 {
 		limit = 10
 	}
 
@@ -140,55 +139,44 @@ func (h *PatientHandler) GetPatients(c *gin.Context) {
 		offset = 0
 	}
 
-	// Get patients
 	patients, total, err := h.service.GetPatients(limit, offset)
 	if err != nil {
 		logger.Errorf("Failed to get patients: %v", err)
 		c.JSON(http.StatusInternalServerError, gin.H{
-			"error":   "Failed to retrieve patients",
+			"error":   "Failed to get patients",
 			"message": err.Error(),
 		})
 		return
 	}
 
-	// Convert to FHIR bundle response
-	fhirPatients := make([]*domain.FHIRPatient, len(patients))
-	for i, patient := range patients {
+	// Convert patients to FHIR format
+	fhirPatients := make([]*fhir.Patient, 0, len(patients))
+	for _, patient := range patients {
 		fhirPatient, err := h.service.ConvertToFHIR(patient)
 		if err != nil {
-			logger.Errorf("Failed to convert patient to FHIR: %v", err)
+			logger.Warnf("Failed to convert patient %d to FHIR: %v", patient.ID, err)
 			continue
 		}
-		fhirPatients[i] = fhirPatient
+		fhirPatients = append(fhirPatients, fhirPatient)
 	}
 
-	// FHIR Bundle format
-	entries := make([]map[string]interface{}, len(fhirPatients))
-	for i, fp := range fhirPatients {
-		entries[i] = map[string]interface{}{
-			"resource": fp,
-		}
-	}
-
-	response := gin.H{
-		"resourceType": "Bundle",
-		"type":         "searchset",
-		"total":        total,
-		"entry":        entries,
-	}
-
-	c.JSON(http.StatusOK, response)
+	c.JSON(http.StatusOK, gin.H{
+		"patients": fhirPatients,
+		"total":    total,
+		"limit":    limit,
+		"offset":   offset,
+	})
 }
 
 // UpdatePatient handles PUT /patients/:id
 // @Summary Update a Patient
-// @Description Update a FHIR Patient resource by its ID
+// @Description Update an existing FHIR Patient resource
 // @Tags Patient
 // @Accept json
 // @Produce json
 // @Param id path int true "Patient ID"
-// @Param patient body domain.FHIRPatient true "FHIR Patient resource"
-// @Success 200 {object} domain.FHIRPatient
+// @Param patient body fhir.Patient true "FHIR Patient resource"
+// @Success 200 {object} fhir.Patient
 // @Failure 400 {object} map[string]interface{}
 // @Failure 404 {object} map[string]interface{}
 // @Failure 500 {object} map[string]interface{}
@@ -204,7 +192,7 @@ func (h *PatientHandler) UpdatePatient(c *gin.Context) {
 		return
 	}
 
-	var fhirPatient domain.FHIRPatient
+	var fhirPatient fhir.Patient
 	if err := c.ShouldBindJSON(&fhirPatient); err != nil {
 		logger.Errorf("Failed to bind JSON: %v", err)
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -214,10 +202,9 @@ func (h *PatientHandler) UpdatePatient(c *gin.Context) {
 		return
 	}
 
-	// Update patient
 	patient, err := h.service.UpdatePatient(uint(id), &fhirPatient)
 	if err != nil {
-		logger.Errorf("Failed to update patient: %v", err)
+		logger.Errorf("Failed to update patient %d: %v", id, err)
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error":   "Failed to update patient",
 			"message": err.Error(),
@@ -225,7 +212,6 @@ func (h *PatientHandler) UpdatePatient(c *gin.Context) {
 		return
 	}
 
-	// Convert back to FHIR for response
 	fhirResponse, err := h.service.ConvertToFHIR(patient)
 	if err != nil {
 		logger.Errorf("Failed to convert to FHIR: %v", err)
@@ -241,13 +227,13 @@ func (h *PatientHandler) UpdatePatient(c *gin.Context) {
 
 // PatchPatient handles PATCH /patients/:id
 // @Summary Partially update a Patient
-// @Description Partially update a FHIR Patient resource by its ID
+// @Description Partially update an existing FHIR Patient resource
 // @Tags Patient
 // @Accept json
 // @Produce json
 // @Param id path int true "Patient ID"
-// @Param patch body object true "Partial update fields"
-// @Success 200 {object} domain.FHIRPatient
+// @Param patches body map[string]interface{} true "Partial updates"
+// @Success 200 {object} fhir.Patient
 // @Failure 400 {object} map[string]interface{}
 // @Failure 404 {object} map[string]interface{}
 // @Failure 500 {object} map[string]interface{}
@@ -273,10 +259,9 @@ func (h *PatientHandler) PatchPatient(c *gin.Context) {
 		return
 	}
 
-	// Patch patient
 	patient, err := h.service.PatchPatient(uint(id), updates)
 	if err != nil {
-		logger.Errorf("Failed to patch patient: %v", err)
+		logger.Errorf("Failed to patch patient %d: %v", id, err)
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error":   "Failed to patch patient",
 			"message": err.Error(),
@@ -284,7 +269,6 @@ func (h *PatientHandler) PatchPatient(c *gin.Context) {
 		return
 	}
 
-	// Convert back to FHIR for response
 	fhirResponse, err := h.service.ConvertToFHIR(patient)
 	if err != nil {
 		logger.Errorf("Failed to convert to FHIR: %v", err)
@@ -300,12 +284,12 @@ func (h *PatientHandler) PatchPatient(c *gin.Context) {
 
 // DeletePatient handles DELETE /patients/:id
 // @Summary Delete a Patient
-// @Description Delete a FHIR Patient resource by its ID
+// @Description Delete an existing FHIR Patient resource
 // @Tags Patient
+// @Produce json
 // @Param id path int true "Patient ID"
-// @Success 204 {object} nil
+// @Success 204 "No Content"
 // @Failure 400 {object} map[string]interface{}
-// @Failure 404 {object} map[string]interface{}
 // @Failure 500 {object} map[string]interface{}
 // @Router /patients/{id} [delete]
 func (h *PatientHandler) DeletePatient(c *gin.Context) {
@@ -319,8 +303,9 @@ func (h *PatientHandler) DeletePatient(c *gin.Context) {
 		return
 	}
 
-	if err := h.service.DeletePatient(uint(id)); err != nil {
-		logger.Errorf("Failed to delete patient: %v", err)
+	err = h.service.DeletePatient(uint(id))
+	if err != nil {
+		logger.Errorf("Failed to delete patient %d: %v", id, err)
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error":   "Failed to delete patient",
 			"message": err.Error(),
@@ -328,5 +313,5 @@ func (h *PatientHandler) DeletePatient(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusNoContent, nil)
+	c.Status(http.StatusNoContent)
 }
