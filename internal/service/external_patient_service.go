@@ -1,18 +1,23 @@
 package service
 
 import (
-	"go-fhir-demo/internal/domain"
 	"go-fhir-demo/pkg/fhirclient"
 
 	"github.com/samply/golang-fhir-models/fhir-models/fhir"
 )
+
+// ExternalPatientServiceInterface defines the contract for external patient service
+type ExternalPatientServiceInterface interface {
+	GetExternalPatientByID(id string) (*fhir.Patient, error)
+	SearchExternalPatients(params map[string]string) (*fhir.Bundle, error)
+}
 
 type externalPatientService struct {
 	client *fhirclient.Client
 }
 
 // NewExternalPatientService creates a new ExternalPatientService.
-func NewExternalPatientService(client *fhirclient.Client) domain.ExternalPatientService {
+func NewExternalPatientService(client *fhirclient.Client) ExternalPatientServiceInterface {
 	return &externalPatientService{
 		client: client,
 	}
