@@ -78,12 +78,16 @@ mocks:
 			echo %%~nf | findstr /I "impl" >nul && ( \
 				echo Skipping %%f because filename contains 'impl' \
 			) || ( \
-				if not exist "%%~dpfmocks" ( \
+				if exist "%%~dpfmocks" ( \
+					echo Mocks directory exists: %%~dpfmocks && \
+					echo Command: mockgen -source=%%f -destination=%%~dpfmocks\mock_%%~nf.go -package=mocks && \
+					mockgen -source="%%f" -destination="%%~dpfmocks\mock_%%~nf.go" -package=mocks \
+				) else ( \
 					echo Creating mocks directory: %%~dpfmocks && \
-					mkdir "%%~dpfmocks" \
-				) && \
-				echo Command: mockgen -source=%%f -destination=%%~dpfmocks\mock_%%~nf.go -package=mocks && \
-				mockgen -source="%%f" -destination="%%~dpfmocks\mock_%%~nf.go" -package=mocks \
+					mkdir "%%~dpfmocks" && \
+					echo Command: mockgen -source=%%f -destination=%%~dpfmocks\mock_%%~nf.go -package=mocks && \
+					mockgen -source="%%f" -destination="%%~dpfmocks\mock_%%~nf.go" -package=mocks \
+				) \
 			) \
 		) \
 	)

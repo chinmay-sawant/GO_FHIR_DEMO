@@ -196,7 +196,7 @@ func main() {
 
 	// Initialize handlers
 	patientHandler := handlers.NewPatientHandler(patientService)
-	externalPatientHandler := handlers.NewExternalPatientHandler(externalPatientService) // Initialize new handler
+	externalPatientHandler := handlers.NewExternalPatientHandler(externalPatientService)
 
 	// Set Gin mode
 	gin.SetMode(cfg.Server.Mode)

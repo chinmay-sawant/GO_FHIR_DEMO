@@ -11,12 +11,23 @@ import (
 	"github.com/samply/golang-fhir-models/fhir-models/fhir"
 )
 
+// PatientHandlerInterface defines the contract for patient handlers
+type PatientHandlerInterface interface {
+	CreatePatient(c *gin.Context)
+	GetPatient(c *gin.Context)
+	GetPatients(c *gin.Context)
+	UpdatePatient(c *gin.Context)
+	PatchPatient(c *gin.Context)
+	DeletePatient(c *gin.Context)
+}
+
+// PatientHandler struct
 type PatientHandler struct {
 	service domain.PatientService
 }
 
 // NewPatientHandler creates a new patient handler
-func NewPatientHandler(service domain.PatientService) *PatientHandler {
+func NewPatientHandler(service domain.PatientService) PatientHandlerInterface {
 	return &PatientHandler{
 		service: service,
 	}
