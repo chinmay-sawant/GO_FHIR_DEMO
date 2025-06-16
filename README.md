@@ -18,6 +18,13 @@ A comprehensive Go Gin framework application with FHIR (Fast Healthcare Interope
 - **Request/Response Middleware** for performance monitoring
 - **Clean Architecture** with proper separation of concerns
 
+### Testing & Quality Assurance
+- **Comprehensive Test Suite** with unit and integration tests
+- **JUnit XML Reports** using [gotestsum](https://github.com/gotestyourself/gotestsum) for CI/CD integration
+- **Test Coverage Reports** with HTML and console output
+- **Mock Generation** using [uber-go/mock](https://github.com/uber-go/mock) for unit testing
+- **Automated Test Reporting** compatible with Jenkins, GitHub Actions, and other CI tools
+
 ### Technical Features
 - Docker support with docker-compose
 - Makefile for common development tasks
@@ -374,6 +381,7 @@ make test
 # Setup development environment (copies .env.example to .env)
 make setup
 ```
+
 ### Mock Generation Commands
 ```cmd
 # Generate all mocks
@@ -478,6 +486,9 @@ go test -cover ./...
 
 ### Testing & Coverage Commands
 ```cmd
+# Generate JUnit XML report with verbose output
+make test-with-junit
+
 # Generate test coverage report
 make coverage
 
@@ -486,20 +497,27 @@ make coverage-detailed
 
 # Clean coverage files
 make clean-coverage
+
+# Generate all mocks for testing
+make mocks
+
+# Clean generated mocks
+make clean-mocks
 ```
-
-# Generate test coverage report (HTML)
-make coverage
-
-# Generate detailed test coverage report with console output
-make coverage-detailed
-
-# Clean coverage files
-make clean-coverage
 
 ### Test Coverage
 
 The application includes comprehensive test coverage generation through the Makefile:
+
+#### JUnit XML Report Generation
+```cmd
+make test-with-junit
+```
+This command:
+- Uses gotestsum for enhanced test output formatting
+- Generates a JUnit XML report at `junit-report.xml`
+- Provides standard verbose output for detailed test information
+- Compatible with CI/CD systems for test result publishing
 
 #### Basic Coverage Report
 ```cmd
@@ -524,74 +542,44 @@ This command:
 ```cmd
 make clean-coverage
 ```
-This command removes generated coverage files (`coverage.out` and `coverage.html`).
+This command removes generated coverage files (`coverage.out`, `coverage.html`, and `junit-report.xml`).
 
-#### Coverage Report Locations
+#### Test Report Locations
+- **JUnit XML**: `junit-report.xml` - Test results in JUnit format for CI/CD systems
 - **Console Output**: Function-level coverage summary (with `make coverage-detailed`)
 - **HTML Report**: `coverage.html` - Interactive coverage visualization
 - **Raw Data**: `coverage.out` - Coverage profile data
 
-## 🔧 Troubleshooting
+### CI/CD Integration
+The JUnit XML reports can be easily integrated into various CI/CD pipelines:
 
-### Common Issues
+#### GitHub Actions Example
+```yaml
+- name: Run Tests
+  run: make test-with-junit
 
-#### Database Connection Issues
-```
-Error: failed to connect to database
-```
-**Solution:**
-1. Verify PostgreSQL is running
-2. Check database credentials in `.env`
-3. Ensure database `fhir_demo` exists
-4. Verify user permissions
-
-#### Migration Errors
-```
-Error: migration failed
-```
-**Solution:**
-1. Check database connection
-2. Verify migration files exist in `migrations/`
-3. Ensure migration tool is installed
-4. Check migration version with `migrate version`
-
-#### Port Already in Use
-```
-Error: bind: address already in use
-```
-**Solution:**
-1. Change `SERVER_PORT` in `.env`
-2. Kill existing process: `netstat -ano | findstr :8080`
-3. Use `taskkill /PID <process_id> /F`
-
-#### Swagger Documentation Not Loading
-**Solution:**
-1. Regenerate docs: `swag init`
-2. Verify swagger imports in `main.go`
-3. Check swagger annotations in handlers
-
-#### Swagger Init Failing
-**Solution:**
-swag init --parseDependency --parseDepth 99
-
-### Debug Mode
-Enable debug logging by setting:
-```env
-LOG_LEVEL=debug
-GIN_MODE=debug
+- name: Publish Test Results
+  uses: dorny/test-reporter@v1
+  if: success() || failure()
+  with:
+    name: Go Tests
+    path: junit-report.xml
+    reporter: java-junit
 ```
 
-## 📚 Additional Resources
-
-### FHIR Resources
-- [FHIR R4 Specification](https://hl7.org/fhir/R4/)
-- [FHIR Patient Resource](https://hl7.org/fhir/R4/patient.html)
-- [FHIR RESTful API](https://hl7.org/fhir/R4/http.html)
-
-### Go Resources
-- [Gin Web Framework](https://gin-gonic.com/)
-- [GORM Documentation](https://gorm.io/)
-- [Swagger Go Documentation](https://github.com/swaggo/swag)
+#### Jenkins Pipeline Example
+```groovy
+stage('Test') {
+    steps {
+        sh 'make test-with-junit'
+    }
+    post {
+        always {
+            junit 'junit-report.xml'
+        }
+    }
+}
+```
 
 ## 🤝 Contributing
 
@@ -603,10 +591,11 @@ GIN_MODE=debug
 
 ### Code Standards
 - Follow Go best practices and idioms
-- Add comprehensive tests for new features
+- Add comprehensive tests for new features with JUnit XML compatibility
 - Update documentation for API changes
 - Add Swagger annotations for new endpoints
 - Follow the existing code structure
+- Ensure all tests pass with `make test-with-junit`
 
 ## 📄 License
 
@@ -643,3 +632,17 @@ go install github.com/uber/mockgen@latest
 ```
 
 Make sure your `$GOPATH/bin` (or `$GOBIN`) is in your system's `PATH` to use `mockgen` from anywhere.
+
+### Installing gotestsum
+
+To install gotestsum for enhanced test reporting and JUnit XML generation, run:
+
+```
+go install gotest.tools/gotestsum@latest
+```
+
+gotestsum provides:
+- Enhanced test output formatting
+- JUnit XML report generation for CI/CD integration
+- Better test result visualization
+- Support for various output formats

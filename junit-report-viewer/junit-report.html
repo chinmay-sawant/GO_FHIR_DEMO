@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>JUnit Test Report</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body data-theme="dark">
+    <div class="container">
+      <div class="header">
+        <button class="theme-toggle" onclick="toggleTheme()">
+          <span id="theme-icon">🌙</span>
+        </button>
+        <h1>JUnit Test Report</h1>
+        <p>Comprehensive test results and coverage analysis</p>
+      </div>
+
+      <div id="loading" class="loading">
+        <div class="spinner"></div>
+        <p>Loading test results...</p>
+      </div>
+
+      <div id="file-input-section" style="display: none">
+        <div class="cors-notice">
+          <strong>Note:</strong> Due to browser security restrictions, please
+          select your junit-report.xml file manually or serve this HTML through
+          a web server.
+        </div>
+        <div class="file-input-container" id="dropZone">
+          <input type="file" id="fileInput" class="file-input" accept=".xml" />
+          <label for="fileInput" class="file-input-label">
+            Choose XML File
+          </label>
+          <div class="file-info">
+            <p>Or drag and drop your junit-report.xml file here</p>
+          </div>
+        </div>
+      </div>
+
+      <div id="error-container" style="display: none">
+        <div class="error-message">
+          <strong>Error:</strong> <span id="error-message"></span>
+        </div>
+      </div>
+
+      <div id="content" style="display: none">
+        <div class="summary">
+          <div class="summary-card">
+            <div class="number tests" id="total-tests">0</div>
+            <div class="label">Total Tests</div>
+          </div>
+          <div class="summary-card">
+            <div class="number failures" id="total-failures">0</div>
+            <div class="label">Failures</div>
+          </div>
+          <div class="summary-card">
+            <div class="number errors" id="total-errors">0</div>
+            <div class="label">Errors</div>
+          </div>
+          <div class="summary-card">
+            <div class="number time" id="total-time">0s</div>
+            <div class="label">Total Time</div>
+          </div>
+          <div class="summary-card">
+            <div class="number coverage" id="coverage-percentage">0%</div>
+            <div class="label">Coverage</div>
+          </div>
+        </div>
+
+        <div class="tabs">
+          <button class="tab active" onclick="showTab('all')">
+            All Modules
+          </button>
+          <button class="tab" onclick="showTab('tested')">
+            Tested Modules
+          </button>
+          <button class="tab" onclick="showTab('untested')">
+            Untested Modules
+          </button>
+        </div>
+
+        <div class="tab-content active" id="all">
+          <div id="all-suites"></div>
+        </div>
+
+        <div class="tab-content" id="tested">
+          <div id="tested-suites"></div>
+        </div>
+
+        <div class="tab-content" id="untested">
+          <div id="untested-suites"></div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      async function loadJUnitReport() {
+        try {
+          const response = await fetch("junit-report.xml");
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          const xmlText = await response.text();
+          parseXMLAndDisplay(xmlText);
+        } catch (error) {
+          console.log("Auto-load failed:", error.message);
+          showFileInput();
+        }
+      }
+
+      function showFileInput() {
+        document.getElementById("loading").style.display = "none";
+        document.getElementById("file-input-section").style.display = "block";
+        setupFileInput();
+      }
+
+      function setupFileInput() {
+        const fileInput = document.getElementById("fileInput");
+        const dropZone = document.getElementById("dropZone");
+
+        fileInput.addEventListener("change", handleFileSelect);
+
+        dropZone.addEventListener("dragover", (e) => {
+          e.preventDefault();
+          dropZone.classList.add("dragover");
+        });
+
+        dropZone.addEventListener("dragleave", () => {
+          dropZone.classList.remove("dragover");
+        });
+
+        dropZone.addEventListener("drop", (e) => {
+          e.preventDefault();
+          dropZone.classList.remove("dragover");
+          const files = e.dataTransfer.files;
+          if (files.length > 0) {
+            handleFile(files[0]);
+          }
+        });
+      }
+
+      function handleFileSelect(event) {
+        const file = event.target.files[0];
+        if (file) {
+          handleFile(file);
+        }
+      }
+
+      function handleFile(file) {
+        if (!file.name.endsWith(".xml")) {
+          showError("Please select an XML file");
+          return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          try {
+            parseXMLAndDisplay(e.target.result);
+          } catch (error) {
+            showError(`Failed to parse XML: ${error.message}`);
+          }
+        };
+        reader.onerror = () => {
+          showError("Failed to read file");
+        };
+        reader.readAsText(file);
+      }
+
+      function parseXMLAndDisplay(xmlText) {
+        const parser = new DOMParser();
+        const xmlDoc = parser.parseFromString(xmlText, "text/xml");
+
+        if (xmlDoc.querySelector("parsererror")) {
+          throw new Error("Invalid XML format");
+        }
+
+        parseAndDisplayReport(xmlDoc);
+      }
+
+      function toggleTheme() {
+        const body = document.body;
+        const themeIcon = document.getElementById("theme-icon");
+
+        if (body.getAttribute("data-theme") === "dark") {
+          body.setAttribute("data-theme", "light");
+          themeIcon.textContent = "☀️";
+          localStorage.setItem("theme", "light");
+        } else {
+          body.setAttribute("data-theme", "dark");
+          themeIcon.textContent = "🌙";
+          localStorage.setItem("theme", "dark");
+        }
+      }
+
+      function initTheme() {
+        const savedTheme = localStorage.getItem("theme") || "dark";
+        const themeIcon = document.getElementById("theme-icon");
+
+        document.body.setAttribute("data-theme", savedTheme);
+        themeIcon.textContent = savedTheme === "dark" ? "🌙" : "☀️";
+      }
+
+      function showTab(tabName) {
+        // Update tabs
+        document
+          .querySelectorAll(".tab")
+          .forEach((tab) => tab.classList.remove("active"));
+        document
+          .querySelector(`[onclick="showTab('${tabName}')"]`)
+          .classList.add("active");
+
+        // Update content
+        document
+          .querySelectorAll(".tab-content")
+          .forEach((content) => content.classList.remove("active"));
+        document.getElementById(tabName).classList.add("active");
+      }
+
+      function parseAndDisplayReport(xmlDoc) {
+        const testsuites = xmlDoc.querySelector("testsuites");
+        if (!testsuites) {
+          showError("Invalid JUnit XML format: No testsuites found");
+          return;
+        }
+
+        // Hide file input section
+        document.getElementById("file-input-section").style.display = "none";
+
+        const totalTests = parseInt(testsuites.getAttribute("tests") || "0");
+        const totalFailures = parseInt(
+          testsuites.getAttribute("failures") || "0"
+        );
+        const totalErrors = parseInt(testsuites.getAttribute("errors") || "0");
+        const totalTime = parseFloat(testsuites.getAttribute("time") || "0");
+
+        // Update summary
+        document.getElementById("total-tests").textContent = totalTests;
+        document.getElementById("total-failures").textContent = totalFailures;
+        document.getElementById("total-errors").textContent = totalErrors;
+        document.getElementById("total-time").textContent =
+          totalTime.toFixed(3) + "s";
+
+        // Parse test suites
+        const testsuiteElements = xmlDoc.querySelectorAll("testsuite");
+        const testedSuites = [];
+        const untestedSuites = [];
+
+        testsuiteElements.forEach((testsuite) => {
+          const name = testsuite.getAttribute("name");
+          const tests = parseInt(testsuite.getAttribute("tests") || "0");
+          const failures = parseInt(testsuite.getAttribute("failures") || "0");
+          const errors = parseInt(testsuite.getAttribute("errors") || "0");
+          const time = parseFloat(testsuite.getAttribute("time") || "0");
+          const timestamp = testsuite.getAttribute("timestamp");
+
+          const suiteData = {
+            name,
+            tests,
+            failures,
+            errors,
+            time,
+            timestamp,
+            element: testsuite,
+          };
+
+          if (tests > 0) {
+            testedSuites.push(suiteData);
+          } else {
+            untestedSuites.push(suiteData);
+          }
+        });
+
+        // Calculate coverage
+        const totalModules = testsuiteElements.length;
+        const testedModules = testedSuites.length;
+        const coveragePercentage =
+          totalModules > 0
+            ? Math.round((testedModules / totalModules) * 100)
+            : 0;
+        document.getElementById("coverage-percentage").textContent =
+          coveragePercentage + "%";
+
+        // Sort by test count (descending)
+        testedSuites.sort((a, b) => b.tests - a.tests);
+        untestedSuites.sort((a, b) => a.name.localeCompare(b.name));
+
+        // Render suites
+        renderTestSuites([...testedSuites, ...untestedSuites], "all-suites");
+        renderTestSuites(testedSuites, "tested-suites");
+        renderTestSuites(untestedSuites, "untested-suites");
+
+        // Show content
+        document.getElementById("content").style.display = "block";
+      }
+
+      function renderTestSuites(suites, containerId) {
+        const container = document.getElementById(containerId);
+        container.innerHTML = "";
+
+        if (suites.length === 0) {
+          container.innerHTML =
+            '<div class="no-coverage">No modules found in this category</div>';
+          return;
+        }
+
+        suites.forEach((suite) => {
+          const testsuiteDiv = document.createElement("div");
+          testsuiteDiv.className = "testsuite";
+
+          // Determine coverage class
+          let coverageClass = "coverage-0";
+          let coverageText = "No Tests";
+
+          if (suite.tests > 0) {
+            if (suite.failures === 0 && suite.errors === 0) {
+              coverageClass = "coverage-100";
+              coverageText = "100% Pass";
+            } else {
+              coverageClass = "coverage-partial";
+              const passRate = Math.round(
+                ((suite.tests - suite.failures - suite.errors) / suite.tests) *
+                  100
+              );
+              coverageText = `${passRate}% Pass`;
+            }
+          }
+
+          let testcasesHtml = "";
+
+          if (suite.tests > 0) {
+            const testcases = suite.element.querySelectorAll("testcase");
+            testcasesHtml = Array.from(testcases)
+              .map((testcase) => {
+                const testName = testcase.getAttribute("name");
+                const testTime = parseFloat(
+                  testcase.getAttribute("time") || "0"
+                );
+                const hasFailure = testcase.querySelector("failure") !== null;
+                const hasError = testcase.querySelector("error") !== null;
+
+                let status = "passed";
+                let statusIcon = "✓";
+
+                if (hasFailure) {
+                  status = "failed";
+                  statusIcon = "✗";
+                } else if (hasError) {
+                  status = "error";
+                  statusIcon = "!";
+                }
+
+                return `
+                            <div class="testcase ${status}">
+                                <div class="testcase-name">
+                                    <span class="status-icon ${status}">${statusIcon}</span>
+                                    ${testName}
+                                </div>
+                                <div class="testcase-time">${testTime.toFixed(
+                                  3
+                                )}s</div>
+                            </div>
+                        `;
+              })
+              .join("");
+          } else {
+            testcasesHtml =
+              '<div class="no-coverage">No tests found in this module</div>';
+          }
+
+          testsuiteDiv.innerHTML = `
+                    <div class="testsuite-header ${coverageClass}" onclick="toggleTestsuite(this)">
+                        <div class="testsuite-title">
+                            <h3>${suite.name}</h3>
+                            <span class="coverage-indicator">${coverageText}</span>
+                        </div>
+                        <div class="testsuite-stats">
+                            <span class="stat">Tests: ${suite.tests}</span>
+                            ${
+                              suite.failures > 0
+                                ? `<span class="stat" style="color: var(--accent-red);">Failures: ${suite.failures}</span>`
+                                : ""
+                            }
+                            ${
+                              suite.errors > 0
+                                ? `<span class="stat" style="color: var(--accent-orange);">Errors: ${suite.errors}</span>`
+                                : ""
+                            }
+                            <span class="stat">Time: ${suite.time.toFixed(
+                              3
+                            )}s</span>
+                            ${
+                              suite.timestamp
+                                ? `<span class="stat">${new Date(
+                                    suite.timestamp
+                                  ).toLocaleString()}</span>`
+                                : ""
+                            }
+                        </div>
+                    </div>
+                    <div class="testcases">
+                        ${testcasesHtml}
+                    </div>
+                `;
+
+          container.appendChild(testsuiteDiv);
+        });
+      }
+
+      function toggleTestsuite(header) {
+        const testcases = header.nextElementSibling;
+        testcases.classList.toggle("show");
+      }
+
+      function showError(message) {
+        document.getElementById("loading").style.display = "none";
+        document.getElementById("file-input-section").style.display = "none";
+        document.getElementById("error-message").textContent = message;
+        document.getElementById("error-container").style.display = "block";
+      }
+
+      // Initialize theme on page load
+      document.addEventListener("DOMContentLoaded", () => {
+        initTheme();
+        loadJUnitReport();
+      });
+    </script>
+  </body>
+</html>

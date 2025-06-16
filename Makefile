@@ -11,7 +11,7 @@ BINARY_WINDOWS=$(BINARY_NAME).exe
 # Database parameters
 DB_URL=postgres://$(DB_USER):$(DB_PASSWORD)@$(DB_HOST):$(DB_PORT)/$(DB_NAME)?sslmode=$(DB_SSLMODE)
 
-.PHONY: all build clean test deps run help migrate-up migrate-down migrate-create mocks
+.PHONY: all build clean test test-with-junit deps run help migrate-up migrate-down migrate-create mocks
 
 all: test build
 
@@ -32,6 +32,10 @@ clean:
 ## Run tests
 test:
 	$(GOTEST) -v ./...
+
+## Run tests with JUnit XML report generation
+test-with-junit:
+	gotestsum --junitfile junit-report.xml --format standard-verbose ./...
 
 ## Download dependencies
 deps:
@@ -58,8 +62,12 @@ migrate-create:
 install-migrate:
 	go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@latest
 
+## Install gotestsum for JUnit XML report generation
+install-gotestsum:
+	go install gotest.tools/gotestsum@latest
+
 ## Setup development environment
-setup: deps install-migrate
+setup: deps install-migrate install-gotestsum
 	copy .env.example .env
 	echo Please update .env file with your database credentials
 
@@ -106,22 +114,25 @@ clean-mocks:
 ## Display help
 help:
 	@echo Available commands:
-	@echo   build         - Build the application
-	@echo   build-windows - Build for Windows
-	@echo   clean         - Clean build files
-	@echo   test          - Run tests
-	@echo   deps          - Download dependencies
-	@echo   run           - Run the application
-	@echo   migrate-up    - Run database migrations up
-	@echo   migrate-down  - Run database migrations down
-	@echo   migrate-create- Create new migration (use: make migrate-create name=migration_name)
-	@echo   setup         - Setup development environment
-	@echo   help          - Display this help
-	@echo   mocks         - Generate all mocks
-	@echo   clean-mocks   - Clean all generated mocks
-	@echo   coverage      - Generate test coverage report
-	@echo   coverage-detailed - Generate detailed test coverage report
-	@echo   clean-coverage - Clean coverage files
+	@echo   build              - Build the application
+	@echo   build-windows      - Build for Windows
+	@echo   clean              - Clean build files
+	@echo   test               - Run tests
+	@echo   test-with-junit    - Run tests with JUnit XML report generation
+	@echo   deps               - Download dependencies
+	@echo   run                - Run the application
+	@echo   migrate-up         - Run database migrations up
+	@echo   migrate-down       - Run database migrations down
+	@echo   migrate-create     - Create new migration (use: make migrate-create name=migration_name)
+	@echo   install-migrate    - Install migration tools
+	@echo   install-gotestsum  - Install gotestsum for JUnit XML reports
+	@echo   setup              - Setup development environment
+	@echo   help               - Display this help
+	@echo   mocks              - Generate all mocks
+	@echo   clean-mocks        - Clean all generated mocks
+	@echo   coverage           - Generate test coverage report
+	@echo   coverage-detailed  - Generate detailed test coverage report
+	@echo   clean-coverage     - Clean coverage files
 
 ## Generate test coverage report
 coverage:
@@ -138,8 +149,19 @@ coverage-detailed:
 	@echo "  - Text summary displayed above"
 	@echo "  - HTML report: coverage.html"
 
+## Generate test coverage with JUnit XML report
+coverage-with-junit:
+	gotestsum --junitfile junit-report.xml --format standard-verbose -- -coverprofile=coverage.out -covermode=atomic ./...
+	$(GOCMD) tool cover -func=coverage.out
+	$(GOCMD) tool cover -html=coverage.out -o coverage.html
+	@echo "Coverage and JUnit reports generated:"
+	@echo "  - JUnit XML: junit-report.xml"
+	@echo "  - Coverage HTML: coverage.html"
+	@echo "  - Coverage profile: coverage.out"
+
 ## Clean coverage files
 clean-coverage:
 	@if exist coverage.out del coverage.out
 	@if exist coverage.html del coverage.html
-	@echo "Coverage files cleaned"
+	@if exist junit-report.xml del junit-report.xml
+	@echo "Coverage and JUnit report files cleaned"
