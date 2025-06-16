@@ -1,71 +1,71 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuites tests="21" failures="0" errors="0" time="0.792012">
-	<testsuite tests="0" failures="0" time="0.086000" name="go-fhir-demo" timestamp="2025-06-16T18:40:11+05:30">
+<testsuites tests="21" failures="0" errors="0" time="0.341319">
+	<testsuite tests="0" failures="0" time="0.061000" name="go-fhir-demo" timestamp="2025-06-16T20:25:33+05:30">
 		<properties>
 			<property name="go.version" value="go1.23.0 windows/amd64"></property>
 		</properties>
 	</testsuite>
-	<testsuite tests="0" failures="0" time="0.087000" name="go-fhir-demo/config" timestamp="2025-06-16T18:40:11+05:30">
+	<testsuite tests="0" failures="0" time="0.071000" name="go-fhir-demo/config" timestamp="2025-06-16T20:25:33+05:30">
 		<properties>
 			<property name="go.version" value="go1.23.0 windows/amd64"></property>
 		</properties>
 	</testsuite>
-	<testsuite tests="0" failures="0" time="0.083000" name="go-fhir-demo/docs" timestamp="2025-06-16T18:40:11+05:30">
+	<testsuite tests="0" failures="0" time="0.051000" name="go-fhir-demo/docs" timestamp="2025-06-16T20:25:33+05:30">
 		<properties>
 			<property name="go.version" value="go1.23.0 windows/amd64"></property>
 		</properties>
 	</testsuite>
-	<testsuite tests="0" failures="0" time="0.095000" name="go-fhir-demo/internal/api/handlers" timestamp="2025-06-16T18:40:11+05:30">
+	<testsuite tests="0" failures="0" time="0.051000" name="go-fhir-demo/internal/api/handlers" timestamp="2025-06-16T20:25:33+05:30">
 		<properties>
 			<property name="go.version" value="go1.23.0 windows/amd64"></property>
 		</properties>
 	</testsuite>
-	<testsuite tests="0" failures="0" time="0.078000" name="go-fhir-demo/internal/api/handlers/mocks" timestamp="2025-06-16T18:40:11+05:30">
+	<testsuite tests="0" failures="0" time="0.077000" name="go-fhir-demo/internal/api/handlers/mocks" timestamp="2025-06-16T20:25:33+05:30">
 		<properties>
 			<property name="go.version" value="go1.23.0 windows/amd64"></property>
 		</properties>
 	</testsuite>
-	<testsuite tests="0" failures="0" time="0.094000" name="go-fhir-demo/internal/api/routes" timestamp="2025-06-16T18:40:11+05:30">
+	<testsuite tests="0" failures="0" time="0.076000" name="go-fhir-demo/internal/api/routes" timestamp="2025-06-16T20:25:33+05:30">
 		<properties>
 			<property name="go.version" value="go1.23.0 windows/amd64"></property>
 		</properties>
 	</testsuite>
-	<testsuite tests="0" failures="0" time="0.084000" name="go-fhir-demo/internal/api/routes/mocks" timestamp="2025-06-16T18:40:11+05:30">
+	<testsuite tests="0" failures="0" time="0.072000" name="go-fhir-demo/internal/api/routes/mocks" timestamp="2025-06-16T20:25:33+05:30">
 		<properties>
 			<property name="go.version" value="go1.23.0 windows/amd64"></property>
 		</properties>
 	</testsuite>
-	<testsuite tests="0" failures="0" time="0.084000" name="go-fhir-demo/internal/domain" timestamp="2025-06-16T18:40:11+05:30">
+	<testsuite tests="0" failures="0" time="0.067000" name="go-fhir-demo/internal/domain" timestamp="2025-06-16T20:25:33+05:30">
 		<properties>
 			<property name="go.version" value="go1.23.0 windows/amd64"></property>
 		</properties>
 	</testsuite>
-	<testsuite tests="0" failures="0" time="0.083000" name="go-fhir-demo/internal/domain/mocks" timestamp="2025-06-16T18:40:11+05:30">
+	<testsuite tests="0" failures="0" time="0.078000" name="go-fhir-demo/internal/domain/mocks" timestamp="2025-06-16T20:25:33+05:30">
 		<properties>
 			<property name="go.version" value="go1.23.0 windows/amd64"></property>
 		</properties>
 	</testsuite>
-	<testsuite tests="0" failures="0" time="0.087000" name="go-fhir-demo/internal/middleware" timestamp="2025-06-16T18:40:11+05:30">
+	<testsuite tests="0" failures="0" time="0.072000" name="go-fhir-demo/internal/middleware" timestamp="2025-06-16T20:25:33+05:30">
 		<properties>
 			<property name="go.version" value="go1.23.0 windows/amd64"></property>
 		</properties>
 	</testsuite>
-	<testsuite tests="0" failures="0" time="0.000000" name="go-fhir-demo/internal/middleware/mocks" timestamp="2025-06-16T18:40:11+05:30">
+	<testsuite tests="0" failures="0" time="0.000000" name="go-fhir-demo/internal/middleware/mocks" timestamp="2025-06-16T20:25:33+05:30">
 		<properties>
 			<property name="go.version" value="go1.23.0 windows/amd64"></property>
 		</properties>
 	</testsuite>
-	<testsuite tests="0" failures="0" time="0.112000" name="go-fhir-demo/internal/repository" timestamp="2025-06-16T18:40:11+05:30">
+	<testsuite tests="0" failures="0" time="0.051000" name="go-fhir-demo/internal/repository" timestamp="2025-06-16T20:25:33+05:30">
 		<properties>
 			<property name="go.version" value="go1.23.0 windows/amd64"></property>
 		</properties>
 	</testsuite>
-	<testsuite tests="0" failures="0" time="0.108000" name="go-fhir-demo/internal/repository/mocks" timestamp="2025-06-16T18:40:11+05:30">
+	<testsuite tests="0" failures="0" time="0.076000" name="go-fhir-demo/internal/repository/mocks" timestamp="2025-06-16T20:25:33+05:30">
 		<properties>
 			<property name="go.version" value="go1.23.0 windows/amd64"></property>
 		</properties>
 	</testsuite>
-	<testsuite tests="21" failures="0" time="0.540000" name="go-fhir-demo/internal/service" timestamp="2025-06-16T18:40:11+05:30">
+	<testsuite tests="21" failures="0" time="0.235000" name="go-fhir-demo/internal/service" timestamp="2025-06-16T20:25:33+05:30">
 		<properties>
 			<property name="go.version" value="go1.23.0 windows/amd64"></property>
 		</properties>
@@ -91,27 +91,27 @@
 		<testcase classname="go-fhir-demo/internal/service" name="TestPatientServiceTestSuite/TestUpdatePatient_Success" time="0.000000"></testcase>
 		<testcase classname="go-fhir-demo/internal/service" name="TestPatientServiceTestSuite" time="0.000000"></testcase>
 	</testsuite>
-	<testsuite tests="0" failures="0" time="0.043000" name="go-fhir-demo/internal/service/mocks" timestamp="2025-06-16T18:40:11+05:30">
+	<testsuite tests="0" failures="0" time="0.043000" name="go-fhir-demo/internal/service/mocks" timestamp="2025-06-16T20:25:33+05:30">
 		<properties>
 			<property name="go.version" value="go1.23.0 windows/amd64"></property>
 		</properties>
 	</testsuite>
-	<testsuite tests="0" failures="0" time="0.047000" name="go-fhir-demo/pkg/database" timestamp="2025-06-16T18:40:11+05:30">
+	<testsuite tests="0" failures="0" time="0.062000" name="go-fhir-demo/pkg/database" timestamp="2025-06-16T20:25:33+05:30">
 		<properties>
 			<property name="go.version" value="go1.23.0 windows/amd64"></property>
 		</properties>
 	</testsuite>
-	<testsuite tests="0" failures="0" time="0.056000" name="go-fhir-demo/pkg/fhirclient" timestamp="2025-06-16T18:40:11+05:30">
+	<testsuite tests="0" failures="0" time="0.032000" name="go-fhir-demo/pkg/fhirclient" timestamp="2025-06-16T20:25:33+05:30">
 		<properties>
 			<property name="go.version" value="go1.23.0 windows/amd64"></property>
 		</properties>
 	</testsuite>
-	<testsuite tests="0" failures="0" time="0.047000" name="go-fhir-demo/pkg/logger" timestamp="2025-06-16T18:40:11+05:30">
+	<testsuite tests="0" failures="0" time="0.052000" name="go-fhir-demo/pkg/logger" timestamp="2025-06-16T20:25:33+05:30">
 		<properties>
 			<property name="go.version" value="go1.23.0 windows/amd64"></property>
 		</properties>
 	</testsuite>
-	<testsuite tests="0" failures="0" time="0.047000" name="go-fhir-demo/pkg/utils" timestamp="2025-06-16T18:40:11+05:30">
+	<testsuite tests="0" failures="0" time="0.054000" name="go-fhir-demo/pkg/utils" timestamp="2025-06-16T20:25:33+05:30">
 		<properties>
 			<property name="go.version" value="go1.23.0 windows/amd64"></property>
 		</properties>

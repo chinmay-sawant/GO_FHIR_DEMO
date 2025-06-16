@@ -1,0 +1,1442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JUnit Test Report</title>
+<link rel="stylesheet" href="styles.css" />
+<script src="script.js"></script>
+
+<link rel="stylesheet" href="styles.css" />
+<script src="script.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+</head>
+<body data-theme="dark">
+    <div class="container">
+        <div class="header">
+            <button class="theme-toggle" onclick="toggleTheme()">
+                <span id="theme-icon">🌙</span>
+            </button>
+            <h1>JUnit Test Report</h1>
+            <p>Comprehensive test results and coverage analysis</p>
+        </div>
+
+        <div id="content">
+            <div class="summary">
+                <div class="summary-card">
+                    <div class="number tests">21</div>
+                    <div class="label">Total Tests</div>
+                </div>
+                <div class="summary-card">
+                    <div class="number failures">0</div>
+                    <div class="label">Failures</div>
+                </div>
+                <div class="summary-card">
+                    <div class="number errors">0</div>
+                    <div class="label">Errors</div>
+                </div>
+                <div class="summary-card">
+                    <div class="number time">0.341s</div>
+                    <div class="label">Total Time</div>
+                </div>
+                <div class="summary-card">
+                    <div class="number coverage">5%</div>
+                    <div class="label">Coverage</div>
+                </div>
+                <div class="summary-card">
+                    <div class="number reliability">100%</div>
+                    <div class="label">Reliability Score</div>
+                </div>
+                <div class="summary-card">
+                    <div class="number performance">16ms</div>
+                    <div class="label">Avg Test Time</div>
+                </div>
+                <div class="summary-card">
+                    <div class="number flaky">0</div>
+                    <div class="label">Slow Tests</div>
+                </div>
+            </div>
+
+            <div class="tabs">
+                <button class="tab active" onclick="showTab('all')">All Modules</button>
+                <button class="tab" onclick="showTab('tested')">Tested Modules</button>
+                <button class="tab" onclick="showTab('untested')">Untested Modules</button>
+                <button class="tab" onclick="showTab('analytics')">Analytics</button>
+            </div>
+
+            <div class="tab-content active" id="all">
+                <div id="all-suites">
+
+<div class="testsuite">
+    <div class="testsuite-header coverage-100" onclick="toggleTestsuite(this)">
+        <div class="testsuite-title">
+            <h3>go-fhir-demo/internal/service</h3>
+            <span class="coverage-indicator">
+                100% Pass
+            </span>
+        </div>
+        <div class="testsuite-stats">
+            <span class="stat">Tests: 21</span>
+            
+            
+            <span class="stat">Time: 0.235s</span>
+        </div>
+    </div>
+    <div class="testcases">
+        
+        <div class="testcase passed">
+            <div class="testcase-name">
+                <span class="status-icon passed">
+                    ✓
+                </span>
+                TestExternalPatientServiceTestSuite/TestGetExternalPatientByID_Error
+            </div>
+            <div class="testcase-time">0.000s</div>
+        </div>
+        
+        <div class="testcase passed">
+            <div class="testcase-name">
+                <span class="status-icon passed">
+                    ✓
+                </span>
+                TestExternalPatientServiceTestSuite/TestGetExternalPatientByID_Success
+            </div>
+            <div class="testcase-time">0.000s</div>
+        </div>
+        
+        <div class="testcase passed">
+            <div class="testcase-name">
+                <span class="status-icon passed">
+                    ✓
+                </span>
+                TestExternalPatientServiceTestSuite/TestSearchExternalPatients_EmptyParams
+            </div>
+            <div class="testcase-time">0.000s</div>
+        </div>
+        
+        <div class="testcase passed">
+            <div class="testcase-name">
+                <span class="status-icon passed">
+                    ✓
+                </span>
+                TestExternalPatientServiceTestSuite/TestSearchExternalPatients_Error
+            </div>
+            <div class="testcase-time">0.000s</div>
+        </div>
+        
+        <div class="testcase passed">
+            <div class="testcase-name">
+                <span class="status-icon passed">
+                    ✓
+                </span>
+                TestExternalPatientServiceTestSuite/TestSearchExternalPatients_Success
+            </div>
+            <div class="testcase-time">0.000s</div>
+        </div>
+        
+        <div class="testcase passed">
+            <div class="testcase-name">
+                <span class="status-icon passed">
+                    ✓
+                </span>
+                TestExternalPatientServiceTestSuite
+            </div>
+            <div class="testcase-time">0.000s</div>
+        </div>
+        
+        <div class="testcase passed">
+            <div class="testcase-name">
+                <span class="status-icon passed">
+                    ✓
+                </span>
+                TestPatientServiceTestSuite/TestConvertFromFHIR_Success
+            </div>
+            <div class="testcase-time">0.000s</div>
+        </div>
+        
+        <div class="testcase passed">
+            <div class="testcase-name">
+                <span class="status-icon passed">
+                    ✓
+                </span>
+                TestPatientServiceTestSuite/TestConvertToFHIR_InvalidJSON
+            </div>
+            <div class="testcase-time">0.000s</div>
+        </div>
+        
+        <div class="testcase passed">
+            <div class="testcase-name">
+                <span class="status-icon passed">
+                    ✓
+                </span>
+                TestPatientServiceTestSuite/TestConvertToFHIR_Success
+            </div>
+            <div class="testcase-time">0.000s</div>
+        </div>
+        
+        <div class="testcase passed">
+            <div class="testcase-name">
+                <span class="status-icon passed">
+                    ✓
+                </span>
+                TestPatientServiceTestSuite/TestCreatePatient_Error
+            </div>
+            <div class="testcase-time">0.000s</div>
+        </div>
+        
+        <div class="testcase passed">
+            <div class="testcase-name">
+                <span class="status-icon passed">
+                    ✓
+                </span>
+                TestPatientServiceTestSuite/TestCreatePatient_Success
+            </div>
+            <div class="testcase-time">0.000s</div>
+        </div>
+        
+        <div class="testcase passed">
+            <div class="testcase-name">
+                <span class="status-icon passed">
+                    ✓
+                </span>
+                TestPatientServiceTestSuite/TestDeletePatient_Error
+            </div>
+            <div class="testcase-time">0.000s</div>
+        </div>
+        
+        <div class="testcase passed">
+            <div class="testcase-name">
+                <span class="status-icon passed">
+                    ✓
+                </span>
+                TestPatientServiceTestSuite/TestDeletePatient_Success
+            </div>
+            <div class="testcase-time">0.000s</div>
+        </div>
+        
+        <div class="testcase passed">
+            <div class="testcase-name">
+                <span class="status-icon passed">
+                    ✓
+                </span>
+                TestPatientServiceTestSuite/TestGetPatient_NotFound
+            </div>
+            <div class="testcase-time">0.000s</div>
+        </div>
+        
+        <div class="testcase passed">
+            <div class="testcase-name">
+                <span class="status-icon passed">
+                    ✓
+                </span>
+                TestPatientServiceTestSuite/TestGetPatient_Success
+            </div>
+            <div class="testcase-time">0.000s</div>
+        </div>
+        
+        <div class="testcase passed">
+            <div class="testcase-name">
+                <span class="status-icon passed">
+                    ✓
+                </span>
+                TestPatientServiceTestSuite/TestGetPatients_Error
+            </div>
+            <div class="testcase-time">0.000s</div>
+        </div>
+        
+        <div class="testcase passed">
+            <div class="testcase-name">
+                <span class="status-icon passed">
+                    ✓
+                </span>
+                TestPatientServiceTestSuite/TestGetPatients_Success
+            </div>
+            <div class="testcase-time">0.000s</div>
+        </div>
+        
+        <div class="testcase passed">
+            <div class="testcase-name">
+                <span class="status-icon passed">
+                    ✓
+                </span>
+                TestPatientServiceTestSuite/TestPatchPatient_Success
+            </div>
+            <div class="testcase-time">0.000s</div>
+        </div>
+        
+        <div class="testcase passed">
+            <div class="testcase-name">
+                <span class="status-icon passed">
+                    ✓
+                </span>
+                TestPatientServiceTestSuite/TestUpdatePatient_NotFound
+            </div>
+            <div class="testcase-time">0.000s</div>
+        </div>
+        
+        <div class="testcase passed">
+            <div class="testcase-name">
+                <span class="status-icon passed">
+                    ✓
+                </span>
+                TestPatientServiceTestSuite/TestUpdatePatient_Success
+            </div>
+            <div class="testcase-time">0.000s</div>
+        </div>
+        
+        <div class="testcase passed">
+            <div class="testcase-name">
+                <span class="status-icon passed">
+                    ✓
+                </span>
+                TestPatientServiceTestSuite
+            </div>
+            <div class="testcase-time">0.000s</div>
+        </div>
+        
+        
+    </div>
+</div>
+
+<div class="testsuite">
+    <div class="testsuite-header coverage-0" onclick="toggleTestsuite(this)">
+        <div class="testsuite-title">
+            <h3>go-fhir-demo</h3>
+            <span class="coverage-indicator">
+                No Tests
+            </span>
+        </div>
+        <div class="testsuite-stats">
+            <span class="stat">Tests: 0</span>
+            
+            
+            <span class="stat">Time: 0.061s</span>
+        </div>
+    </div>
+    <div class="testcases">
+        
+        
+        <div class="no-coverage">No tests found in this module</div>
+        
+    </div>
+</div>
+
+<div class="testsuite">
+    <div class="testsuite-header coverage-0" onclick="toggleTestsuite(this)">
+        <div class="testsuite-title">
+            <h3>go-fhir-demo/config</h3>
+            <span class="coverage-indicator">
+                No Tests
+            </span>
+        </div>
+        <div class="testsuite-stats">
+            <span class="stat">Tests: 0</span>
+            
+            
+            <span class="stat">Time: 0.071s</span>
+        </div>
+    </div>
+    <div class="testcases">
+        
+        
+        <div class="no-coverage">No tests found in this module</div>
+        
+    </div>
+</div>
+
+<div class="testsuite">
+    <div class="testsuite-header coverage-0" onclick="toggleTestsuite(this)">
+        <div class="testsuite-title">
+            <h3>go-fhir-demo/docs</h3>
+            <span class="coverage-indicator">
+                No Tests
+            </span>
+        </div>
+        <div class="testsuite-stats">
+            <span class="stat">Tests: 0</span>
+            
+            
+            <span class="stat">Time: 0.051s</span>
+        </div>
+    </div>
+    <div class="testcases">
+        
+        
+        <div class="no-coverage">No tests found in this module</div>
+        
+    </div>
+</div>
+
+<div class="testsuite">
+    <div class="testsuite-header coverage-0" onclick="toggleTestsuite(this)">
+        <div class="testsuite-title">
+            <h3>go-fhir-demo/internal/api/handlers</h3>
+            <span class="coverage-indicator">
+                No Tests
+            </span>
+        </div>
+        <div class="testsuite-stats">
+            <span class="stat">Tests: 0</span>
+            
+            
+            <span class="stat">Time: 0.051s</span>
+        </div>
+    </div>
+    <div class="testcases">
+        
+        
+        <div class="no-coverage">No tests found in this module</div>
+        
+    </div>
+</div>
+
+<div class="testsuite">
+    <div class="testsuite-header coverage-0" onclick="toggleTestsuite(this)">
+        <div class="testsuite-title">
+            <h3>go-fhir-demo/internal/api/handlers/mocks</h3>
+            <span class="coverage-indicator">
+                No Tests
+            </span>
+        </div>
+        <div class="testsuite-stats">
+            <span class="stat">Tests: 0</span>
+            
+            
+            <span class="stat">Time: 0.077s</span>
+        </div>
+    </div>
+    <div class="testcases">
+        
+        
+        <div class="no-coverage">No tests found in this module</div>
+        
+    </div>
+</div>
+
+<div class="testsuite">
+    <div class="testsuite-header coverage-0" onclick="toggleTestsuite(this)">
+        <div class="testsuite-title">
+            <h3>go-fhir-demo/internal/api/routes</h3>
+            <span class="coverage-indicator">
+                No Tests
+            </span>
+        </div>
+        <div class="testsuite-stats">
+            <span class="stat">Tests: 0</span>
+            
+            
+            <span class="stat">Time: 0.076s</span>
+        </div>
+    </div>
+    <div class="testcases">
+        
+        
+        <div class="no-coverage">No tests found in this module</div>
+        
+    </div>
+</div>
+
+<div class="testsuite">
+    <div class="testsuite-header coverage-0" onclick="toggleTestsuite(this)">
+        <div class="testsuite-title">
+            <h3>go-fhir-demo/internal/api/routes/mocks</h3>
+            <span class="coverage-indicator">
+                No Tests
+            </span>
+        </div>
+        <div class="testsuite-stats">
+            <span class="stat">Tests: 0</span>
+            
+            
+            <span class="stat">Time: 0.072s</span>
+        </div>
+    </div>
+    <div class="testcases">
+        
+        
+        <div class="no-coverage">No tests found in this module</div>
+        
+    </div>
+</div>
+
+<div class="testsuite">
+    <div class="testsuite-header coverage-0" onclick="toggleTestsuite(this)">
+        <div class="testsuite-title">
+            <h3>go-fhir-demo/internal/domain</h3>
+            <span class="coverage-indicator">
+                No Tests
+            </span>
+        </div>
+        <div class="testsuite-stats">
+            <span class="stat">Tests: 0</span>
+            
+            
+            <span class="stat">Time: 0.067s</span>
+        </div>
+    </div>
+    <div class="testcases">
+        
+        
+        <div class="no-coverage">No tests found in this module</div>
+        
+    </div>
+</div>
+
+<div class="testsuite">
+    <div class="testsuite-header coverage-0" onclick="toggleTestsuite(this)">
+        <div class="testsuite-title">
+            <h3>go-fhir-demo/internal/domain/mocks</h3>
+            <span class="coverage-indicator">
+                No Tests
+            </span>
+        </div>
+        <div class="testsuite-stats">
+            <span class="stat">Tests: 0</span>
+            
+            
+            <span class="stat">Time: 0.078s</span>
+        </div>
+    </div>
+    <div class="testcases">
+        
+        
+        <div class="no-coverage">No tests found in this module</div>
+        
+    </div>
+</div>
+
+<div class="testsuite">
+    <div class="testsuite-header coverage-0" onclick="toggleTestsuite(this)">
+        <div class="testsuite-title">
+            <h3>go-fhir-demo/internal/middleware</h3>
+            <span class="coverage-indicator">
+                No Tests
+            </span>
+        </div>
+        <div class="testsuite-stats">
+            <span class="stat">Tests: 0</span>
+            
+            
+            <span class="stat">Time: 0.072s</span>
+        </div>
+    </div>
+    <div class="testcases">
+        
+        
+        <div class="no-coverage">No tests found in this module</div>
+        
+    </div>
+</div>
+
+<div class="testsuite">
+    <div class="testsuite-header coverage-0" onclick="toggleTestsuite(this)">
+        <div class="testsuite-title">
+            <h3>go-fhir-demo/internal/middleware/mocks</h3>
+            <span class="coverage-indicator">
+                No Tests
+            </span>
+        </div>
+        <div class="testsuite-stats">
+            <span class="stat">Tests: 0</span>
+            
+            
+            <span class="stat">Time: 0.000s</span>
+        </div>
+    </div>
+    <div class="testcases">
+        
+        
+        <div class="no-coverage">No tests found in this module</div>
+        
+    </div>
+</div>
+
+<div class="testsuite">
+    <div class="testsuite-header coverage-0" onclick="toggleTestsuite(this)">
+        <div class="testsuite-title">
+            <h3>go-fhir-demo/internal/repository</h3>
+            <span class="coverage-indicator">
+                No Tests
+            </span>
+        </div>
+        <div class="testsuite-stats">
+            <span class="stat">Tests: 0</span>
+            
+            
+            <span class="stat">Time: 0.051s</span>
+        </div>
+    </div>
+    <div class="testcases">
+        
+        
+        <div class="no-coverage">No tests found in this module</div>
+        
+    </div>
+</div>
+
+<div class="testsuite">
+    <div class="testsuite-header coverage-0" onclick="toggleTestsuite(this)">
+        <div class="testsuite-title">
+            <h3>go-fhir-demo/internal/repository/mocks</h3>
+            <span class="coverage-indicator">
+                No Tests
+            </span>
+        </div>
+        <div class="testsuite-stats">
+            <span class="stat">Tests: 0</span>
+            
+            
+            <span class="stat">Time: 0.076s</span>
+        </div>
+    </div>
+    <div class="testcases">
+        
+        
+        <div class="no-coverage">No tests found in this module</div>
+        
+    </div>
+</div>
+
+<div class="testsuite">
+    <div class="testsuite-header coverage-0" onclick="toggleTestsuite(this)">
+        <div class="testsuite-title">
+            <h3>go-fhir-demo/internal/service/mocks</h3>
+            <span class="coverage-indicator">
+                No Tests
+            </span>
+        </div>
+        <div class="testsuite-stats">
+            <span class="stat">Tests: 0</span>
+            
+            
+            <span class="stat">Time: 0.043s</span>
+        </div>
+    </div>
+    <div class="testcases">
+        
+        
+        <div class="no-coverage">No tests found in this module</div>
+        
+    </div>
+</div>
+
+<div class="testsuite">
+    <div class="testsuite-header coverage-0" onclick="toggleTestsuite(this)">
+        <div class="testsuite-title">
+            <h3>go-fhir-demo/pkg/database</h3>
+            <span class="coverage-indicator">
+                No Tests
+            </span>
+        </div>
+        <div class="testsuite-stats">
+            <span class="stat">Tests: 0</span>
+            
+            
+            <span class="stat">Time: 0.062s</span>
+        </div>
+    </div>
+    <div class="testcases">
+        
+        
+        <div class="no-coverage">No tests found in this module</div>
+        
+    </div>
+</div>
+
+<div class="testsuite">
+    <div class="testsuite-header coverage-0" onclick="toggleTestsuite(this)">
+        <div class="testsuite-title">
+            <h3>go-fhir-demo/pkg/fhirclient</h3>
+            <span class="coverage-indicator">
+                No Tests
+            </span>
+        </div>
+        <div class="testsuite-stats">
+            <span class="stat">Tests: 0</span>
+            
+            
+            <span class="stat">Time: 0.032s</span>
+        </div>
+    </div>
+    <div class="testcases">
+        
+        
+        <div class="no-coverage">No tests found in this module</div>
+        
+    </div>
+</div>
+
+<div class="testsuite">
+    <div class="testsuite-header coverage-0" onclick="toggleTestsuite(this)">
+        <div class="testsuite-title">
+            <h3>go-fhir-demo/pkg/logger</h3>
+            <span class="coverage-indicator">
+                No Tests
+            </span>
+        </div>
+        <div class="testsuite-stats">
+            <span class="stat">Tests: 0</span>
+            
+            
+            <span class="stat">Time: 0.052s</span>
+        </div>
+    </div>
+    <div class="testcases">
+        
+        
+        <div class="no-coverage">No tests found in this module</div>
+        
+    </div>
+</div>
+
+<div class="testsuite">
+    <div class="testsuite-header coverage-0" onclick="toggleTestsuite(this)">
+        <div class="testsuite-title">
+            <h3>go-fhir-demo/pkg/utils</h3>
+            <span class="coverage-indicator">
+                No Tests
+            </span>
+        </div>
+        <div class="testsuite-stats">
+            <span class="stat">Tests: 0</span>
+            
+            
+            <span class="stat">Time: 0.054s</span>
+        </div>
+    </div>
+    <div class="testcases">
+        
+        
+        <div class="no-coverage">No tests found in this module</div>
+        
+    </div>
+</div>
+
+
+</div>
+            </div>
+
+            <div class="tab-content" id="tested">
+                <div id="tested-suites">
+
+<div class="testsuite">
+    <div class="testsuite-header coverage-100" onclick="toggleTestsuite(this)">
+        <div class="testsuite-title">
+            <h3>go-fhir-demo/internal/service</h3>
+            <span class="coverage-indicator">
+                100% Pass
+            </span>
+        </div>
+        <div class="testsuite-stats">
+            <span class="stat">Tests: 21</span>
+            
+            
+            <span class="stat">Time: 0.235s</span>
+        </div>
+    </div>
+    <div class="testcases">
+        
+        <div class="testcase passed">
+            <div class="testcase-name">
+                <span class="status-icon passed">
+                    ✓
+                </span>
+                TestExternalPatientServiceTestSuite/TestGetExternalPatientByID_Error
+            </div>
+            <div class="testcase-time">0.000s</div>
+        </div>
+        
+        <div class="testcase passed">
+            <div class="testcase-name">
+                <span class="status-icon passed">
+                    ✓
+                </span>
+                TestExternalPatientServiceTestSuite/TestGetExternalPatientByID_Success
+            </div>
+            <div class="testcase-time">0.000s</div>
+        </div>
+        
+        <div class="testcase passed">
+            <div class="testcase-name">
+                <span class="status-icon passed">
+                    ✓
+                </span>
+                TestExternalPatientServiceTestSuite/TestSearchExternalPatients_EmptyParams
+            </div>
+            <div class="testcase-time">0.000s</div>
+        </div>
+        
+        <div class="testcase passed">
+            <div class="testcase-name">
+                <span class="status-icon passed">
+                    ✓
+                </span>
+                TestExternalPatientServiceTestSuite/TestSearchExternalPatients_Error
+            </div>
+            <div class="testcase-time">0.000s</div>
+        </div>
+        
+        <div class="testcase passed">
+            <div class="testcase-name">
+                <span class="status-icon passed">
+                    ✓
+                </span>
+                TestExternalPatientServiceTestSuite/TestSearchExternalPatients_Success
+            </div>
+            <div class="testcase-time">0.000s</div>
+        </div>
+        
+        <div class="testcase passed">
+            <div class="testcase-name">
+                <span class="status-icon passed">
+                    ✓
+                </span>
+                TestExternalPatientServiceTestSuite
+            </div>
+            <div class="testcase-time">0.000s</div>
+        </div>
+        
+        <div class="testcase passed">
+            <div class="testcase-name">
+                <span class="status-icon passed">
+                    ✓
+                </span>
+                TestPatientServiceTestSuite/TestConvertFromFHIR_Success
+            </div>
+            <div class="testcase-time">0.000s</div>
+        </div>
+        
+        <div class="testcase passed">
+            <div class="testcase-name">
+                <span class="status-icon passed">
+                    ✓
+                </span>
+                TestPatientServiceTestSuite/TestConvertToFHIR_InvalidJSON
+            </div>
+            <div class="testcase-time">0.000s</div>
+        </div>
+        
+        <div class="testcase passed">
+            <div class="testcase-name">
+                <span class="status-icon passed">
+                    ✓
+                </span>
+                TestPatientServiceTestSuite/TestConvertToFHIR_Success
+            </div>
+            <div class="testcase-time">0.000s</div>
+        </div>
+        
+        <div class="testcase passed">
+            <div class="testcase-name">
+                <span class="status-icon passed">
+                    ✓
+                </span>
+                TestPatientServiceTestSuite/TestCreatePatient_Error
+            </div>
+            <div class="testcase-time">0.000s</div>
+        </div>
+        
+        <div class="testcase passed">
+            <div class="testcase-name">
+                <span class="status-icon passed">
+                    ✓
+                </span>
+                TestPatientServiceTestSuite/TestCreatePatient_Success
+            </div>
+            <div class="testcase-time">0.000s</div>
+        </div>
+        
+        <div class="testcase passed">
+            <div class="testcase-name">
+                <span class="status-icon passed">
+                    ✓
+                </span>
+                TestPatientServiceTestSuite/TestDeletePatient_Error
+            </div>
+            <div class="testcase-time">0.000s</div>
+        </div>
+        
+        <div class="testcase passed">
+            <div class="testcase-name">
+                <span class="status-icon passed">
+                    ✓
+                </span>
+                TestPatientServiceTestSuite/TestDeletePatient_Success
+            </div>
+            <div class="testcase-time">0.000s</div>
+        </div>
+        
+        <div class="testcase passed">
+            <div class="testcase-name">
+                <span class="status-icon passed">
+                    ✓
+                </span>
+                TestPatientServiceTestSuite/TestGetPatient_NotFound
+            </div>
+            <div class="testcase-time">0.000s</div>
+        </div>
+        
+        <div class="testcase passed">
+            <div class="testcase-name">
+                <span class="status-icon passed">
+                    ✓
+                </span>
+                TestPatientServiceTestSuite/TestGetPatient_Success
+            </div>
+            <div class="testcase-time">0.000s</div>
+        </div>
+        
+        <div class="testcase passed">
+            <div class="testcase-name">
+                <span class="status-icon passed">
+                    ✓
+                </span>
+                TestPatientServiceTestSuite/TestGetPatients_Error
+            </div>
+            <div class="testcase-time">0.000s</div>
+        </div>
+        
+        <div class="testcase passed">
+            <div class="testcase-name">
+                <span class="status-icon passed">
+                    ✓
+                </span>
+                TestPatientServiceTestSuite/TestGetPatients_Success
+            </div>
+            <div class="testcase-time">0.000s</div>
+        </div>
+        
+        <div class="testcase passed">
+            <div class="testcase-name">
+                <span class="status-icon passed">
+                    ✓
+                </span>
+                TestPatientServiceTestSuite/TestPatchPatient_Success
+            </div>
+            <div class="testcase-time">0.000s</div>
+        </div>
+        
+        <div class="testcase passed">
+            <div class="testcase-name">
+                <span class="status-icon passed">
+                    ✓
+                </span>
+                TestPatientServiceTestSuite/TestUpdatePatient_NotFound
+            </div>
+            <div class="testcase-time">0.000s</div>
+        </div>
+        
+        <div class="testcase passed">
+            <div class="testcase-name">
+                <span class="status-icon passed">
+                    ✓
+                </span>
+                TestPatientServiceTestSuite/TestUpdatePatient_Success
+            </div>
+            <div class="testcase-time">0.000s</div>
+        </div>
+        
+        <div class="testcase passed">
+            <div class="testcase-name">
+                <span class="status-icon passed">
+                    ✓
+                </span>
+                TestPatientServiceTestSuite
+            </div>
+            <div class="testcase-time">0.000s</div>
+        </div>
+        
+        
+    </div>
+</div>
+
+
+</div>
+            </div>
+
+            <div class="tab-content" id="untested">
+                <div id="untested-suites">
+
+<div class="testsuite">
+    <div class="testsuite-header coverage-0" onclick="toggleTestsuite(this)">
+        <div class="testsuite-title">
+            <h3>go-fhir-demo</h3>
+            <span class="coverage-indicator">
+                No Tests
+            </span>
+        </div>
+        <div class="testsuite-stats">
+            <span class="stat">Tests: 0</span>
+            
+            
+            <span class="stat">Time: 0.061s</span>
+        </div>
+    </div>
+    <div class="testcases">
+        
+        
+        <div class="no-coverage">No tests found in this module</div>
+        
+    </div>
+</div>
+
+<div class="testsuite">
+    <div class="testsuite-header coverage-0" onclick="toggleTestsuite(this)">
+        <div class="testsuite-title">
+            <h3>go-fhir-demo/config</h3>
+            <span class="coverage-indicator">
+                No Tests
+            </span>
+        </div>
+        <div class="testsuite-stats">
+            <span class="stat">Tests: 0</span>
+            
+            
+            <span class="stat">Time: 0.071s</span>
+        </div>
+    </div>
+    <div class="testcases">
+        
+        
+        <div class="no-coverage">No tests found in this module</div>
+        
+    </div>
+</div>
+
+<div class="testsuite">
+    <div class="testsuite-header coverage-0" onclick="toggleTestsuite(this)">
+        <div class="testsuite-title">
+            <h3>go-fhir-demo/docs</h3>
+            <span class="coverage-indicator">
+                No Tests
+            </span>
+        </div>
+        <div class="testsuite-stats">
+            <span class="stat">Tests: 0</span>
+            
+            
+            <span class="stat">Time: 0.051s</span>
+        </div>
+    </div>
+    <div class="testcases">
+        
+        
+        <div class="no-coverage">No tests found in this module</div>
+        
+    </div>
+</div>
+
+<div class="testsuite">
+    <div class="testsuite-header coverage-0" onclick="toggleTestsuite(this)">
+        <div class="testsuite-title">
+            <h3>go-fhir-demo/internal/api/handlers</h3>
+            <span class="coverage-indicator">
+                No Tests
+            </span>
+        </div>
+        <div class="testsuite-stats">
+            <span class="stat">Tests: 0</span>
+            
+            
+            <span class="stat">Time: 0.051s</span>
+        </div>
+    </div>
+    <div class="testcases">
+        
+        
+        <div class="no-coverage">No tests found in this module</div>
+        
+    </div>
+</div>
+
+<div class="testsuite">
+    <div class="testsuite-header coverage-0" onclick="toggleTestsuite(this)">
+        <div class="testsuite-title">
+            <h3>go-fhir-demo/internal/api/handlers/mocks</h3>
+            <span class="coverage-indicator">
+                No Tests
+            </span>
+        </div>
+        <div class="testsuite-stats">
+            <span class="stat">Tests: 0</span>
+            
+            
+            <span class="stat">Time: 0.077s</span>
+        </div>
+    </div>
+    <div class="testcases">
+        
+        
+        <div class="no-coverage">No tests found in this module</div>
+        
+    </div>
+</div>
+
+<div class="testsuite">
+    <div class="testsuite-header coverage-0" onclick="toggleTestsuite(this)">
+        <div class="testsuite-title">
+            <h3>go-fhir-demo/internal/api/routes</h3>
+            <span class="coverage-indicator">
+                No Tests
+            </span>
+        </div>
+        <div class="testsuite-stats">
+            <span class="stat">Tests: 0</span>
+            
+            
+            <span class="stat">Time: 0.076s</span>
+        </div>
+    </div>
+    <div class="testcases">
+        
+        
+        <div class="no-coverage">No tests found in this module</div>
+        
+    </div>
+</div>
+
+<div class="testsuite">
+    <div class="testsuite-header coverage-0" onclick="toggleTestsuite(this)">
+        <div class="testsuite-title">
+            <h3>go-fhir-demo/internal/api/routes/mocks</h3>
+            <span class="coverage-indicator">
+                No Tests
+            </span>
+        </div>
+        <div class="testsuite-stats">
+            <span class="stat">Tests: 0</span>
+            
+            
+            <span class="stat">Time: 0.072s</span>
+        </div>
+    </div>
+    <div class="testcases">
+        
+        
+        <div class="no-coverage">No tests found in this module</div>
+        
+    </div>
+</div>
+
+<div class="testsuite">
+    <div class="testsuite-header coverage-0" onclick="toggleTestsuite(this)">
+        <div class="testsuite-title">
+            <h3>go-fhir-demo/internal/domain</h3>
+            <span class="coverage-indicator">
+                No Tests
+            </span>
+        </div>
+        <div class="testsuite-stats">
+            <span class="stat">Tests: 0</span>
+            
+            
+            <span class="stat">Time: 0.067s</span>
+        </div>
+    </div>
+    <div class="testcases">
+        
+        
+        <div class="no-coverage">No tests found in this module</div>
+        
+    </div>
+</div>
+
+<div class="testsuite">
+    <div class="testsuite-header coverage-0" onclick="toggleTestsuite(this)">
+        <div class="testsuite-title">
+            <h3>go-fhir-demo/internal/domain/mocks</h3>
+            <span class="coverage-indicator">
+                No Tests
+            </span>
+        </div>
+        <div class="testsuite-stats">
+            <span class="stat">Tests: 0</span>
+            
+            
+            <span class="stat">Time: 0.078s</span>
+        </div>
+    </div>
+    <div class="testcases">
+        
+        
+        <div class="no-coverage">No tests found in this module</div>
+        
+    </div>
+</div>
+
+<div class="testsuite">
+    <div class="testsuite-header coverage-0" onclick="toggleTestsuite(this)">
+        <div class="testsuite-title">
+            <h3>go-fhir-demo/internal/middleware</h3>
+            <span class="coverage-indicator">
+                No Tests
+            </span>
+        </div>
+        <div class="testsuite-stats">
+            <span class="stat">Tests: 0</span>
+            
+            
+            <span class="stat">Time: 0.072s</span>
+        </div>
+    </div>
+    <div class="testcases">
+        
+        
+        <div class="no-coverage">No tests found in this module</div>
+        
+    </div>
+</div>
+
+<div class="testsuite">
+    <div class="testsuite-header coverage-0" onclick="toggleTestsuite(this)">
+        <div class="testsuite-title">
+            <h3>go-fhir-demo/internal/middleware/mocks</h3>
+            <span class="coverage-indicator">
+                No Tests
+            </span>
+        </div>
+        <div class="testsuite-stats">
+            <span class="stat">Tests: 0</span>
+            
+            
+            <span class="stat">Time: 0.000s</span>
+        </div>
+    </div>
+    <div class="testcases">
+        
+        
+        <div class="no-coverage">No tests found in this module</div>
+        
+    </div>
+</div>
+
+<div class="testsuite">
+    <div class="testsuite-header coverage-0" onclick="toggleTestsuite(this)">
+        <div class="testsuite-title">
+            <h3>go-fhir-demo/internal/repository</h3>
+            <span class="coverage-indicator">
+                No Tests
+            </span>
+        </div>
+        <div class="testsuite-stats">
+            <span class="stat">Tests: 0</span>
+            
+            
+            <span class="stat">Time: 0.051s</span>
+        </div>
+    </div>
+    <div class="testcases">
+        
+        
+        <div class="no-coverage">No tests found in this module</div>
+        
+    </div>
+</div>
+
+<div class="testsuite">
+    <div class="testsuite-header coverage-0" onclick="toggleTestsuite(this)">
+        <div class="testsuite-title">
+            <h3>go-fhir-demo/internal/repository/mocks</h3>
+            <span class="coverage-indicator">
+                No Tests
+            </span>
+        </div>
+        <div class="testsuite-stats">
+            <span class="stat">Tests: 0</span>
+            
+            
+            <span class="stat">Time: 0.076s</span>
+        </div>
+    </div>
+    <div class="testcases">
+        
+        
+        <div class="no-coverage">No tests found in this module</div>
+        
+    </div>
+</div>
+
+<div class="testsuite">
+    <div class="testsuite-header coverage-0" onclick="toggleTestsuite(this)">
+        <div class="testsuite-title">
+            <h3>go-fhir-demo/internal/service/mocks</h3>
+            <span class="coverage-indicator">
+                No Tests
+            </span>
+        </div>
+        <div class="testsuite-stats">
+            <span class="stat">Tests: 0</span>
+            
+            
+            <span class="stat">Time: 0.043s</span>
+        </div>
+    </div>
+    <div class="testcases">
+        
+        
+        <div class="no-coverage">No tests found in this module</div>
+        
+    </div>
+</div>
+
+<div class="testsuite">
+    <div class="testsuite-header coverage-0" onclick="toggleTestsuite(this)">
+        <div class="testsuite-title">
+            <h3>go-fhir-demo/pkg/database</h3>
+            <span class="coverage-indicator">
+                No Tests
+            </span>
+        </div>
+        <div class="testsuite-stats">
+            <span class="stat">Tests: 0</span>
+            
+            
+            <span class="stat">Time: 0.062s</span>
+        </div>
+    </div>
+    <div class="testcases">
+        
+        
+        <div class="no-coverage">No tests found in this module</div>
+        
+    </div>
+</div>
+
+<div class="testsuite">
+    <div class="testsuite-header coverage-0" onclick="toggleTestsuite(this)">
+        <div class="testsuite-title">
+            <h3>go-fhir-demo/pkg/fhirclient</h3>
+            <span class="coverage-indicator">
+                No Tests
+            </span>
+        </div>
+        <div class="testsuite-stats">
+            <span class="stat">Tests: 0</span>
+            
+            
+            <span class="stat">Time: 0.032s</span>
+        </div>
+    </div>
+    <div class="testcases">
+        
+        
+        <div class="no-coverage">No tests found in this module</div>
+        
+    </div>
+</div>
+
+<div class="testsuite">
+    <div class="testsuite-header coverage-0" onclick="toggleTestsuite(this)">
+        <div class="testsuite-title">
+            <h3>go-fhir-demo/pkg/logger</h3>
+            <span class="coverage-indicator">
+                No Tests
+            </span>
+        </div>
+        <div class="testsuite-stats">
+            <span class="stat">Tests: 0</span>
+            
+            
+            <span class="stat">Time: 0.052s</span>
+        </div>
+    </div>
+    <div class="testcases">
+        
+        
+        <div class="no-coverage">No tests found in this module</div>
+        
+    </div>
+</div>
+
+<div class="testsuite">
+    <div class="testsuite-header coverage-0" onclick="toggleTestsuite(this)">
+        <div class="testsuite-title">
+            <h3>go-fhir-demo/pkg/utils</h3>
+            <span class="coverage-indicator">
+                No Tests
+            </span>
+        </div>
+        <div class="testsuite-stats">
+            <span class="stat">Tests: 0</span>
+            
+            
+            <span class="stat">Time: 0.054s</span>
+        </div>
+    </div>
+    <div class="testcases">
+        
+        
+        <div class="no-coverage">No tests found in this module</div>
+        
+    </div>
+</div>
+
+
+</div>
+            </div>
+
+            <div class="tab-content" id="analytics">
+                <div class="analytics-grid">
+                    <div class="analytics-section">
+                        <h3>Test Distribution</h3>
+                        <canvas id="testDistributionChart" width="400" height="200"></canvas>
+                    </div>
+                    <div class="analytics-section">
+                        <h3>Performance Analysis</h3>
+                        <canvas id="performanceChart" width="400" height="200"></canvas>
+                    </div>
+                    <div class="analytics-section">
+                        <h3>Failure Analysis</h3>
+                        <div id="failureAnalysis">
+
+<div class="metric-card success">🎉 No failing tests detected!</div>
+
+</div>
+                    </div>
+                    <div class="analytics-section">
+                        <h3>Performance Insights</h3>
+                        <div id="performanceInsights">
+<div class="insights-section">
+    <h4>Performance Bottlenecks</h4>
+    
+    <div class="bottleneck-list">
+        
+        <div class="bottleneck-item">
+            <span class="bottleneck-name">go-fhir-demo/internal/service</span>
+            <span class="bottleneck-time">0.23s</span>
+        </div>
+        
+    </div>
+    
+</div>
+<div class="insights-section">
+    <h4>Recommendations</h4>
+    <div class="recommendations">
+        
+        <div class="recommendation">🎯 Focus on optimizing go-fhir-demo/internal/service - it&#39;s the slowest module</div>
+        
+        <div class="recommendation">📈 Increase test coverage - more modules without tests than with tests</div>
+        
+    </div>
+</div>
+</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const analyticsData = {"totalTests":21,"totalFailures":0,"totalErrors":0,"totalTime":0.341319,"reliabilityScore":100,"avgTestTime":16.253285714285713,"slowTests":0,"coveragePercent":5.263157894736842,"testedSuites":[{"XMLName":{"Space":"","Local":"testsuite"},"Name":"go-fhir-demo/internal/service","Tests":21,"Failures":0,"Errors":0,"Time":0.235,"Timestamp":"2025-06-16T20:25:33+05:30","TestCases":[{"XMLName":{"Space":"","Local":"testcase"},"Name":"TestExternalPatientServiceTestSuite/TestGetExternalPatientByID_Error","ClassName":"go-fhir-demo/internal/service","Time":0,"Failure":null,"Error":null,"Skipped":null},{"XMLName":{"Space":"","Local":"testcase"},"Name":"TestExternalPatientServiceTestSuite/TestGetExternalPatientByID_Success","ClassName":"go-fhir-demo/internal/service","Time":0,"Failure":null,"Error":null,"Skipped":null},{"XMLName":{"Space":"","Local":"testcase"},"Name":"TestExternalPatientServiceTestSuite/TestSearchExternalPatients_EmptyParams","ClassName":"go-fhir-demo/internal/service","Time":0,"Failure":null,"Error":null,"Skipped":null},{"XMLName":{"Space":"","Local":"testcase"},"Name":"TestExternalPatientServiceTestSuite/TestSearchExternalPatients_Error","ClassName":"go-fhir-demo/internal/service","Time":0,"Failure":null,"Error":null,"Skipped":null},{"XMLName":{"Space":"","Local":"testcase"},"Name":"TestExternalPatientServiceTestSuite/TestSearchExternalPatients_Success","ClassName":"go-fhir-demo/internal/service","Time":0,"Failure":null,"Error":null,"Skipped":null},{"XMLName":{"Space":"","Local":"testcase"},"Name":"TestExternalPatientServiceTestSuite","ClassName":"go-fhir-demo/internal/service","Time":0,"Failure":null,"Error":null,"Skipped":null},{"XMLName":{"Space":"","Local":"testcase"},"Name":"TestPatientServiceTestSuite/TestConvertFromFHIR_Success","ClassName":"go-fhir-demo/internal/service","Time":0,"Failure":null,"Error":null,"Skipped":null},{"XMLName":{"Space":"","Local":"testcase"},"Name":"TestPatientServiceTestSuite/TestConvertToFHIR_InvalidJSON","ClassName":"go-fhir-demo/internal/service","Time":0,"Failure":null,"Error":null,"Skipped":null},{"XMLName":{"Space":"","Local":"testcase"},"Name":"TestPatientServiceTestSuite/TestConvertToFHIR_Success","ClassName":"go-fhir-demo/internal/service","Time":0,"Failure":null,"Error":null,"Skipped":null},{"XMLName":{"Space":"","Local":"testcase"},"Name":"TestPatientServiceTestSuite/TestCreatePatient_Error","ClassName":"go-fhir-demo/internal/service","Time":0,"Failure":null,"Error":null,"Skipped":null},{"XMLName":{"Space":"","Local":"testcase"},"Name":"TestPatientServiceTestSuite/TestCreatePatient_Success","ClassName":"go-fhir-demo/internal/service","Time":0,"Failure":null,"Error":null,"Skipped":null},{"XMLName":{"Space":"","Local":"testcase"},"Name":"TestPatientServiceTestSuite/TestDeletePatient_Error","ClassName":"go-fhir-demo/internal/service","Time":0,"Failure":null,"Error":null,"Skipped":null},{"XMLName":{"Space":"","Local":"testcase"},"Name":"TestPatientServiceTestSuite/TestDeletePatient_Success","ClassName":"go-fhir-demo/internal/service","Time":0,"Failure":null,"Error":null,"Skipped":null},{"XMLName":{"Space":"","Local":"testcase"},"Name":"TestPatientServiceTestSuite/TestGetPatient_NotFound","ClassName":"go-fhir-demo/internal/service","Time":0,"Failure":null,"Error":null,"Skipped":null},{"XMLName":{"Space":"","Local":"testcase"},"Name":"TestPatientServiceTestSuite/TestGetPatient_Success","ClassName":"go-fhir-demo/internal/service","Time":0,"Failure":null,"Error":null,"Skipped":null},{"XMLName":{"Space":"","Local":"testcase"},"Name":"TestPatientServiceTestSuite/TestGetPatients_Error","ClassName":"go-fhir-demo/internal/service","Time":0,"Failure":null,"Error":null,"Skipped":null},{"XMLName":{"Space":"","Local":"testcase"},"Name":"TestPatientServiceTestSuite/TestGetPatients_Success","ClassName":"go-fhir-demo/internal/service","Time":0,"Failure":null,"Error":null,"Skipped":null},{"XMLName":{"Space":"","Local":"testcase"},"Name":"TestPatientServiceTestSuite/TestPatchPatient_Success","ClassName":"go-fhir-demo/internal/service","Time":0,"Failure":null,"Error":null,"Skipped":null},{"XMLName":{"Space":"","Local":"testcase"},"Name":"TestPatientServiceTestSuite/TestUpdatePatient_NotFound","ClassName":"go-fhir-demo/internal/service","Time":0,"Failure":null,"Error":null,"Skipped":null},{"XMLName":{"Space":"","Local":"testcase"},"Name":"TestPatientServiceTestSuite/TestUpdatePatient_Success","ClassName":"go-fhir-demo/internal/service","Time":0,"Failure":null,"Error":null,"Skipped":null},{"XMLName":{"Space":"","Local":"testcase"},"Name":"TestPatientServiceTestSuite","ClassName":"go-fhir-demo/internal/service","Time":0,"Failure":null,"Error":null,"Skipped":null}],"Properties":[{"Name":"go.version","Value":"go1.23.0 windows/amd64"}]}],"untestedSuites":[{"XMLName":{"Space":"","Local":"testsuite"},"Name":"go-fhir-demo","Tests":0,"Failures":0,"Errors":0,"Time":0.061,"Timestamp":"2025-06-16T20:25:33+05:30","TestCases":null,"Properties":[{"Name":"go.version","Value":"go1.23.0 windows/amd64"}]},{"XMLName":{"Space":"","Local":"testsuite"},"Name":"go-fhir-demo/config","Tests":0,"Failures":0,"Errors":0,"Time":0.071,"Timestamp":"2025-06-16T20:25:33+05:30","TestCases":null,"Properties":[{"Name":"go.version","Value":"go1.23.0 windows/amd64"}]},{"XMLName":{"Space":"","Local":"testsuite"},"Name":"go-fhir-demo/docs","Tests":0,"Failures":0,"Errors":0,"Time":0.051,"Timestamp":"2025-06-16T20:25:33+05:30","TestCases":null,"Properties":[{"Name":"go.version","Value":"go1.23.0 windows/amd64"}]},{"XMLName":{"Space":"","Local":"testsuite"},"Name":"go-fhir-demo/internal/api/handlers","Tests":0,"Failures":0,"Errors":0,"Time":0.051,"Timestamp":"2025-06-16T20:25:33+05:30","TestCases":null,"Properties":[{"Name":"go.version","Value":"go1.23.0 windows/amd64"}]},{"XMLName":{"Space":"","Local":"testsuite"},"Name":"go-fhir-demo/internal/api/handlers/mocks","Tests":0,"Failures":0,"Errors":0,"Time":0.077,"Timestamp":"2025-06-16T20:25:33+05:30","TestCases":null,"Properties":[{"Name":"go.version","Value":"go1.23.0 windows/amd64"}]},{"XMLName":{"Space":"","Local":"testsuite"},"Name":"go-fhir-demo/internal/api/routes","Tests":0,"Failures":0,"Errors":0,"Time":0.076,"Timestamp":"2025-06-16T20:25:33+05:30","TestCases":null,"Properties":[{"Name":"go.version","Value":"go1.23.0 windows/amd64"}]},{"XMLName":{"Space":"","Local":"testsuite"},"Name":"go-fhir-demo/internal/api/routes/mocks","Tests":0,"Failures":0,"Errors":0,"Time":0.072,"Timestamp":"2025-06-16T20:25:33+05:30","TestCases":null,"Properties":[{"Name":"go.version","Value":"go1.23.0 windows/amd64"}]},{"XMLName":{"Space":"","Local":"testsuite"},"Name":"go-fhir-demo/internal/domain","Tests":0,"Failures":0,"Errors":0,"Time":0.067,"Timestamp":"2025-06-16T20:25:33+05:30","TestCases":null,"Properties":[{"Name":"go.version","Value":"go1.23.0 windows/amd64"}]},{"XMLName":{"Space":"","Local":"testsuite"},"Name":"go-fhir-demo/internal/domain/mocks","Tests":0,"Failures":0,"Errors":0,"Time":0.078,"Timestamp":"2025-06-16T20:25:33+05:30","TestCases":null,"Properties":[{"Name":"go.version","Value":"go1.23.0 windows/amd64"}]},{"XMLName":{"Space":"","Local":"testsuite"},"Name":"go-fhir-demo/internal/middleware","Tests":0,"Failures":0,"Errors":0,"Time":0.072,"Timestamp":"2025-06-16T20:25:33+05:30","TestCases":null,"Properties":[{"Name":"go.version","Value":"go1.23.0 windows/amd64"}]},{"XMLName":{"Space":"","Local":"testsuite"},"Name":"go-fhir-demo/internal/middleware/mocks","Tests":0,"Failures":0,"Errors":0,"Time":0,"Timestamp":"2025-06-16T20:25:33+05:30","TestCases":null,"Properties":[{"Name":"go.version","Value":"go1.23.0 windows/amd64"}]},{"XMLName":{"Space":"","Local":"testsuite"},"Name":"go-fhir-demo/internal/repository","Tests":0,"Failures":0,"Errors":0,"Time":0.051,"Timestamp":"2025-06-16T20:25:33+05:30","TestCases":null,"Properties":[{"Name":"go.version","Value":"go1.23.0 windows/amd64"}]},{"XMLName":{"Space":"","Local":"testsuite"},"Name":"go-fhir-demo/internal/repository/mocks","Tests":0,"Failures":0,"Errors":0,"Time":0.076,"Timestamp":"2025-06-16T20:25:33+05:30","TestCases":null,"Properties":[{"Name":"go.version","Value":"go1.23.0 windows/amd64"}]},{"XMLName":{"Space":"","Local":"testsuite"},"Name":"go-fhir-demo/internal/service/mocks","Tests":0,"Failures":0,"Errors":0,"Time":0.043,"Timestamp":"2025-06-16T20:25:33+05:30","TestCases":null,"Properties":[{"Name":"go.version","Value":"go1.23.0 windows/amd64"}]},{"XMLName":{"Space":"","Local":"testsuite"},"Name":"go-fhir-demo/pkg/database","Tests":0,"Failures":0,"Errors":0,"Time":0.062,"Timestamp":"2025-06-16T20:25:33+05:30","TestCases":null,"Properties":[{"Name":"go.version","Value":"go1.23.0 windows/amd64"}]},{"XMLName":{"Space":"","Local":"testsuite"},"Name":"go-fhir-demo/pkg/fhirclient","Tests":0,"Failures":0,"Errors":0,"Time":0.032,"Timestamp":"2025-06-16T20:25:33+05:30","TestCases":null,"Properties":[{"Name":"go.version","Value":"go1.23.0 windows/amd64"}]},{"XMLName":{"Space":"","Local":"testsuite"},"Name":"go-fhir-demo/pkg/logger","Tests":0,"Failures":0,"Errors":0,"Time":0.052,"Timestamp":"2025-06-16T20:25:33+05:30","TestCases":null,"Properties":[{"Name":"go.version","Value":"go1.23.0 windows/amd64"}]},{"XMLName":{"Space":"","Local":"testsuite"},"Name":"go-fhir-demo/pkg/utils","Tests":0,"Failures":0,"Errors":0,"Time":0.054,"Timestamp":"2025-06-16T20:25:33+05:30","TestCases":null,"Properties":[{"Name":"go.version","Value":"go1.23.0 windows/amd64"}]}],"performanceData":{"fastTests":21,"mediumTests":0,"slowTests":0,"testVelocity":89.36170212765958,"bottlenecks":[{"name":"go-fhir-demo/internal/service","time":0.235}]},"failurePatterns":{},"recommendations":["🎯 Focus on optimizing go-fhir-demo/internal/service - it's the slowest module","📈 Increase test coverage - more modules without tests than with tests"]};
+        
+        
+        
+    </script>
+</body>
+</html>
+
+
+
+
+

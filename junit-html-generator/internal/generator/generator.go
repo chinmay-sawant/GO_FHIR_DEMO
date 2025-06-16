@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"html/template"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 
@@ -41,12 +40,7 @@ func (g *Generator) Generate(testSuites *models.TestSuites, outputDir string) er
 		return fmt.Errorf("failed to generate HTML: %w", err)
 	}
 
-	// Copy/embed assets based on standalone flag
-	if g.standalone {
-		return g.generateStandaloneHTML(testSuites, analytics, outputDir)
-	} else {
-		return g.copyAssets(outputDir)
-	}
+	return nil
 }
 
 func (g *Generator) generateHTML(testSuites *models.TestSuites, analytics *models.Analytics, outputDir string) error {
@@ -56,13 +50,13 @@ func (g *Generator) generateHTML(testSuites *models.TestSuites, analytics *model
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{.Title}}</title>
-    {{if not .Standalone}}
-    <link rel="stylesheet" href="styles.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    {{else}}
-    <style>{{.CSS}}</style>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    {{end}}
+<link rel="stylesheet" href="styles.css" />
+<script src="script.js"></script>
+
+<link rel="stylesheet" href="styles.css" />
+<script src="script.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 </head>
 <body data-theme="dark">
     <div class="container">
@@ -280,101 +274,4 @@ func (g *Generator) generateHTML(testSuites *models.TestSuites, analytics *model
 	defer file.Close()
 
 	return t.Execute(file, data)
-}
-
-func (g *Generator) generateStandaloneHTML(testSuites *models.TestSuites, analytics *models.Analytics, outputDir string) error {
-	// Read CSS and JS content and embed them
-	// This would require reading the actual CSS and JS files and embedding them
-	return nil
-}
-
-func (g *Generator) copyAssets(outputDir string) error {
-	// Copy CSS file
-	cssContent := getCSSContent()
-	cssFile := filepath.Join(outputDir, "styles.css")
-	if err := ioutil.WriteFile(cssFile, []byte(cssContent), 0644); err != nil {
-		return fmt.Errorf("failed to write CSS file: %w", err)
-	}
-
-	// Copy JS file
-	jsContent := getJSContent()
-	jsFile := filepath.Join(outputDir, "script.js")
-	if err := ioutil.WriteFile(jsFile, []byte(jsContent), 0644); err != nil {
-		return fmt.Errorf("failed to write JS file: %w", err)
-	}
-
-	return nil
-}
-
-func getCSSContent() string {
-	// Return the CSS content from your styles.css file
-	return `:root {
-  --bg-primary: #0d1117;
-  --bg-secondary: #161b22;
-  --bg-tertiary: #21262d;
-  --text-primary: #f0f6fc;
-  --text-secondary: #8b949e;
-  --text-muted: #656d76;
-  --border-color: #30363d;
-  --accent-blue: #58a6ff;
-  --accent-green: #3fb950;
-  --accent-red: #f85149;
-  --accent-orange: #d29922;
-  --accent-purple: #a5a5ff;
-  --shadow: rgba(0, 0, 0, 0.3);
-  --gradient-primary: linear-gradient(135deg, #161b22 0%, #0d1117 100%);
-  --gradient-accent: linear-gradient(135deg, #58a6ff 0%, #a5a5ff 100%);
-  --hover-bg: rgba(255, 255, 255, 0.05);
-}
-
-/* Add more CSS content from your styles.css file here */`
-}
-
-func getJSContent() string {
-	// Return basic JS functionality
-	return `function toggleTheme() {
-  const body = document.body;
-  const themeIcon = document.getElementById("theme-icon");
-  
-  if (body.getAttribute("data-theme") === "dark") {
-    body.setAttribute("data-theme", "light");
-    themeIcon.textContent = "☀️";
-    localStorage.setItem("theme", "light");
-  } else {
-    body.setAttribute("data-theme", "dark");
-    themeIcon.textContent = "🌙";
-    localStorage.setItem("theme", "dark");
-  }
-}
-
-function showTab(tabName) {
-  document.querySelectorAll(".tab").forEach(tab => tab.classList.remove("active"));
-  document.querySelector('[onclick="showTab(\'' + tabName + '\')"]').classList.add("active");
-  
-  document.querySelectorAll(".tab-content").forEach(content => content.classList.remove("active"));
-  document.getElementById(tabName).classList.add("active");
-}
-
-function toggleTestsuite(header) {
-  const testcases = header.nextElementSibling;
-  testcases.classList.toggle("show");
-}
-
-document.addEventListener("DOMContentLoaded", () => {
-  const savedTheme = localStorage.getItem("theme") || "dark";
-  const themeIcon = document.getElementById("theme-icon");
-  
-  document.body.setAttribute("data-theme", savedTheme);
-  themeIcon.textContent = savedTheme === "dark" ? "🌙" : "☀️";
-  
-  // Initialize charts if Chart.js is available
-  if (typeof Chart !== 'undefined') {
-    initializeCharts();
-  }
-});
-
-function initializeCharts() {
-  // Initialize charts with analyticsData
-  // Add chart initialization code here
-}`
 }

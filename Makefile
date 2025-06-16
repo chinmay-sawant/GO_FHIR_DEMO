@@ -134,21 +134,6 @@ help:
 	@echo   coverage-detailed  - Generate detailed test coverage report
 	@echo   clean-coverage     - Clean coverage files
 
-## Generate test coverage report
-coverage:
-	$(GOTEST) -coverprofile=coverage.out ./...
-	$(GOCMD) tool cover -html=coverage.out -o coverage.html
-	@echo "Coverage report generated at coverage.html"
-
-## Generate test coverage report with detailed output
-coverage-detailed:
-	$(GOTEST) -v -coverprofile=coverage.out -covermode=atomic ./...
-	$(GOCMD) tool cover -func=coverage.out
-	$(GOCMD) tool cover -html=coverage.out -o coverage.html
-	@echo "Detailed coverage report generated:"
-	@echo "  - Text summary displayed above"
-	@echo "  - HTML report: coverage.html"
-
 ## Generate test coverage with JUnit XML report
 coverage-with-junit:
 	gotestsum --junitfile junit-report.xml --format standard-verbose -- -coverprofile=coverage.out -covermode=atomic ./...
@@ -158,7 +143,16 @@ coverage-with-junit:
 	@echo "  - JUnit XML: junit-report.xml"
 	@echo "  - Coverage HTML: coverage.html"
 	@echo "  - Coverage profile: coverage.out"
-
+	@echo "Generating HTML report from JUnit XML using junit-html-generate..."
+	if exist .\junit-html-generator\junit-html-generator.exe ( \
+		.\junit-html-generator\junit-html-generator.exe -input junit-report.xml -output .\junit-report-viewer -standalone \
+	) else ( \
+		echo "JUnit HTML generator not found. Please execute 'go build' under the junit-html-generator folder." \
+	)
+	@echo "JUnit HTML report generated at junit-report-viewer/index.html"
+	@echo "Open junit-report-viewer/index.html in your browser to view the JUnit report."
+	cmd.exe /c start .\junit-report-viewer\index.html
+	
 ## Clean coverage files
 clean-coverage:
 	@if exist coverage.out del coverage.out
