@@ -374,6 +374,14 @@ make test
 # Setup development environment (copies .env.example to .env)
 make setup
 ```
+### Mock Generation Commands
+```cmd
+# Generate all mocks
+make mocks
+
+# Clean all generated mocks
+make clean-mocks
+```
 
 ### Database Commands
 ```cmd
@@ -467,6 +475,61 @@ go test -v ./...
 # Run tests with coverage
 go test -cover ./...
 ```
+
+### Testing & Coverage Commands
+```cmd
+# Generate test coverage report
+make coverage
+
+# Generate detailed test coverage report
+make coverage-detailed
+
+# Clean coverage files
+make clean-coverage
+```
+
+# Generate test coverage report (HTML)
+make coverage
+
+# Generate detailed test coverage report with console output
+make coverage-detailed
+
+# Clean coverage files
+make clean-coverage
+
+### Test Coverage
+
+The application includes comprehensive test coverage generation through the Makefile:
+
+#### Basic Coverage Report
+```cmd
+make coverage
+```
+This command:
+- Runs all tests with coverage profiling
+- Generates an HTML coverage report at `coverage.html`
+- Provides a quick overview of test coverage
+
+#### Detailed Coverage Report
+```cmd
+make coverage-detailed
+```
+This command:
+- Runs tests with verbose output and atomic coverage mode
+- Displays detailed coverage statistics in the console
+- Generates both console summary and HTML report
+- Shows function-level coverage information
+
+#### Coverage File Management
+```cmd
+make clean-coverage
+```
+This command removes generated coverage files (`coverage.out` and `coverage.html`).
+
+#### Coverage Report Locations
+- **Console Output**: Function-level coverage summary (with `make coverage-detailed`)
+- **HTML Report**: `coverage.html` - Interactive coverage visualization
+- **Raw Data**: `coverage.out` - Coverage profile data
 
 ## 🔧 Troubleshooting
 

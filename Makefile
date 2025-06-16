@@ -119,3 +119,27 @@ help:
 	@echo   help          - Display this help
 	@echo   mocks         - Generate all mocks
 	@echo   clean-mocks   - Clean all generated mocks
+	@echo   coverage      - Generate test coverage report
+	@echo   coverage-detailed - Generate detailed test coverage report
+	@echo   clean-coverage - Clean coverage files
+
+## Generate test coverage report
+coverage:
+	$(GOTEST) -coverprofile=coverage.out ./...
+	$(GOCMD) tool cover -html=coverage.out -o coverage.html
+	@echo "Coverage report generated at coverage.html"
+
+## Generate test coverage report with detailed output
+coverage-detailed:
+	$(GOTEST) -v -coverprofile=coverage.out -covermode=atomic ./...
+	$(GOCMD) tool cover -func=coverage.out
+	$(GOCMD) tool cover -html=coverage.out -o coverage.html
+	@echo "Detailed coverage report generated:"
+	@echo "  - Text summary displayed above"
+	@echo "  - HTML report: coverage.html"
+
+## Clean coverage files
+clean-coverage:
+	@if exist coverage.out del coverage.out
+	@if exist coverage.html del coverage.html
+	@echo "Coverage files cleaned"
