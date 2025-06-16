@@ -13,11 +13,11 @@ type ExternalPatientServiceInterface interface {
 }
 
 type externalPatientService struct {
-	client *fhirclient.Client
+	client fhirclient.ClientInterface
 }
 
 // NewExternalPatientService creates a new ExternalPatientService.
-func NewExternalPatientService(client *fhirclient.Client) ExternalPatientServiceInterface {
+func NewExternalPatientService(client fhirclient.ClientInterface) ExternalPatientServiceInterface {
 	return &externalPatientService{
 		client: client,
 	}
