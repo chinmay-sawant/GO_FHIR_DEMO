@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>JUnit Test Report</title>
     <link rel="stylesheet" href="styles.css" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   </head>
   <body data-theme="dark">
     <div class="container">
@@ -66,6 +67,18 @@
             <div class="number coverage" id="coverage-percentage">0%</div>
             <div class="label">Coverage</div>
           </div>
+          <div class="summary-card">
+            <div class="number reliability" id="reliability-score">0%</div>
+            <div class="label">Reliability Score</div>
+          </div>
+          <div class="summary-card">
+            <div class="number performance" id="avg-test-time">0ms</div>
+            <div class="label">Avg Test Time</div>
+          </div>
+          <div class="summary-card">
+            <div class="number flaky" id="flaky-tests">0</div>
+            <div class="label">Slow Tests</div>
+          </div>
         </div>
 
         <div class="tabs">
@@ -78,6 +91,7 @@
           <button class="tab" onclick="showTab('untested')">
             Untested Modules
           </button>
+          <button class="tab" onclick="showTab('analytics')">Analytics</button>
         </div>
 
         <div class="tab-content active" id="all">
@@ -91,10 +105,50 @@
         <div class="tab-content" id="untested">
           <div id="untested-suites"></div>
         </div>
+
+        <div class="tab-content" id="analytics">
+          <div class="analytics-grid">
+            <div class="analytics-section">
+              <h3>Test Distribution</h3>
+              <canvas
+                id="testDistributionChart"
+                width="400"
+                height="200"
+              ></canvas>
+            </div>
+
+            <div class="analytics-section">
+              <h3>Performance Analysis</h3>
+              <canvas id="performanceChart" width="400" height="200"></canvas>
+            </div>
+
+            <div class="analytics-section">
+              <h3>Failure Analysis</h3>
+              <div id="failureAnalysis"></div>
+            </div>
+
+            <div class="analytics-section">
+              <h3>Test Health Metrics</h3>
+              <div id="healthMetrics"></div>
+            </div>
+
+            <div class="analytics-section">
+              <h3>Module Coverage Heatmap</h3>
+              <div id="coverageHeatmap"></div>
+            </div>
+
+            <div class="analytics-section">
+              <h3>Performance Insights</h3>
+              <div id="performanceInsights"></div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
     <script>
+      let analyticsData = {};
+
       async function loadJUnitReport() {
         try {
           const response = await fetch("junit-report.xml");
@@ -285,6 +339,13 @@
         testedSuites.sort((a, b) => b.tests - a.tests);
         untestedSuites.sort((a, b) => a.name.localeCompare(b.name));
 
+        // Calculate advanced analytics
+        calculateAdvancedAnalytics(
+          testedSuites,
+          untestedSuites,
+          testsuiteElements
+        );
+
         // Render suites
         renderTestSuites([...testedSuites, ...untestedSuites], "all-suites");
         renderTestSuites(testedSuites, "tested-suites");
@@ -292,6 +353,430 @@
 
         // Show content
         document.getElementById("content").style.display = "block";
+      }
+
+      function calculateAdvancedAnalytics(
+        testedSuites,
+        untestedSuites,
+        testsuiteElements
+      ) {
+        // Calculate reliability score
+        const totalTests = testedSuites.reduce(
+          (sum, suite) => sum + suite.tests,
+          0
+        );
+        const totalFailures = testedSuites.reduce(
+          (sum, suite) => sum + suite.failures + suite.errors,
+          0
+        );
+        const reliabilityScore =
+          totalTests > 0
+            ? Math.round(((totalTests - totalFailures) / totalTests) * 100)
+            : 0;
+
+        // Calculate average test time
+        const totalTime = testedSuites.reduce(
+          (sum, suite) => sum + suite.time,
+          0
+        );
+        const avgTestTime =
+          totalTests > 0 ? Math.round((totalTime / totalTests) * 1000) : 0;
+
+        // Find slow tests (top 10% by time)
+        const allTestTimes = [];
+        testedSuites.forEach((suite) => {
+          const testcases = suite.element.querySelectorAll("testcase");
+          testcases.forEach((testcase) => {
+            const time = parseFloat(testcase.getAttribute("time") || "0");
+            allTestTimes.push(time);
+          });
+        });
+        allTestTimes.sort((a, b) => b - a);
+        const slowTestThreshold =
+          allTestTimes[Math.floor(allTestTimes.length * 0.1)] || 0;
+        const slowTests = allTestTimes.filter(
+          (time) => time >= slowTestThreshold
+        ).length;
+
+        // Update summary cards
+        document.getElementById("reliability-score").textContent =
+          reliabilityScore + "%";
+        document.getElementById("avg-test-time").textContent =
+          avgTestTime + "ms";
+        document.getElementById("flaky-tests").textContent = slowTests;
+
+        // Store analytics data
+        analyticsData = {
+          testedSuites,
+          untestedSuites,
+          totalTests,
+          totalFailures,
+          reliabilityScore,
+          avgTestTime,
+          slowTests,
+          slowTestThreshold,
+          allTestTimes,
+        };
+
+        // Render analytics
+        renderAnalytics();
+      }
+
+      function renderAnalytics() {
+        renderTestDistributionChart();
+        renderPerformanceChart();
+        renderFailureAnalysis();
+        renderHealthMetrics();
+        renderCoverageHeatmap();
+        renderPerformanceInsights();
+      }
+
+      function renderTestDistributionChart() {
+        const ctx = document
+          .getElementById("testDistributionChart")
+          .getContext("2d");
+        const data = {
+          labels: ["Passing", "Failing", "Error", "No Tests"],
+          datasets: [
+            {
+              data: [
+                analyticsData.totalTests - analyticsData.totalFailures,
+                analyticsData.testedSuites.reduce(
+                  (sum, suite) => sum + suite.failures,
+                  0
+                ),
+                analyticsData.testedSuites.reduce(
+                  (sum, suite) => sum + suite.errors,
+                  0
+                ),
+                analyticsData.untestedSuites.length,
+              ],
+              backgroundColor: ["#4ade80", "#ef4444", "#f97316", "#6b7280"],
+              borderWidth: 0,
+            },
+          ],
+        };
+
+        new Chart(ctx, {
+          type: "doughnut",
+          data: data,
+          options: {
+            responsive: true,
+            plugins: {
+              legend: {
+                position: "bottom",
+                labels: { color: "var(--text-color)" },
+              },
+            },
+          },
+        });
+      }
+
+      function renderPerformanceChart() {
+        const ctx = document
+          .getElementById("performanceChart")
+          .getContext("2d");
+        const suiteData = analyticsData.testedSuites
+          .slice(0, 10)
+          .map((suite) => ({
+            label:
+              suite.name.length > 20
+                ? suite.name.substring(0, 20) + "..."
+                : suite.name,
+            time: suite.time,
+            tests: suite.tests,
+          }));
+
+        new Chart(ctx, {
+          type: "bar",
+          data: {
+            labels: suiteData.map((s) => s.label),
+            datasets: [
+              {
+                label: "Execution Time (s)",
+                data: suiteData.map((s) => s.time),
+                backgroundColor: "#3b82f6",
+                borderRadius: 4,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            scales: {
+              y: {
+                beginAtZero: true,
+                ticks: { color: "var(--text-color)" },
+              },
+              x: {
+                ticks: {
+                  color: "var(--text-color)",
+                  maxRotation: 45,
+                },
+              },
+            },
+            plugins: {
+              legend: {
+                labels: { color: "var(--text-color)" },
+              },
+            },
+          },
+        });
+      }
+
+      function renderFailureAnalysis() {
+        const container = document.getElementById("failureAnalysis");
+        const failingSuites = analyticsData.testedSuites.filter(
+          (suite) => suite.failures > 0 || suite.errors > 0
+        );
+
+        if (failingSuites.length === 0) {
+          container.innerHTML =
+            '<div class="metric-card success">🎉 No failing tests detected!</div>';
+          return;
+        }
+
+        const failurePatterns = {};
+        failingSuites.forEach((suite) => {
+          const testcases = suite.element.querySelectorAll("testcase");
+          testcases.forEach((testcase) => {
+            const failure = testcase.querySelector("failure");
+            const error = testcase.querySelector("error");
+            if (failure || error) {
+              const message =
+                (failure || error).getAttribute("message") || "Unknown";
+              const pattern = message.split(":")[0] || message.substring(0, 50);
+              failurePatterns[pattern] = (failurePatterns[pattern] || 0) + 1;
+            }
+          });
+        });
+
+        const sortedPatterns = Object.entries(failurePatterns)
+          .sort(([, a], [, b]) => b - a)
+          .slice(0, 5);
+
+        container.innerHTML = `
+          <div class="failure-patterns">
+            <h4>Common Failure Patterns</h4>
+            ${sortedPatterns
+              .map(
+                ([pattern, count]) => `
+              <div class="failure-pattern">
+                <span class="pattern-text">${pattern}</span>
+                <span class="pattern-count">${count} occurrences</span>
+              </div>
+            `
+              )
+              .join("")}
+          </div>
+          <div class="failure-summary">
+            <div class="metric-card error">
+              <div class="metric-value">${failingSuites.length}</div>
+              <div class="metric-label">Failing Modules</div>
+            </div>
+          </div>
+        `;
+      }
+
+      function renderHealthMetrics() {
+        const container = document.getElementById("healthMetrics");
+        const { testedSuites, reliabilityScore, avgTestTime } = analyticsData;
+
+        const fastTests = analyticsData.allTestTimes.filter(
+          (time) => time < 0.1
+        ).length;
+        const mediumTests = analyticsData.allTestTimes.filter(
+          (time) => time >= 0.1 && time < 1
+        ).length;
+        const slowTests = analyticsData.allTestTimes.filter(
+          (time) => time >= 1
+        ).length;
+
+        const totalExecutionTimeForTestedSuites = testedSuites.reduce(
+          (sum, suite) => sum + suite.time,
+          0
+        );
+        const testVelocity =
+          analyticsData.totalTests > 0 && totalExecutionTimeForTestedSuites > 0
+            ? Math.round(
+                analyticsData.totalTests / totalExecutionTimeForTestedSuites
+              )
+            : 0;
+
+        const totalTrackedTimes = analyticsData.allTestTimes.length;
+        const fastPercent =
+          totalTrackedTimes > 0 ? (fastTests / totalTrackedTimes) * 100 : 0;
+        const mediumPercent =
+          totalTrackedTimes > 0 ? (mediumTests / totalTrackedTimes) * 100 : 0;
+        const slowPercent =
+          totalTrackedTimes > 0 ? (slowTests / totalTrackedTimes) * 100 : 0;
+
+        container.innerHTML = `
+          <div class="health-grid">
+            <div class="metric-card ${
+              reliabilityScore >= 90
+                ? "success"
+                : reliabilityScore >= 70
+                ? "warning"
+                : "error"
+            }">
+              <div class="metric-value">${reliabilityScore}%</div>
+              <div class="metric-label">Test Reliability</div>
+            </div>
+            <div class="metric-card ${
+              avgTestTime < 100
+                ? "success"
+                : avgTestTime < 500
+                ? "warning"
+                : "error"
+            }">
+              <div class="metric-value">${avgTestTime}ms</div>
+              <div class="metric-label">Avg Test Duration</div>
+            </div>
+            <div class="metric-card info">
+              <div class="metric-value">${testVelocity}</div>
+              <div class="metric-label">Tests/Second</div>
+            </div>
+          </div>
+          <div class="performance-breakdown">
+            <h4>Performance Distribution</h4>
+            <div class="perf-bar">
+              <div class="perf-segment fast" style="width: ${fastPercent.toFixed(
+                2
+              )}%">
+                Fast (&lt;100ms): ${fastTests}
+              </div>
+              <div class="perf-segment medium" style="width: ${mediumPercent.toFixed(
+                2
+              )}%">
+                Medium (100ms-1s): ${mediumTests}
+              </div>
+              <div class="perf-segment slow" style="width: ${slowPercent.toFixed(
+                2
+              )}%">
+                Slow (&gt;1s): ${slowTests}
+              </div>
+            </div>
+          </div>
+        `;
+      }
+
+      function renderCoverageHeatmap() {
+        const container = document.getElementById("coverageHeatmap");
+        const allSuites = [
+          ...analyticsData.testedSuites,
+          ...analyticsData.untestedSuites,
+        ];
+
+        container.innerHTML = `
+          <div class="heatmap-grid">
+            ${allSuites
+              .slice(0, 20)
+              .map((suite) => {
+                let coverage = 0;
+                let cssClass = "no-coverage";
+
+                if (suite.tests > 0) {
+                  coverage = Math.round(
+                    ((suite.tests - suite.failures - suite.errors) /
+                      suite.tests) *
+                      100
+                  );
+                  if (coverage === 100) cssClass = "full-coverage";
+                  else if (coverage >= 75) cssClass = "high-coverage";
+                  else if (coverage >= 50) cssClass = "medium-coverage";
+                  else cssClass = "low-coverage";
+                }
+
+                return `
+                <div class="heatmap-cell ${cssClass}" title="${
+                  suite.name
+                }: ${coverage}% success rate">
+                  <div class="cell-label">${suite.name.substring(0, 8)}...</div>
+                  <div class="cell-value">${coverage}%</div>
+                </div>
+              `;
+              })
+              .join("")}
+          </div>
+        `;
+      }
+
+      function renderPerformanceInsights() {
+        const container = document.getElementById("performanceInsights");
+        const { testedSuites, allTestTimes, slowTestThreshold } = analyticsData;
+
+        const bottlenecks = testedSuites
+          .filter((suite) => suite.time > slowTestThreshold)
+          .sort((a, b) => b.time - a.time)
+          .slice(0, 5);
+
+        const recommendations = [];
+
+        if (analyticsData.avgTestTime > 500) {
+          recommendations.push(
+            "⚡ Consider optimizing test setup/teardown - average test time is high"
+          );
+        }
+
+        if (bottlenecks.length > 0) {
+          recommendations.push(
+            `🎯 Focus on optimizing ${bottlenecks[0].name} - it's the slowest module`
+          );
+        }
+
+        if (analyticsData.reliabilityScore < 90) {
+          recommendations.push(
+            "🔧 Improve test stability - reliability score below 90%"
+          );
+        }
+
+        if (
+          analyticsData.untestedSuites.length >
+          analyticsData.testedSuites.length
+        ) {
+          recommendations.push(
+            "📈 Increase test coverage - more modules without tests than with tests"
+          );
+        }
+
+        container.innerHTML = `
+          <div class="insights-section">
+            <h4>Performance Bottlenecks</h4>
+            ${
+              bottlenecks.length > 0
+                ? `
+              <div class="bottleneck-list">
+                ${bottlenecks
+                  .map(
+                    (suite) => `
+                  <div class="bottleneck-item">
+                    <span class="bottleneck-name">${suite.name}</span>
+                    <span class="bottleneck-time">${suite.time.toFixed(
+                      2
+                    )}s</span>
+                  </div>
+                `
+                  )
+                  .join("")}
+              </div>
+            `
+                : "<p>No significant performance bottlenecks detected.</p>"
+            }
+          </div>
+
+          <div class="insights-section">
+            <h4>Recommendations</h4>
+            <div class="recommendations">
+              ${
+                recommendations.length > 0
+                  ? recommendations
+                      .map((rec) => `<div class="recommendation">${rec}</div>`)
+                      .join("")
+                  : '<div class="recommendation success">✅ All metrics look good!</div>'
+              }
+            </div>
+          </div>
+        `;
       }
 
       function renderTestSuites(suites, containerId) {
@@ -425,5 +910,201 @@
         loadJUnitReport();
       });
     </script>
+
+    <style>
+      .analytics-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+        gap: 20px;
+        margin-top: 20px;
+      }
+
+      .analytics-section {
+        background: var(--card-bg);
+        padding: 20px;
+        border-radius: 12px;
+        border: 1px solid var(--border-color);
+      }
+
+      .analytics-section h3 {
+        margin: 0 0 15px 0;
+        color: var(--text-color);
+        font-size: 1.1rem;
+      }
+
+      .metric-card {
+        background: var(--card-bg);
+        padding: 15px;
+        border-radius: 8px;
+        text-align: center;
+        border: 2px solid transparent;
+      }
+
+      .metric-card.success {
+        border-color: var(--accent-green);
+      }
+      .metric-card.warning {
+        border-color: var(--accent-orange);
+      }
+      .metric-card.error {
+        border-color: var(--accent-red);
+      }
+      .metric-card.info {
+        border-color: var(--accent-blue);
+      }
+
+      .metric-value {
+        font-size: 1.8rem;
+        font-weight: bold;
+        color: var(--text-color);
+      }
+
+      .metric-label {
+        font-size: 0.9rem;
+        color: var(--text-secondary);
+        margin-top: 5px;
+      }
+
+      .health-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 10px;
+        margin-bottom: 20px;
+      }
+
+      .failure-patterns {
+        margin-bottom: 15px;
+      }
+
+      .failure-pattern {
+        display: flex;
+        justify-content: space-between;
+        padding: 8px 0;
+        border-bottom: 1px solid var(--border-color);
+      }
+
+      .pattern-text {
+        flex: 1;
+        font-family: monospace;
+        font-size: 0.9rem;
+      }
+
+      .pattern-count {
+        color: var(--accent-red);
+        font-weight: bold;
+      }
+
+      .perf-bar {
+        display: flex;
+        height: 30px;
+        border-radius: 4px;
+        overflow: hidden;
+        margin-top: 10px;
+      }
+
+      .perf-segment {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.8rem;
+        color: white;
+        min-width: 20px;
+      }
+
+      .perf-segment.fast {
+        background-color: var(--accent-green);
+      }
+      .perf-segment.medium {
+        background-color: var(--accent-orange);
+      }
+      .perf-segment.slow {
+        background-color: var(--accent-red);
+      }
+
+      .heatmap-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+        gap: 8px;
+      }
+
+      .heatmap-cell {
+        aspect-ratio: 1;
+        border-radius: 8px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.8rem;
+        cursor: pointer;
+      }
+
+      .heatmap-cell.no-coverage {
+        background-color: var(--text-secondary);
+      }
+      .heatmap-cell.low-coverage {
+        background-color: var(--accent-red);
+      }
+      .heatmap-cell.medium-coverage {
+        background-color: var(--accent-orange);
+      }
+      .heatmap-cell.high-coverage {
+        background-color: var(--accent-blue);
+      }
+      .heatmap-cell.full-coverage {
+        background-color: var(--accent-green);
+      }
+
+      .cell-label {
+        font-size: 0.7rem;
+        opacity: 0.8;
+      }
+
+      .cell-value {
+        font-weight: bold;
+      }
+
+      .bottleneck-list {
+        space-y: 8px;
+      }
+
+      .bottleneck-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 8px 12px;
+        background: var(--bg-secondary);
+        border-radius: 6px;
+        margin-bottom: 5px;
+      }
+
+      .bottleneck-time {
+        color: var(--accent-red);
+        font-weight: bold;
+      }
+
+      .recommendations {
+        space-y: 8px;
+      }
+
+      .recommendation {
+        padding: 10px;
+        border-radius: 6px;
+        background: var(--bg-secondary);
+        border-left: 4px solid var(--accent-blue);
+        margin-bottom: 8px;
+      }
+
+      .recommendation.success {
+        border-left-color: var(--accent-green);
+      }
+
+      .insights-section {
+        margin-bottom: 20px;
+      }
+
+      .insights-section h4 {
+        color: var(--text-color);
+        margin-bottom: 10px;
+      }
+    </style>
   </body>
 </html>
