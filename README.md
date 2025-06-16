@@ -566,3 +566,17 @@ For questions, issues, or contributions:
 - **Documentation:** [Wiki](https://github.com/your-repo/go-fhir-demo/wiki)
 
 **Built with ❤️ for Healthcare Interoperability**
+
+## Mocking
+
+This application uses [github.com/uber-go/mock](https://github.com/uber-go/mock) for generating mocks in tests.
+
+### Installing mockgen
+
+To install the mock generator tool (`mockgen`), run:
+
+```
+go install github.com/uber/mockgen@latest
+```
+
+Make sure your `$GOPATH/bin` (or `$GOBIN`) is in your system's `PATH` to use `mockgen` from anywhere.

@@ -11,7 +11,7 @@ BINARY_WINDOWS=$(BINARY_NAME).exe
 # Database parameters
 DB_URL=postgres://$(DB_USER):$(DB_PASSWORD)@$(DB_HOST):$(DB_PORT)/$(DB_NAME)?sslmode=$(DB_SSLMODE)
 
-.PHONY: all build clean test deps run help migrate-up migrate-down migrate-create
+.PHONY: all build clean test deps run help migrate-up migrate-down migrate-create mocks
 
 all: test build
 
@@ -63,6 +63,42 @@ setup: deps install-migrate
 	copy .env.example .env
 	echo Please update .env file with your database credentials
 
+
+# Target to generate all mocks
+.PHONY: mocks
+mocks:
+	@echo Starting mock generation...
+	@for /f "tokens=*" %%f in ('dir /s /b "internal\*.go" 2^>nul ^| findstr /v /i "mock" ^| findstr /v /i "_test"') do ( \
+		echo Processing Go file: %%f && \
+		for %%d in ("%%~dpf") do ( \
+			set "file_dir=%%~d" && \
+			set "file_name=%%~nf" && \
+			echo File directory: %%~d && \
+			echo File name: %%~nf && \
+			echo %%~nf | findstr /I "impl" >nul && ( \
+				echo Skipping %%f because filename contains 'impl' \
+			) || ( \
+				if not exist "%%~dpfmocks" ( \
+					echo Creating mocks directory: %%~dpfmocks && \
+					mkdir "%%~dpfmocks" \
+				) && \
+				echo Command: mockgen -source=%%f -destination=%%~dpfmocks\mock_%%~nf.go -package=mocks && \
+				mockgen -source="%%f" -destination="%%~dpfmocks\mock_%%~nf.go" -package=mocks \
+			) \
+		) \
+	)
+	@echo Mock generation completed.
+
+# Clean target to remove all generated mocks
+.PHONY: clean-mocks
+clean-mocks:
+	@echo Cleaning all mock files...
+	@for /f "tokens=*" %%d in ('dir /s /b /ad "internal\*mocks" 2^>nul') do ( \
+		echo Cleaning mock directory: %%d && \
+		del /Q "%%d\*.go" 2>nul || echo No mocks to clean in %%d. \
+	)
+	@echo Mock cleanup completed.
+
 ## Display help
 help:
 	@echo Available commands:
@@ -77,3 +113,5 @@ help:
 	@echo   migrate-create- Create new migration (use: make migrate-create name=migration_name)
 	@echo   setup         - Setup development environment
 	@echo   help          - Display this help
+	@echo   mocks         - Generate all mocks
+	@echo   clean-mocks   - Clean all generated mocks
