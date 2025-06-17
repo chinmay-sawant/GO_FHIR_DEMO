@@ -1,1376 +1,1785 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>JUnit Test Report</title>
-<link rel="stylesheet" href="styles.css" />
-<script src="script.js"></script>
+    <link rel="stylesheet" href="styles.css" />
+    <script src="script.js"></script>
 
-<link rel="stylesheet" href="styles.css" />
-<script src="script.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-</head>
-<body data-theme="dark">
+    <link rel="stylesheet" href="styles.css" />
+    <script src="script.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  </head>
+  <body data-theme="dark">
     <div class="container">
-        <div class="header">
-            <button class="theme-toggle" onclick="toggleTheme()">
-                <span id="theme-icon">🌙</span>
-            </button>
-            <h1>JUnit Test Report</h1>
-            <p>Comprehensive test results and coverage analysis</p>
+      <div class="header">
+        <button class="theme-toggle" onclick="toggleTheme()">
+          <span id="theme-icon">🌙</span>
+        </button>
+        <h1>JUnit Test Report</h1>
+        <p>Comprehensive test results and coverage analysis</p>
+      </div>
+
+      <div id="content">
+        <div class="summary">
+          <div class="summary-card">
+            <div class="number tests">51</div>
+            <div class="label">Total Tests</div>
+          </div>
+          <div class="summary-card">
+            <div class="number failures">0</div>
+            <div class="label">Failures</div>
+          </div>
+          <div class="summary-card">
+            <div class="number errors">0</div>
+            <div class="label">Errors</div>
+          </div>
+          <div class="summary-card">
+            <div class="number time">7.853s</div>
+            <div class="label">Total Time</div>
+          </div>
+          <div class="summary-card">
+            <div class="number coverage">75%</div>
+            <div class="label">Coverage</div>
+          </div>
+          <div class="summary-card">
+            <div class="number reliability">100%</div>
+            <div class="label">Reliability Score</div>
+          </div>
+          <div class="summary-card">
+            <div class="number performance">154ms</div>
+            <div class="label">Avg Test Time</div>
+          </div>
+          <div class="summary-card">
+            <div class="number flaky">1</div>
+            <div class="label">Slow Tests</div>
+          </div>
         </div>
 
-        <div id="content">
-            <div class="summary">
-                <div class="summary-card">
-                    <div class="number tests">51</div>
-                    <div class="label">Total Tests</div>
+        <div class="tabs">
+          <button class="tab active" onclick="showTab('all')">
+            All Modules
+          </button>
+          <button class="tab" onclick="showTab('tested')">
+            Tested Modules
+          </button>
+          <button class="tab" onclick="showTab('untested')">
+            Untested Modules
+          </button>
+          <button class="tab" onclick="showTab('analytics')">Analytics</button>
+        </div>
+
+        <div class="tab-content active" id="all">
+          <div id="all-suites">
+            <div class="testsuite">
+              <div
+                class="testsuite-header coverage-100"
+                onclick="toggleTestsuite(this)"
+              >
+                <div class="testsuite-title">
+                  <h3>go-fhir-demo/internal/repository</h3>
+                  <span class="coverage-indicator"> 100% Pass </span>
                 </div>
-                <div class="summary-card">
-                    <div class="number failures">0</div>
-                    <div class="label">Failures</div>
+                <div class="testsuite-stats">
+                  <span class="stat">Tests: 11</span>
+
+                  <span class="stat">Time: 6.417s</span>
                 </div>
-                <div class="summary-card">
-                    <div class="number errors">0</div>
-                    <div class="label">Errors</div>
+              </div>
+              <div class="testcases">
+                <div class="testcase passed">
+                  <div class="testcase-name">
+                    <span class="status-icon passed"> ✓ </span>
+                    TestPatientRepositoryTestSuite/TestCount_EmptyTable
+                  </div>
+                  <div class="testcase-time">0.010s</div>
                 </div>
-                <div class="summary-card">
-                    <div class="number time">7.853s</div>
-                    <div class="label">Total Time</div>
+
+                <div class="testcase passed">
+                  <div class="testcase-name">
+                    <span class="status-icon passed"> ✓ </span>
+                    TestPatientRepositoryTestSuite/TestCount_Success
+                  </div>
+                  <div class="testcase-time">0.010s</div>
                 </div>
-                <div class="summary-card">
-                    <div class="number coverage">75%</div>
-                    <div class="label">Coverage</div>
+
+                <div class="testcase passed">
+                  <div class="testcase-name">
+                    <span class="status-icon passed"> ✓ </span>
+                    TestPatientRepositoryTestSuite/TestCreate_Error
+                  </div>
+                  <div class="testcase-time">0.010s</div>
                 </div>
-                <div class="summary-card">
-                    <div class="number reliability">100%</div>
-                    <div class="label">Reliability Score</div>
+
+                <div class="testcase passed">
+                  <div class="testcase-name">
+                    <span class="status-icon passed"> ✓ </span>
+                    TestPatientRepositoryTestSuite/TestCreate_Success
+                  </div>
+                  <div class="testcase-time">0.010s</div>
                 </div>
-                <div class="summary-card">
-                    <div class="number performance">154ms</div>
-                    <div class="label">Avg Test Time</div>
+
+                <div class="testcase passed">
+                  <div class="testcase-name">
+                    <span class="status-icon passed"> ✓ </span>
+                    TestPatientRepositoryTestSuite/TestDelete_Success
+                  </div>
+                  <div class="testcase-time">0.010s</div>
                 </div>
-                <div class="summary-card">
-                    <div class="number flaky">1</div>
-                    <div class="label">Slow Tests</div>
+
+                <div class="testcase passed">
+                  <div class="testcase-name">
+                    <span class="status-icon passed"> ✓ </span>
+                    TestPatientRepositoryTestSuite/TestGetAll_Success
+                  </div>
+                  <div class="testcase-time">0.010s</div>
                 </div>
+
+                <div class="testcase passed">
+                  <div class="testcase-name">
+                    <span class="status-icon passed"> ✓ </span>
+                    TestPatientRepositoryTestSuite/TestGetAll_WithPagination
+                  </div>
+                  <div class="testcase-time">0.010s</div>
+                </div>
+
+                <div class="testcase passed">
+                  <div class="testcase-name">
+                    <span class="status-icon passed"> ✓ </span>
+                    TestPatientRepositoryTestSuite/TestGetByID_NotFound
+                  </div>
+                  <div class="testcase-time">0.010s</div>
+                </div>
+
+                <div class="testcase passed">
+                  <div class="testcase-name">
+                    <span class="status-icon passed"> ✓ </span>
+                    TestPatientRepositoryTestSuite/TestGetByID_Success
+                  </div>
+                  <div class="testcase-time">0.010s</div>
+                </div>
+
+                <div class="testcase passed">
+                  <div class="testcase-name">
+                    <span class="status-icon passed"> ✓ </span>
+                    TestPatientRepositoryTestSuite/TestUpdate_Success
+                  </div>
+                  <div class="testcase-time">0.010s</div>
+                </div>
+
+                <div class="testcase passed">
+                  <div class="testcase-name">
+                    <span class="status-icon passed"> ✓ </span>
+                    TestPatientRepositoryTestSuite
+                  </div>
+                  <div class="testcase-time">5.740s</div>
+                </div>
+              </div>
             </div>
 
-            <div class="tabs">
-                <button class="tab active" onclick="showTab('all')">All Modules</button>
-                <button class="tab" onclick="showTab('tested')">Tested Modules</button>
-                <button class="tab" onclick="showTab('untested')">Untested Modules</button>
-                <button class="tab" onclick="showTab('analytics')">Analytics</button>
+            <div class="testsuite">
+              <div
+                class="testsuite-header coverage-100"
+                onclick="toggleTestsuite(this)"
+              >
+                <div class="testsuite-title">
+                  <h3>go-fhir-demo/internal/service</h3>
+                  <span class="coverage-indicator"> 100% Pass </span>
+                </div>
+                <div class="testsuite-stats">
+                  <span class="stat">Tests: 21</span>
+
+                  <span class="stat">Time: 0.696s</span>
+                </div>
+              </div>
+              <div class="testcases">
+                <div class="testcase passed">
+                  <div class="testcase-name">
+                    <span class="status-icon passed"> ✓ </span>
+                    TestExternalPatientServiceTestSuite/TestGetExternalPatientByID_Error
+                  </div>
+                  <div class="testcase-time">0.000s</div>
+                </div>
+
+                <div class="testcase passed">
+                  <div class="testcase-name">
+                    <span class="status-icon passed"> ✓ </span>
+                    TestExternalPatientServiceTestSuite/TestGetExternalPatientByID_Success
+                  </div>
+                  <div class="testcase-time">0.000s</div>
+                </div>
+
+                <div class="testcase passed">
+                  <div class="testcase-name">
+                    <span class="status-icon passed"> ✓ </span>
+                    TestExternalPatientServiceTestSuite/TestSearchExternalPatients_EmptyParams
+                  </div>
+                  <div class="testcase-time">0.000s</div>
+                </div>
+
+                <div class="testcase passed">
+                  <div class="testcase-name">
+                    <span class="status-icon passed"> ✓ </span>
+                    TestExternalPatientServiceTestSuite/TestSearchExternalPatients_Error
+                  </div>
+                  <div class="testcase-time">0.000s</div>
+                </div>
+
+                <div class="testcase passed">
+                  <div class="testcase-name">
+                    <span class="status-icon passed"> ✓ </span>
+                    TestExternalPatientServiceTestSuite/TestSearchExternalPatients_Success
+                  </div>
+                  <div class="testcase-time">0.000s</div>
+                </div>
+
+                <div class="testcase passed">
+                  <div class="testcase-name">
+                    <span class="status-icon passed"> ✓ </span>
+                    TestExternalPatientServiceTestSuite
+                  </div>
+                  <div class="testcase-time">0.000s</div>
+                </div>
+
+                <div class="testcase passed">
+                  <div class="testcase-name">
+                    <span class="status-icon passed"> ✓ </span>
+                    TestPatientServiceTestSuite/TestConvertFromFHIR_Success
+                  </div>
+                  <div class="testcase-time">0.000s</div>
+                </div>
+
+                <div class="testcase passed">
+                  <div class="testcase-name">
+                    <span class="status-icon passed"> ✓ </span>
+                    TestPatientServiceTestSuite/TestConvertToFHIR_InvalidJSON
+                  </div>
+                  <div class="testcase-time">0.000s</div>
+                </div>
+
+                <div class="testcase passed">
+                  <div class="testcase-name">
+                    <span class="status-icon passed"> ✓ </span>
+                    TestPatientServiceTestSuite/TestConvertToFHIR_Success
+                  </div>
+                  <div class="testcase-time">0.000s</div>
+                </div>
+
+                <div class="testcase passed">
+                  <div class="testcase-name">
+                    <span class="status-icon passed"> ✓ </span>
+                    TestPatientServiceTestSuite/TestCreatePatient_Error
+                  </div>
+                  <div class="testcase-time">0.000s</div>
+                </div>
+
+                <div class="testcase passed">
+                  <div class="testcase-name">
+                    <span class="status-icon passed"> ✓ </span>
+                    TestPatientServiceTestSuite/TestCreatePatient_Success
+                  </div>
+                  <div class="testcase-time">0.000s</div>
+                </div>
+
+                <div class="testcase passed">
+                  <div class="testcase-name">
+                    <span class="status-icon passed"> ✓ </span>
+                    TestPatientServiceTestSuite/TestDeletePatient_Error
+                  </div>
+                  <div class="testcase-time">0.000s</div>
+                </div>
+
+                <div class="testcase passed">
+                  <div class="testcase-name">
+                    <span class="status-icon passed"> ✓ </span>
+                    TestPatientServiceTestSuite/TestDeletePatient_Success
+                  </div>
+                  <div class="testcase-time">0.000s</div>
+                </div>
+
+                <div class="testcase passed">
+                  <div class="testcase-name">
+                    <span class="status-icon passed"> ✓ </span>
+                    TestPatientServiceTestSuite/TestGetPatient_NotFound
+                  </div>
+                  <div class="testcase-time">0.000s</div>
+                </div>
+
+                <div class="testcase passed">
+                  <div class="testcase-name">
+                    <span class="status-icon passed"> ✓ </span>
+                    TestPatientServiceTestSuite/TestGetPatient_Success
+                  </div>
+                  <div class="testcase-time">0.000s</div>
+                </div>
+
+                <div class="testcase passed">
+                  <div class="testcase-name">
+                    <span class="status-icon passed"> ✓ </span>
+                    TestPatientServiceTestSuite/TestGetPatients_Error
+                  </div>
+                  <div class="testcase-time">0.000s</div>
+                </div>
+
+                <div class="testcase passed">
+                  <div class="testcase-name">
+                    <span class="status-icon passed"> ✓ </span>
+                    TestPatientServiceTestSuite/TestGetPatients_Success
+                  </div>
+                  <div class="testcase-time">0.000s</div>
+                </div>
+
+                <div class="testcase passed">
+                  <div class="testcase-name">
+                    <span class="status-icon passed"> ✓ </span>
+                    TestPatientServiceTestSuite/TestPatchPatient_Success
+                  </div>
+                  <div class="testcase-time">0.000s</div>
+                </div>
+
+                <div class="testcase passed">
+                  <div class="testcase-name">
+                    <span class="status-icon passed"> ✓ </span>
+                    TestPatientServiceTestSuite/TestUpdatePatient_NotFound
+                  </div>
+                  <div class="testcase-time">0.000s</div>
+                </div>
+
+                <div class="testcase passed">
+                  <div class="testcase-name">
+                    <span class="status-icon passed"> ✓ </span>
+                    TestPatientServiceTestSuite/TestUpdatePatient_Success
+                  </div>
+                  <div class="testcase-time">0.000s</div>
+                </div>
+
+                <div class="testcase passed">
+                  <div class="testcase-name">
+                    <span class="status-icon passed"> ✓ </span>
+                    TestPatientServiceTestSuite
+                  </div>
+                  <div class="testcase-time">0.000s</div>
+                </div>
+              </div>
             </div>
 
-            <div class="tab-content active" id="all">
-                <div id="all-suites">
+            <div class="testsuite">
+              <div
+                class="testsuite-header coverage-100"
+                onclick="toggleTestsuite(this)"
+              >
+                <div class="testsuite-title">
+                  <h3>go-fhir-demo/internal/api/handlers</h3>
+                  <span class="coverage-indicator"> 100% Pass </span>
+                </div>
+                <div class="testsuite-stats">
+                  <span class="stat">Tests: 19</span>
 
-<div class="testsuite">
-    <div class="testsuite-header coverage-100" onclick="toggleTestsuite(this)">
-        <div class="testsuite-title">
-            <h3>go-fhir-demo/internal/repository</h3>
-            <span class="coverage-indicator">
-                100% Pass
-            </span>
-        </div>
-        <div class="testsuite-stats">
-            <span class="stat">Tests: 11</span>
-            
-            
-            <span class="stat">Time: 6.417s</span>
-        </div>
-    </div>
-    <div class="testcases">
-        
-        <div class="testcase passed">
-            <div class="testcase-name">
-                <span class="status-icon passed">
-                    ✓
-                </span>
-                TestPatientRepositoryTestSuite/TestCount_EmptyTable
-            </div>
-            <div class="testcase-time">0.010s</div>
-        </div>
-        
-        <div class="testcase passed">
-            <div class="testcase-name">
-                <span class="status-icon passed">
-                    ✓
-                </span>
-                TestPatientRepositoryTestSuite/TestCount_Success
-            </div>
-            <div class="testcase-time">0.010s</div>
-        </div>
-        
-        <div class="testcase passed">
-            <div class="testcase-name">
-                <span class="status-icon passed">
-                    ✓
-                </span>
-                TestPatientRepositoryTestSuite/TestCreate_Error
-            </div>
-            <div class="testcase-time">0.010s</div>
-        </div>
-        
-        <div class="testcase passed">
-            <div class="testcase-name">
-                <span class="status-icon passed">
-                    ✓
-                </span>
-                TestPatientRepositoryTestSuite/TestCreate_Success
-            </div>
-            <div class="testcase-time">0.010s</div>
-        </div>
-        
-        <div class="testcase passed">
-            <div class="testcase-name">
-                <span class="status-icon passed">
-                    ✓
-                </span>
-                TestPatientRepositoryTestSuite/TestDelete_Success
-            </div>
-            <div class="testcase-time">0.010s</div>
-        </div>
-        
-        <div class="testcase passed">
-            <div class="testcase-name">
-                <span class="status-icon passed">
-                    ✓
-                </span>
-                TestPatientRepositoryTestSuite/TestGetAll_Success
-            </div>
-            <div class="testcase-time">0.010s</div>
-        </div>
-        
-        <div class="testcase passed">
-            <div class="testcase-name">
-                <span class="status-icon passed">
-                    ✓
-                </span>
-                TestPatientRepositoryTestSuite/TestGetAll_WithPagination
-            </div>
-            <div class="testcase-time">0.010s</div>
-        </div>
-        
-        <div class="testcase passed">
-            <div class="testcase-name">
-                <span class="status-icon passed">
-                    ✓
-                </span>
-                TestPatientRepositoryTestSuite/TestGetByID_NotFound
-            </div>
-            <div class="testcase-time">0.010s</div>
-        </div>
-        
-        <div class="testcase passed">
-            <div class="testcase-name">
-                <span class="status-icon passed">
-                    ✓
-                </span>
-                TestPatientRepositoryTestSuite/TestGetByID_Success
-            </div>
-            <div class="testcase-time">0.010s</div>
-        </div>
-        
-        <div class="testcase passed">
-            <div class="testcase-name">
-                <span class="status-icon passed">
-                    ✓
-                </span>
-                TestPatientRepositoryTestSuite/TestUpdate_Success
-            </div>
-            <div class="testcase-time">0.010s</div>
-        </div>
-        
-        <div class="testcase passed">
-            <div class="testcase-name">
-                <span class="status-icon passed">
-                    ✓
-                </span>
-                TestPatientRepositoryTestSuite
-            </div>
-            <div class="testcase-time">5.740s</div>
-        </div>
-        
-        
-    </div>
-</div>
+                  <span class="stat">Time: 0.630s</span>
+                </div>
+              </div>
+              <div class="testcases">
+                <div class="testcase passed">
+                  <div class="testcase-name">
+                    <span class="status-icon passed"> ✓ </span>
+                    TestExternalPatientHandlerTestSuite/TestGetExternalPatientByID_BadRequest
+                  </div>
+                  <div class="testcase-time">0.000s</div>
+                </div>
 
-<div class="testsuite">
-    <div class="testsuite-header coverage-100" onclick="toggleTestsuite(this)">
-        <div class="testsuite-title">
-            <h3>go-fhir-demo/internal/service</h3>
-            <span class="coverage-indicator">
-                100% Pass
-            </span>
-        </div>
-        <div class="testsuite-stats">
-            <span class="stat">Tests: 21</span>
-            
-            
-            <span class="stat">Time: 0.696s</span>
-        </div>
-    </div>
-    <div class="testcases">
-        
-        <div class="testcase passed">
-            <div class="testcase-name">
-                <span class="status-icon passed">
-                    ✓
-                </span>
-                TestExternalPatientServiceTestSuite/TestGetExternalPatientByID_Error
-            </div>
-            <div class="testcase-time">0.000s</div>
-        </div>
-        
-        <div class="testcase passed">
-            <div class="testcase-name">
-                <span class="status-icon passed">
-                    ✓
-                </span>
-                TestExternalPatientServiceTestSuite/TestGetExternalPatientByID_Success
-            </div>
-            <div class="testcase-time">0.000s</div>
-        </div>
-        
-        <div class="testcase passed">
-            <div class="testcase-name">
-                <span class="status-icon passed">
-                    ✓
-                </span>
-                TestExternalPatientServiceTestSuite/TestSearchExternalPatients_EmptyParams
-            </div>
-            <div class="testcase-time">0.000s</div>
-        </div>
-        
-        <div class="testcase passed">
-            <div class="testcase-name">
-                <span class="status-icon passed">
-                    ✓
-                </span>
-                TestExternalPatientServiceTestSuite/TestSearchExternalPatients_Error
-            </div>
-            <div class="testcase-time">0.000s</div>
-        </div>
-        
-        <div class="testcase passed">
-            <div class="testcase-name">
-                <span class="status-icon passed">
-                    ✓
-                </span>
-                TestExternalPatientServiceTestSuite/TestSearchExternalPatients_Success
-            </div>
-            <div class="testcase-time">0.000s</div>
-        </div>
-        
-        <div class="testcase passed">
-            <div class="testcase-name">
-                <span class="status-icon passed">
-                    ✓
-                </span>
-                TestExternalPatientServiceTestSuite
-            </div>
-            <div class="testcase-time">0.000s</div>
-        </div>
-        
-        <div class="testcase passed">
-            <div class="testcase-name">
-                <span class="status-icon passed">
-                    ✓
-                </span>
-                TestPatientServiceTestSuite/TestConvertFromFHIR_Success
-            </div>
-            <div class="testcase-time">0.000s</div>
-        </div>
-        
-        <div class="testcase passed">
-            <div class="testcase-name">
-                <span class="status-icon passed">
-                    ✓
-                </span>
-                TestPatientServiceTestSuite/TestConvertToFHIR_InvalidJSON
-            </div>
-            <div class="testcase-time">0.000s</div>
-        </div>
-        
-        <div class="testcase passed">
-            <div class="testcase-name">
-                <span class="status-icon passed">
-                    ✓
-                </span>
-                TestPatientServiceTestSuite/TestConvertToFHIR_Success
-            </div>
-            <div class="testcase-time">0.000s</div>
-        </div>
-        
-        <div class="testcase passed">
-            <div class="testcase-name">
-                <span class="status-icon passed">
-                    ✓
-                </span>
-                TestPatientServiceTestSuite/TestCreatePatient_Error
-            </div>
-            <div class="testcase-time">0.000s</div>
-        </div>
-        
-        <div class="testcase passed">
-            <div class="testcase-name">
-                <span class="status-icon passed">
-                    ✓
-                </span>
-                TestPatientServiceTestSuite/TestCreatePatient_Success
-            </div>
-            <div class="testcase-time">0.000s</div>
-        </div>
-        
-        <div class="testcase passed">
-            <div class="testcase-name">
-                <span class="status-icon passed">
-                    ✓
-                </span>
-                TestPatientServiceTestSuite/TestDeletePatient_Error
-            </div>
-            <div class="testcase-time">0.000s</div>
-        </div>
-        
-        <div class="testcase passed">
-            <div class="testcase-name">
-                <span class="status-icon passed">
-                    ✓
-                </span>
-                TestPatientServiceTestSuite/TestDeletePatient_Success
-            </div>
-            <div class="testcase-time">0.000s</div>
-        </div>
-        
-        <div class="testcase passed">
-            <div class="testcase-name">
-                <span class="status-icon passed">
-                    ✓
-                </span>
-                TestPatientServiceTestSuite/TestGetPatient_NotFound
-            </div>
-            <div class="testcase-time">0.000s</div>
-        </div>
-        
-        <div class="testcase passed">
-            <div class="testcase-name">
-                <span class="status-icon passed">
-                    ✓
-                </span>
-                TestPatientServiceTestSuite/TestGetPatient_Success
-            </div>
-            <div class="testcase-time">0.000s</div>
-        </div>
-        
-        <div class="testcase passed">
-            <div class="testcase-name">
-                <span class="status-icon passed">
-                    ✓
-                </span>
-                TestPatientServiceTestSuite/TestGetPatients_Error
-            </div>
-            <div class="testcase-time">0.000s</div>
-        </div>
-        
-        <div class="testcase passed">
-            <div class="testcase-name">
-                <span class="status-icon passed">
-                    ✓
-                </span>
-                TestPatientServiceTestSuite/TestGetPatients_Success
-            </div>
-            <div class="testcase-time">0.000s</div>
-        </div>
-        
-        <div class="testcase passed">
-            <div class="testcase-name">
-                <span class="status-icon passed">
-                    ✓
-                </span>
-                TestPatientServiceTestSuite/TestPatchPatient_Success
-            </div>
-            <div class="testcase-time">0.000s</div>
-        </div>
-        
-        <div class="testcase passed">
-            <div class="testcase-name">
-                <span class="status-icon passed">
-                    ✓
-                </span>
-                TestPatientServiceTestSuite/TestUpdatePatient_NotFound
-            </div>
-            <div class="testcase-time">0.000s</div>
-        </div>
-        
-        <div class="testcase passed">
-            <div class="testcase-name">
-                <span class="status-icon passed">
-                    ✓
-                </span>
-                TestPatientServiceTestSuite/TestUpdatePatient_Success
-            </div>
-            <div class="testcase-time">0.000s</div>
-        </div>
-        
-        <div class="testcase passed">
-            <div class="testcase-name">
-                <span class="status-icon passed">
-                    ✓
-                </span>
-                TestPatientServiceTestSuite
-            </div>
-            <div class="testcase-time">0.000s</div>
-        </div>
-        
-        
-    </div>
-</div>
+                <div class="testcase passed">
+                  <div class="testcase-name">
+                    <span class="status-icon passed"> ✓ </span>
+                    TestExternalPatientHandlerTestSuite/TestGetExternalPatientByID_Error
+                  </div>
+                  <div class="testcase-time">0.000s</div>
+                </div>
 
-<div class="testsuite">
-    <div class="testsuite-header coverage-100" onclick="toggleTestsuite(this)">
-        <div class="testsuite-title">
-            <h3>go-fhir-demo/internal/api/handlers</h3>
-            <span class="coverage-indicator">
-                100% Pass
-            </span>
-        </div>
-        <div class="testsuite-stats">
-            <span class="stat">Tests: 19</span>
-            
-            
-            <span class="stat">Time: 0.630s</span>
-        </div>
-    </div>
-    <div class="testcases">
-        
-        <div class="testcase passed">
-            <div class="testcase-name">
-                <span class="status-icon passed">
-                    ✓
-                </span>
-                TestExternalPatientHandlerTestSuite/TestGetExternalPatientByID_BadRequest
-            </div>
-            <div class="testcase-time">0.000s</div>
-        </div>
-        
-        <div class="testcase passed">
-            <div class="testcase-name">
-                <span class="status-icon passed">
-                    ✓
-                </span>
-                TestExternalPatientHandlerTestSuite/TestGetExternalPatientByID_Error
-            </div>
-            <div class="testcase-time">0.000s</div>
-        </div>
-        
-        <div class="testcase passed">
-            <div class="testcase-name">
-                <span class="status-icon passed">
-                    ✓
-                </span>
-                TestExternalPatientHandlerTestSuite/TestGetExternalPatientByID_Success
-            </div>
-            <div class="testcase-time">0.000s</div>
-        </div>
-        
-        <div class="testcase passed">
-            <div class="testcase-name">
-                <span class="status-icon passed">
-                    ✓
-                </span>
-                TestExternalPatientHandlerTestSuite/TestSearchExternalPatients_Error
-            </div>
-            <div class="testcase-time">0.000s</div>
-        </div>
-        
-        <div class="testcase passed">
-            <div class="testcase-name">
-                <span class="status-icon passed">
-                    ✓
-                </span>
-                TestExternalPatientHandlerTestSuite/TestSearchExternalPatients_Success
-            </div>
-            <div class="testcase-time">0.000s</div>
-        </div>
-        
-        <div class="testcase passed">
-            <div class="testcase-name">
-                <span class="status-icon passed">
-                    ✓
-                </span>
-                TestExternalPatientHandlerTestSuite
-            </div>
-            <div class="testcase-time">0.000s</div>
-        </div>
-        
-        <div class="testcase passed">
-            <div class="testcase-name">
-                <span class="status-icon passed">
-                    ✓
-                </span>
-                TestPatientHandlerTestSuite/TestCreatePatient_BadRequest
-            </div>
-            <div class="testcase-time">0.000s</div>
-        </div>
-        
-        <div class="testcase passed">
-            <div class="testcase-name">
-                <span class="status-icon passed">
-                    ✓
-                </span>
-                TestPatientHandlerTestSuite/TestCreatePatient_Error
-            </div>
-            <div class="testcase-time">0.000s</div>
-        </div>
-        
-        <div class="testcase passed">
-            <div class="testcase-name">
-                <span class="status-icon passed">
-                    ✓
-                </span>
-                TestPatientHandlerTestSuite/TestCreatePatient_Success
-            </div>
-            <div class="testcase-time">0.000s</div>
-        </div>
-        
-        <div class="testcase passed">
-            <div class="testcase-name">
-                <span class="status-icon passed">
-                    ✓
-                </span>
-                TestPatientHandlerTestSuite/TestDeletePatient_BadRequest
-            </div>
-            <div class="testcase-time">0.000s</div>
-        </div>
-        
-        <div class="testcase passed">
-            <div class="testcase-name">
-                <span class="status-icon passed">
-                    ✓
-                </span>
-                TestPatientHandlerTestSuite/TestDeletePatient_Error
-            </div>
-            <div class="testcase-time">0.000s</div>
-        </div>
-        
-        <div class="testcase passed">
-            <div class="testcase-name">
-                <span class="status-icon passed">
-                    ✓
-                </span>
-                TestPatientHandlerTestSuite/TestDeletePatient_Success
-            </div>
-            <div class="testcase-time">0.000s</div>
-        </div>
-        
-        <div class="testcase passed">
-            <div class="testcase-name">
-                <span class="status-icon passed">
-                    ✓
-                </span>
-                TestPatientHandlerTestSuite/TestGetPatient_BadRequest
-            </div>
-            <div class="testcase-time">0.000s</div>
-        </div>
-        
-        <div class="testcase passed">
-            <div class="testcase-name">
-                <span class="status-icon passed">
-                    ✓
-                </span>
-                TestPatientHandlerTestSuite/TestGetPatient_NotFound
-            </div>
-            <div class="testcase-time">0.000s</div>
-        </div>
-        
-        <div class="testcase passed">
-            <div class="testcase-name">
-                <span class="status-icon passed">
-                    ✓
-                </span>
-                TestPatientHandlerTestSuite/TestGetPatient_Success
-            </div>
-            <div class="testcase-time">0.000s</div>
-        </div>
-        
-        <div class="testcase passed">
-            <div class="testcase-name">
-                <span class="status-icon passed">
-                    ✓
-                </span>
-                TestPatientHandlerTestSuite/TestGetPatients_Success
-            </div>
-            <div class="testcase-time">0.000s</div>
-        </div>
-        
-        <div class="testcase passed">
-            <div class="testcase-name">
-                <span class="status-icon passed">
-                    ✓
-                </span>
-                TestPatientHandlerTestSuite/TestPatchPatient_Success
-            </div>
-            <div class="testcase-time">0.000s</div>
-        </div>
-        
-        <div class="testcase passed">
-            <div class="testcase-name">
-                <span class="status-icon passed">
-                    ✓
-                </span>
-                TestPatientHandlerTestSuite/TestUpdatePatient_Success
-            </div>
-            <div class="testcase-time">0.000s</div>
-        </div>
-        
-        <div class="testcase passed">
-            <div class="testcase-name">
-                <span class="status-icon passed">
-                    ✓
-                </span>
-                TestPatientHandlerTestSuite
-            </div>
-            <div class="testcase-time">0.000s</div>
-        </div>
-        
-        
-    </div>
-</div>
+                <div class="testcase passed">
+                  <div class="testcase-name">
+                    <span class="status-icon passed"> ✓ </span>
+                    TestExternalPatientHandlerTestSuite/TestGetExternalPatientByID_Success
+                  </div>
+                  <div class="testcase-time">0.000s</div>
+                </div>
 
-<div class="testsuite">
-    <div class="testsuite-header coverage-0" onclick="toggleTestsuite(this)">
-        <div class="testsuite-title">
-            <h3>go-fhir-demo/pkg/fhirclient</h3>
-            <span class="coverage-indicator">
-                No Tests
-            </span>
-        </div>
-        <div class="testsuite-stats">
-            <span class="stat">Tests: 0</span>
-            
-            
-            <span class="stat">Time: 0.110s</span>
-        </div>
-    </div>
-    <div class="testcases">
-        
-        
-        <div class="no-coverage">No tests found in this module</div>
-        
-    </div>
-</div>
+                <div class="testcase passed">
+                  <div class="testcase-name">
+                    <span class="status-icon passed"> ✓ </span>
+                    TestExternalPatientHandlerTestSuite/TestSearchExternalPatients_Error
+                  </div>
+                  <div class="testcase-time">0.000s</div>
+                </div>
 
+                <div class="testcase passed">
+                  <div class="testcase-name">
+                    <span class="status-icon passed"> ✓ </span>
+                    TestExternalPatientHandlerTestSuite/TestSearchExternalPatients_Success
+                  </div>
+                  <div class="testcase-time">0.000s</div>
+                </div>
 
-</div>
+                <div class="testcase passed">
+                  <div class="testcase-name">
+                    <span class="status-icon passed"> ✓ </span>
+                    TestExternalPatientHandlerTestSuite
+                  </div>
+                  <div class="testcase-time">0.000s</div>
+                </div>
+
+                <div class="testcase passed">
+                  <div class="testcase-name">
+                    <span class="status-icon passed"> ✓ </span>
+                    TestPatientHandlerTestSuite/TestCreatePatient_BadRequest
+                  </div>
+                  <div class="testcase-time">0.000s</div>
+                </div>
+
+                <div class="testcase passed">
+                  <div class="testcase-name">
+                    <span class="status-icon passed"> ✓ </span>
+                    TestPatientHandlerTestSuite/TestCreatePatient_Error
+                  </div>
+                  <div class="testcase-time">0.000s</div>
+                </div>
+
+                <div class="testcase passed">
+                  <div class="testcase-name">
+                    <span class="status-icon passed"> ✓ </span>
+                    TestPatientHandlerTestSuite/TestCreatePatient_Success
+                  </div>
+                  <div class="testcase-time">0.000s</div>
+                </div>
+
+                <div class="testcase passed">
+                  <div class="testcase-name">
+                    <span class="status-icon passed"> ✓ </span>
+                    TestPatientHandlerTestSuite/TestDeletePatient_BadRequest
+                  </div>
+                  <div class="testcase-time">0.000s</div>
+                </div>
+
+                <div class="testcase passed">
+                  <div class="testcase-name">
+                    <span class="status-icon passed"> ✓ </span>
+                    TestPatientHandlerTestSuite/TestDeletePatient_Error
+                  </div>
+                  <div class="testcase-time">0.000s</div>
+                </div>
+
+                <div class="testcase passed">
+                  <div class="testcase-name">
+                    <span class="status-icon passed"> ✓ </span>
+                    TestPatientHandlerTestSuite/TestDeletePatient_Success
+                  </div>
+                  <div class="testcase-time">0.000s</div>
+                </div>
+
+                <div class="testcase passed">
+                  <div class="testcase-name">
+                    <span class="status-icon passed"> ✓ </span>
+                    TestPatientHandlerTestSuite/TestGetPatient_BadRequest
+                  </div>
+                  <div class="testcase-time">0.000s</div>
+                </div>
+
+                <div class="testcase passed">
+                  <div class="testcase-name">
+                    <span class="status-icon passed"> ✓ </span>
+                    TestPatientHandlerTestSuite/TestGetPatient_NotFound
+                  </div>
+                  <div class="testcase-time">0.000s</div>
+                </div>
+
+                <div class="testcase passed">
+                  <div class="testcase-name">
+                    <span class="status-icon passed"> ✓ </span>
+                    TestPatientHandlerTestSuite/TestGetPatient_Success
+                  </div>
+                  <div class="testcase-time">0.000s</div>
+                </div>
+
+                <div class="testcase passed">
+                  <div class="testcase-name">
+                    <span class="status-icon passed"> ✓ </span>
+                    TestPatientHandlerTestSuite/TestGetPatients_Success
+                  </div>
+                  <div class="testcase-time">0.000s</div>
+                </div>
+
+                <div class="testcase passed">
+                  <div class="testcase-name">
+                    <span class="status-icon passed"> ✓ </span>
+                    TestPatientHandlerTestSuite/TestPatchPatient_Success
+                  </div>
+                  <div class="testcase-time">0.000s</div>
+                </div>
+
+                <div class="testcase passed">
+                  <div class="testcase-name">
+                    <span class="status-icon passed"> ✓ </span>
+                    TestPatientHandlerTestSuite/TestUpdatePatient_Success
+                  </div>
+                  <div class="testcase-time">0.000s</div>
+                </div>
+
+                <div class="testcase passed">
+                  <div class="testcase-name">
+                    <span class="status-icon passed"> ✓ </span>
+                    TestPatientHandlerTestSuite
+                  </div>
+                  <div class="testcase-time">0.000s</div>
+                </div>
+              </div>
             </div>
 
-            <div class="tab-content" id="tested">
-                <div id="tested-suites">
+            <div class="testsuite">
+              <div
+                class="testsuite-header coverage-0"
+                onclick="toggleTestsuite(this)"
+              >
+                <div class="testsuite-title">
+                  <h3>go-fhir-demo/pkg/fhirclient</h3>
+                  <span class="coverage-indicator"> No Tests </span>
+                </div>
+                <div class="testsuite-stats">
+                  <span class="stat">Tests: 0</span>
 
-<div class="testsuite">
-    <div class="testsuite-header coverage-100" onclick="toggleTestsuite(this)">
-        <div class="testsuite-title">
-            <h3>go-fhir-demo/internal/repository</h3>
-            <span class="coverage-indicator">
-                100% Pass
-            </span>
-        </div>
-        <div class="testsuite-stats">
-            <span class="stat">Tests: 11</span>
-            
-            
-            <span class="stat">Time: 6.417s</span>
-        </div>
-    </div>
-    <div class="testcases">
-        
-        <div class="testcase passed">
-            <div class="testcase-name">
-                <span class="status-icon passed">
-                    ✓
-                </span>
-                TestPatientRepositoryTestSuite/TestCount_EmptyTable
+                  <span class="stat">Time: 0.110s</span>
+                </div>
+              </div>
+              <div class="testcases">
+                <div class="no-coverage">No tests found in this module</div>
+              </div>
             </div>
-            <div class="testcase-time">0.010s</div>
+          </div>
         </div>
-        
-        <div class="testcase passed">
-            <div class="testcase-name">
-                <span class="status-icon passed">
-                    ✓
-                </span>
-                TestPatientRepositoryTestSuite/TestCount_Success
-            </div>
-            <div class="testcase-time">0.010s</div>
-        </div>
-        
-        <div class="testcase passed">
-            <div class="testcase-name">
-                <span class="status-icon passed">
-                    ✓
-                </span>
-                TestPatientRepositoryTestSuite/TestCreate_Error
-            </div>
-            <div class="testcase-time">0.010s</div>
-        </div>
-        
-        <div class="testcase passed">
-            <div class="testcase-name">
-                <span class="status-icon passed">
-                    ✓
-                </span>
-                TestPatientRepositoryTestSuite/TestCreate_Success
-            </div>
-            <div class="testcase-time">0.010s</div>
-        </div>
-        
-        <div class="testcase passed">
-            <div class="testcase-name">
-                <span class="status-icon passed">
-                    ✓
-                </span>
-                TestPatientRepositoryTestSuite/TestDelete_Success
-            </div>
-            <div class="testcase-time">0.010s</div>
-        </div>
-        
-        <div class="testcase passed">
-            <div class="testcase-name">
-                <span class="status-icon passed">
-                    ✓
-                </span>
-                TestPatientRepositoryTestSuite/TestGetAll_Success
-            </div>
-            <div class="testcase-time">0.010s</div>
-        </div>
-        
-        <div class="testcase passed">
-            <div class="testcase-name">
-                <span class="status-icon passed">
-                    ✓
-                </span>
-                TestPatientRepositoryTestSuite/TestGetAll_WithPagination
-            </div>
-            <div class="testcase-time">0.010s</div>
-        </div>
-        
-        <div class="testcase passed">
-            <div class="testcase-name">
-                <span class="status-icon passed">
-                    ✓
-                </span>
-                TestPatientRepositoryTestSuite/TestGetByID_NotFound
-            </div>
-            <div class="testcase-time">0.010s</div>
-        </div>
-        
-        <div class="testcase passed">
-            <div class="testcase-name">
-                <span class="status-icon passed">
-                    ✓
-                </span>
-                TestPatientRepositoryTestSuite/TestGetByID_Success
-            </div>
-            <div class="testcase-time">0.010s</div>
-        </div>
-        
-        <div class="testcase passed">
-            <div class="testcase-name">
-                <span class="status-icon passed">
-                    ✓
-                </span>
-                TestPatientRepositoryTestSuite/TestUpdate_Success
-            </div>
-            <div class="testcase-time">0.010s</div>
-        </div>
-        
-        <div class="testcase passed">
-            <div class="testcase-name">
-                <span class="status-icon passed">
-                    ✓
-                </span>
-                TestPatientRepositoryTestSuite
-            </div>
-            <div class="testcase-time">5.740s</div>
-        </div>
-        
-        
-    </div>
-</div>
 
-<div class="testsuite">
-    <div class="testsuite-header coverage-100" onclick="toggleTestsuite(this)">
-        <div class="testsuite-title">
-            <h3>go-fhir-demo/internal/service</h3>
-            <span class="coverage-indicator">
-                100% Pass
-            </span>
-        </div>
-        <div class="testsuite-stats">
-            <span class="stat">Tests: 21</span>
-            
-            
-            <span class="stat">Time: 0.696s</span>
-        </div>
-    </div>
-    <div class="testcases">
-        
-        <div class="testcase passed">
-            <div class="testcase-name">
-                <span class="status-icon passed">
-                    ✓
-                </span>
-                TestExternalPatientServiceTestSuite/TestGetExternalPatientByID_Error
-            </div>
-            <div class="testcase-time">0.000s</div>
-        </div>
-        
-        <div class="testcase passed">
-            <div class="testcase-name">
-                <span class="status-icon passed">
-                    ✓
-                </span>
-                TestExternalPatientServiceTestSuite/TestGetExternalPatientByID_Success
-            </div>
-            <div class="testcase-time">0.000s</div>
-        </div>
-        
-        <div class="testcase passed">
-            <div class="testcase-name">
-                <span class="status-icon passed">
-                    ✓
-                </span>
-                TestExternalPatientServiceTestSuite/TestSearchExternalPatients_EmptyParams
-            </div>
-            <div class="testcase-time">0.000s</div>
-        </div>
-        
-        <div class="testcase passed">
-            <div class="testcase-name">
-                <span class="status-icon passed">
-                    ✓
-                </span>
-                TestExternalPatientServiceTestSuite/TestSearchExternalPatients_Error
-            </div>
-            <div class="testcase-time">0.000s</div>
-        </div>
-        
-        <div class="testcase passed">
-            <div class="testcase-name">
-                <span class="status-icon passed">
-                    ✓
-                </span>
-                TestExternalPatientServiceTestSuite/TestSearchExternalPatients_Success
-            </div>
-            <div class="testcase-time">0.000s</div>
-        </div>
-        
-        <div class="testcase passed">
-            <div class="testcase-name">
-                <span class="status-icon passed">
-                    ✓
-                </span>
-                TestExternalPatientServiceTestSuite
-            </div>
-            <div class="testcase-time">0.000s</div>
-        </div>
-        
-        <div class="testcase passed">
-            <div class="testcase-name">
-                <span class="status-icon passed">
-                    ✓
-                </span>
-                TestPatientServiceTestSuite/TestConvertFromFHIR_Success
-            </div>
-            <div class="testcase-time">0.000s</div>
-        </div>
-        
-        <div class="testcase passed">
-            <div class="testcase-name">
-                <span class="status-icon passed">
-                    ✓
-                </span>
-                TestPatientServiceTestSuite/TestConvertToFHIR_InvalidJSON
-            </div>
-            <div class="testcase-time">0.000s</div>
-        </div>
-        
-        <div class="testcase passed">
-            <div class="testcase-name">
-                <span class="status-icon passed">
-                    ✓
-                </span>
-                TestPatientServiceTestSuite/TestConvertToFHIR_Success
-            </div>
-            <div class="testcase-time">0.000s</div>
-        </div>
-        
-        <div class="testcase passed">
-            <div class="testcase-name">
-                <span class="status-icon passed">
-                    ✓
-                </span>
-                TestPatientServiceTestSuite/TestCreatePatient_Error
-            </div>
-            <div class="testcase-time">0.000s</div>
-        </div>
-        
-        <div class="testcase passed">
-            <div class="testcase-name">
-                <span class="status-icon passed">
-                    ✓
-                </span>
-                TestPatientServiceTestSuite/TestCreatePatient_Success
-            </div>
-            <div class="testcase-time">0.000s</div>
-        </div>
-        
-        <div class="testcase passed">
-            <div class="testcase-name">
-                <span class="status-icon passed">
-                    ✓
-                </span>
-                TestPatientServiceTestSuite/TestDeletePatient_Error
-            </div>
-            <div class="testcase-time">0.000s</div>
-        </div>
-        
-        <div class="testcase passed">
-            <div class="testcase-name">
-                <span class="status-icon passed">
-                    ✓
-                </span>
-                TestPatientServiceTestSuite/TestDeletePatient_Success
-            </div>
-            <div class="testcase-time">0.000s</div>
-        </div>
-        
-        <div class="testcase passed">
-            <div class="testcase-name">
-                <span class="status-icon passed">
-                    ✓
-                </span>
-                TestPatientServiceTestSuite/TestGetPatient_NotFound
-            </div>
-            <div class="testcase-time">0.000s</div>
-        </div>
-        
-        <div class="testcase passed">
-            <div class="testcase-name">
-                <span class="status-icon passed">
-                    ✓
-                </span>
-                TestPatientServiceTestSuite/TestGetPatient_Success
-            </div>
-            <div class="testcase-time">0.000s</div>
-        </div>
-        
-        <div class="testcase passed">
-            <div class="testcase-name">
-                <span class="status-icon passed">
-                    ✓
-                </span>
-                TestPatientServiceTestSuite/TestGetPatients_Error
-            </div>
-            <div class="testcase-time">0.000s</div>
-        </div>
-        
-        <div class="testcase passed">
-            <div class="testcase-name">
-                <span class="status-icon passed">
-                    ✓
-                </span>
-                TestPatientServiceTestSuite/TestGetPatients_Success
-            </div>
-            <div class="testcase-time">0.000s</div>
-        </div>
-        
-        <div class="testcase passed">
-            <div class="testcase-name">
-                <span class="status-icon passed">
-                    ✓
-                </span>
-                TestPatientServiceTestSuite/TestPatchPatient_Success
-            </div>
-            <div class="testcase-time">0.000s</div>
-        </div>
-        
-        <div class="testcase passed">
-            <div class="testcase-name">
-                <span class="status-icon passed">
-                    ✓
-                </span>
-                TestPatientServiceTestSuite/TestUpdatePatient_NotFound
-            </div>
-            <div class="testcase-time">0.000s</div>
-        </div>
-        
-        <div class="testcase passed">
-            <div class="testcase-name">
-                <span class="status-icon passed">
-                    ✓
-                </span>
-                TestPatientServiceTestSuite/TestUpdatePatient_Success
-            </div>
-            <div class="testcase-time">0.000s</div>
-        </div>
-        
-        <div class="testcase passed">
-            <div class="testcase-name">
-                <span class="status-icon passed">
-                    ✓
-                </span>
-                TestPatientServiceTestSuite
-            </div>
-            <div class="testcase-time">0.000s</div>
-        </div>
-        
-        
-    </div>
-</div>
+        <div class="tab-content" id="tested">
+          <div id="tested-suites">
+            <div class="testsuite">
+              <div
+                class="testsuite-header coverage-100"
+                onclick="toggleTestsuite(this)"
+              >
+                <div class="testsuite-title">
+                  <h3>go-fhir-demo/internal/repository</h3>
+                  <span class="coverage-indicator"> 100% Pass </span>
+                </div>
+                <div class="testsuite-stats">
+                  <span class="stat">Tests: 11</span>
 
-<div class="testsuite">
-    <div class="testsuite-header coverage-100" onclick="toggleTestsuite(this)">
-        <div class="testsuite-title">
-            <h3>go-fhir-demo/internal/api/handlers</h3>
-            <span class="coverage-indicator">
-                100% Pass
-            </span>
-        </div>
-        <div class="testsuite-stats">
-            <span class="stat">Tests: 19</span>
-            
-            
-            <span class="stat">Time: 0.630s</span>
-        </div>
-    </div>
-    <div class="testcases">
-        
-        <div class="testcase passed">
-            <div class="testcase-name">
-                <span class="status-icon passed">
-                    ✓
-                </span>
-                TestExternalPatientHandlerTestSuite/TestGetExternalPatientByID_BadRequest
-            </div>
-            <div class="testcase-time">0.000s</div>
-        </div>
-        
-        <div class="testcase passed">
-            <div class="testcase-name">
-                <span class="status-icon passed">
-                    ✓
-                </span>
-                TestExternalPatientHandlerTestSuite/TestGetExternalPatientByID_Error
-            </div>
-            <div class="testcase-time">0.000s</div>
-        </div>
-        
-        <div class="testcase passed">
-            <div class="testcase-name">
-                <span class="status-icon passed">
-                    ✓
-                </span>
-                TestExternalPatientHandlerTestSuite/TestGetExternalPatientByID_Success
-            </div>
-            <div class="testcase-time">0.000s</div>
-        </div>
-        
-        <div class="testcase passed">
-            <div class="testcase-name">
-                <span class="status-icon passed">
-                    ✓
-                </span>
-                TestExternalPatientHandlerTestSuite/TestSearchExternalPatients_Error
-            </div>
-            <div class="testcase-time">0.000s</div>
-        </div>
-        
-        <div class="testcase passed">
-            <div class="testcase-name">
-                <span class="status-icon passed">
-                    ✓
-                </span>
-                TestExternalPatientHandlerTestSuite/TestSearchExternalPatients_Success
-            </div>
-            <div class="testcase-time">0.000s</div>
-        </div>
-        
-        <div class="testcase passed">
-            <div class="testcase-name">
-                <span class="status-icon passed">
-                    ✓
-                </span>
-                TestExternalPatientHandlerTestSuite
-            </div>
-            <div class="testcase-time">0.000s</div>
-        </div>
-        
-        <div class="testcase passed">
-            <div class="testcase-name">
-                <span class="status-icon passed">
-                    ✓
-                </span>
-                TestPatientHandlerTestSuite/TestCreatePatient_BadRequest
-            </div>
-            <div class="testcase-time">0.000s</div>
-        </div>
-        
-        <div class="testcase passed">
-            <div class="testcase-name">
-                <span class="status-icon passed">
-                    ✓
-                </span>
-                TestPatientHandlerTestSuite/TestCreatePatient_Error
-            </div>
-            <div class="testcase-time">0.000s</div>
-        </div>
-        
-        <div class="testcase passed">
-            <div class="testcase-name">
-                <span class="status-icon passed">
-                    ✓
-                </span>
-                TestPatientHandlerTestSuite/TestCreatePatient_Success
-            </div>
-            <div class="testcase-time">0.000s</div>
-        </div>
-        
-        <div class="testcase passed">
-            <div class="testcase-name">
-                <span class="status-icon passed">
-                    ✓
-                </span>
-                TestPatientHandlerTestSuite/TestDeletePatient_BadRequest
-            </div>
-            <div class="testcase-time">0.000s</div>
-        </div>
-        
-        <div class="testcase passed">
-            <div class="testcase-name">
-                <span class="status-icon passed">
-                    ✓
-                </span>
-                TestPatientHandlerTestSuite/TestDeletePatient_Error
-            </div>
-            <div class="testcase-time">0.000s</div>
-        </div>
-        
-        <div class="testcase passed">
-            <div class="testcase-name">
-                <span class="status-icon passed">
-                    ✓
-                </span>
-                TestPatientHandlerTestSuite/TestDeletePatient_Success
-            </div>
-            <div class="testcase-time">0.000s</div>
-        </div>
-        
-        <div class="testcase passed">
-            <div class="testcase-name">
-                <span class="status-icon passed">
-                    ✓
-                </span>
-                TestPatientHandlerTestSuite/TestGetPatient_BadRequest
-            </div>
-            <div class="testcase-time">0.000s</div>
-        </div>
-        
-        <div class="testcase passed">
-            <div class="testcase-name">
-                <span class="status-icon passed">
-                    ✓
-                </span>
-                TestPatientHandlerTestSuite/TestGetPatient_NotFound
-            </div>
-            <div class="testcase-time">0.000s</div>
-        </div>
-        
-        <div class="testcase passed">
-            <div class="testcase-name">
-                <span class="status-icon passed">
-                    ✓
-                </span>
-                TestPatientHandlerTestSuite/TestGetPatient_Success
-            </div>
-            <div class="testcase-time">0.000s</div>
-        </div>
-        
-        <div class="testcase passed">
-            <div class="testcase-name">
-                <span class="status-icon passed">
-                    ✓
-                </span>
-                TestPatientHandlerTestSuite/TestGetPatients_Success
-            </div>
-            <div class="testcase-time">0.000s</div>
-        </div>
-        
-        <div class="testcase passed">
-            <div class="testcase-name">
-                <span class="status-icon passed">
-                    ✓
-                </span>
-                TestPatientHandlerTestSuite/TestPatchPatient_Success
-            </div>
-            <div class="testcase-time">0.000s</div>
-        </div>
-        
-        <div class="testcase passed">
-            <div class="testcase-name">
-                <span class="status-icon passed">
-                    ✓
-                </span>
-                TestPatientHandlerTestSuite/TestUpdatePatient_Success
-            </div>
-            <div class="testcase-time">0.000s</div>
-        </div>
-        
-        <div class="testcase passed">
-            <div class="testcase-name">
-                <span class="status-icon passed">
-                    ✓
-                </span>
-                TestPatientHandlerTestSuite
-            </div>
-            <div class="testcase-time">0.000s</div>
-        </div>
-        
-        
-    </div>
-</div>
+                  <span class="stat">Time: 6.417s</span>
+                </div>
+              </div>
+              <div class="testcases">
+                <div class="testcase passed">
+                  <div class="testcase-name">
+                    <span class="status-icon passed"> ✓ </span>
+                    TestPatientRepositoryTestSuite/TestCount_EmptyTable
+                  </div>
+                  <div class="testcase-time">0.010s</div>
+                </div>
 
+                <div class="testcase passed">
+                  <div class="testcase-name">
+                    <span class="status-icon passed"> ✓ </span>
+                    TestPatientRepositoryTestSuite/TestCount_Success
+                  </div>
+                  <div class="testcase-time">0.010s</div>
+                </div>
 
-</div>
+                <div class="testcase passed">
+                  <div class="testcase-name">
+                    <span class="status-icon passed"> ✓ </span>
+                    TestPatientRepositoryTestSuite/TestCreate_Error
+                  </div>
+                  <div class="testcase-time">0.010s</div>
+                </div>
+
+                <div class="testcase passed">
+                  <div class="testcase-name">
+                    <span class="status-icon passed"> ✓ </span>
+                    TestPatientRepositoryTestSuite/TestCreate_Success
+                  </div>
+                  <div class="testcase-time">0.010s</div>
+                </div>
+
+                <div class="testcase passed">
+                  <div class="testcase-name">
+                    <span class="status-icon passed"> ✓ </span>
+                    TestPatientRepositoryTestSuite/TestDelete_Success
+                  </div>
+                  <div class="testcase-time">0.010s</div>
+                </div>
+
+                <div class="testcase passed">
+                  <div class="testcase-name">
+                    <span class="status-icon passed"> ✓ </span>
+                    TestPatientRepositoryTestSuite/TestGetAll_Success
+                  </div>
+                  <div class="testcase-time">0.010s</div>
+                </div>
+
+                <div class="testcase passed">
+                  <div class="testcase-name">
+                    <span class="status-icon passed"> ✓ </span>
+                    TestPatientRepositoryTestSuite/TestGetAll_WithPagination
+                  </div>
+                  <div class="testcase-time">0.010s</div>
+                </div>
+
+                <div class="testcase passed">
+                  <div class="testcase-name">
+                    <span class="status-icon passed"> ✓ </span>
+                    TestPatientRepositoryTestSuite/TestGetByID_NotFound
+                  </div>
+                  <div class="testcase-time">0.010s</div>
+                </div>
+
+                <div class="testcase passed">
+                  <div class="testcase-name">
+                    <span class="status-icon passed"> ✓ </span>
+                    TestPatientRepositoryTestSuite/TestGetByID_Success
+                  </div>
+                  <div class="testcase-time">0.010s</div>
+                </div>
+
+                <div class="testcase passed">
+                  <div class="testcase-name">
+                    <span class="status-icon passed"> ✓ </span>
+                    TestPatientRepositoryTestSuite/TestUpdate_Success
+                  </div>
+                  <div class="testcase-time">0.010s</div>
+                </div>
+
+                <div class="testcase passed">
+                  <div class="testcase-name">
+                    <span class="status-icon passed"> ✓ </span>
+                    TestPatientRepositoryTestSuite
+                  </div>
+                  <div class="testcase-time">5.740s</div>
+                </div>
+              </div>
             </div>
 
-            <div class="tab-content" id="untested">
-                <div id="untested-suites">
+            <div class="testsuite">
+              <div
+                class="testsuite-header coverage-100"
+                onclick="toggleTestsuite(this)"
+              >
+                <div class="testsuite-title">
+                  <h3>go-fhir-demo/internal/service</h3>
+                  <span class="coverage-indicator"> 100% Pass </span>
+                </div>
+                <div class="testsuite-stats">
+                  <span class="stat">Tests: 21</span>
 
-<div class="testsuite">
-    <div class="testsuite-header coverage-0" onclick="toggleTestsuite(this)">
-        <div class="testsuite-title">
-            <h3>go-fhir-demo/pkg/fhirclient</h3>
-            <span class="coverage-indicator">
-                No Tests
-            </span>
-        </div>
-        <div class="testsuite-stats">
-            <span class="stat">Tests: 0</span>
-            
-            
-            <span class="stat">Time: 0.110s</span>
-        </div>
-    </div>
-    <div class="testcases">
-        
-        
-        <div class="no-coverage">No tests found in this module</div>
-        
-    </div>
-</div>
+                  <span class="stat">Time: 0.696s</span>
+                </div>
+              </div>
+              <div class="testcases">
+                <div class="testcase passed">
+                  <div class="testcase-name">
+                    <span class="status-icon passed"> ✓ </span>
+                    TestExternalPatientServiceTestSuite/TestGetExternalPatientByID_Error
+                  </div>
+                  <div class="testcase-time">0.000s</div>
+                </div>
 
+                <div class="testcase passed">
+                  <div class="testcase-name">
+                    <span class="status-icon passed"> ✓ </span>
+                    TestExternalPatientServiceTestSuite/TestGetExternalPatientByID_Success
+                  </div>
+                  <div class="testcase-time">0.000s</div>
+                </div>
 
-</div>
+                <div class="testcase passed">
+                  <div class="testcase-name">
+                    <span class="status-icon passed"> ✓ </span>
+                    TestExternalPatientServiceTestSuite/TestSearchExternalPatients_EmptyParams
+                  </div>
+                  <div class="testcase-time">0.000s</div>
+                </div>
+
+                <div class="testcase passed">
+                  <div class="testcase-name">
+                    <span class="status-icon passed"> ✓ </span>
+                    TestExternalPatientServiceTestSuite/TestSearchExternalPatients_Error
+                  </div>
+                  <div class="testcase-time">0.000s</div>
+                </div>
+
+                <div class="testcase passed">
+                  <div class="testcase-name">
+                    <span class="status-icon passed"> ✓ </span>
+                    TestExternalPatientServiceTestSuite/TestSearchExternalPatients_Success
+                  </div>
+                  <div class="testcase-time">0.000s</div>
+                </div>
+
+                <div class="testcase passed">
+                  <div class="testcase-name">
+                    <span class="status-icon passed"> ✓ </span>
+                    TestExternalPatientServiceTestSuite
+                  </div>
+                  <div class="testcase-time">0.000s</div>
+                </div>
+
+                <div class="testcase passed">
+                  <div class="testcase-name">
+                    <span class="status-icon passed"> ✓ </span>
+                    TestPatientServiceTestSuite/TestConvertFromFHIR_Success
+                  </div>
+                  <div class="testcase-time">0.000s</div>
+                </div>
+
+                <div class="testcase passed">
+                  <div class="testcase-name">
+                    <span class="status-icon passed"> ✓ </span>
+                    TestPatientServiceTestSuite/TestConvertToFHIR_InvalidJSON
+                  </div>
+                  <div class="testcase-time">0.000s</div>
+                </div>
+
+                <div class="testcase passed">
+                  <div class="testcase-name">
+                    <span class="status-icon passed"> ✓ </span>
+                    TestPatientServiceTestSuite/TestConvertToFHIR_Success
+                  </div>
+                  <div class="testcase-time">0.000s</div>
+                </div>
+
+                <div class="testcase passed">
+                  <div class="testcase-name">
+                    <span class="status-icon passed"> ✓ </span>
+                    TestPatientServiceTestSuite/TestCreatePatient_Error
+                  </div>
+                  <div class="testcase-time">0.000s</div>
+                </div>
+
+                <div class="testcase passed">
+                  <div class="testcase-name">
+                    <span class="status-icon passed"> ✓ </span>
+                    TestPatientServiceTestSuite/TestCreatePatient_Success
+                  </div>
+                  <div class="testcase-time">0.000s</div>
+                </div>
+
+                <div class="testcase passed">
+                  <div class="testcase-name">
+                    <span class="status-icon passed"> ✓ </span>
+                    TestPatientServiceTestSuite/TestDeletePatient_Error
+                  </div>
+                  <div class="testcase-time">0.000s</div>
+                </div>
+
+                <div class="testcase passed">
+                  <div class="testcase-name">
+                    <span class="status-icon passed"> ✓ </span>
+                    TestPatientServiceTestSuite/TestDeletePatient_Success
+                  </div>
+                  <div class="testcase-time">0.000s</div>
+                </div>
+
+                <div class="testcase passed">
+                  <div class="testcase-name">
+                    <span class="status-icon passed"> ✓ </span>
+                    TestPatientServiceTestSuite/TestGetPatient_NotFound
+                  </div>
+                  <div class="testcase-time">0.000s</div>
+                </div>
+
+                <div class="testcase passed">
+                  <div class="testcase-name">
+                    <span class="status-icon passed"> ✓ </span>
+                    TestPatientServiceTestSuite/TestGetPatient_Success
+                  </div>
+                  <div class="testcase-time">0.000s</div>
+                </div>
+
+                <div class="testcase passed">
+                  <div class="testcase-name">
+                    <span class="status-icon passed"> ✓ </span>
+                    TestPatientServiceTestSuite/TestGetPatients_Error
+                  </div>
+                  <div class="testcase-time">0.000s</div>
+                </div>
+
+                <div class="testcase passed">
+                  <div class="testcase-name">
+                    <span class="status-icon passed"> ✓ </span>
+                    TestPatientServiceTestSuite/TestGetPatients_Success
+                  </div>
+                  <div class="testcase-time">0.000s</div>
+                </div>
+
+                <div class="testcase passed">
+                  <div class="testcase-name">
+                    <span class="status-icon passed"> ✓ </span>
+                    TestPatientServiceTestSuite/TestPatchPatient_Success
+                  </div>
+                  <div class="testcase-time">0.000s</div>
+                </div>
+
+                <div class="testcase passed">
+                  <div class="testcase-name">
+                    <span class="status-icon passed"> ✓ </span>
+                    TestPatientServiceTestSuite/TestUpdatePatient_NotFound
+                  </div>
+                  <div class="testcase-time">0.000s</div>
+                </div>
+
+                <div class="testcase passed">
+                  <div class="testcase-name">
+                    <span class="status-icon passed"> ✓ </span>
+                    TestPatientServiceTestSuite/TestUpdatePatient_Success
+                  </div>
+                  <div class="testcase-time">0.000s</div>
+                </div>
+
+                <div class="testcase passed">
+                  <div class="testcase-name">
+                    <span class="status-icon passed"> ✓ </span>
+                    TestPatientServiceTestSuite
+                  </div>
+                  <div class="testcase-time">0.000s</div>
+                </div>
+              </div>
             </div>
 
-            <div class="tab-content" id="analytics">
-                <div class="analytics-grid">
-                    <div class="analytics-section">
-                        <h3>Test Distribution</h3>
-                        <canvas id="testDistributionChart" width="400" height="200"></canvas>
+            <div class="testsuite">
+              <div
+                class="testsuite-header coverage-100"
+                onclick="toggleTestsuite(this)"
+              >
+                <div class="testsuite-title">
+                  <h3>go-fhir-demo/internal/api/handlers</h3>
+                  <span class="coverage-indicator"> 100% Pass </span>
+                </div>
+                <div class="testsuite-stats">
+                  <span class="stat">Tests: 19</span>
+
+                  <span class="stat">Time: 0.630s</span>
+                </div>
+              </div>
+              <div class="testcases">
+                <div class="testcase passed">
+                  <div class="testcase-name">
+                    <span class="status-icon passed"> ✓ </span>
+                    TestExternalPatientHandlerTestSuite/TestGetExternalPatientByID_BadRequest
+                  </div>
+                  <div class="testcase-time">0.000s</div>
+                </div>
+
+                <div class="testcase passed">
+                  <div class="testcase-name">
+                    <span class="status-icon passed"> ✓ </span>
+                    TestExternalPatientHandlerTestSuite/TestGetExternalPatientByID_Error
+                  </div>
+                  <div class="testcase-time">0.000s</div>
+                </div>
+
+                <div class="testcase passed">
+                  <div class="testcase-name">
+                    <span class="status-icon passed"> ✓ </span>
+                    TestExternalPatientHandlerTestSuite/TestGetExternalPatientByID_Success
+                  </div>
+                  <div class="testcase-time">0.000s</div>
+                </div>
+
+                <div class="testcase passed">
+                  <div class="testcase-name">
+                    <span class="status-icon passed"> ✓ </span>
+                    TestExternalPatientHandlerTestSuite/TestSearchExternalPatients_Error
+                  </div>
+                  <div class="testcase-time">0.000s</div>
+                </div>
+
+                <div class="testcase passed">
+                  <div class="testcase-name">
+                    <span class="status-icon passed"> ✓ </span>
+                    TestExternalPatientHandlerTestSuite/TestSearchExternalPatients_Success
+                  </div>
+                  <div class="testcase-time">0.000s</div>
+                </div>
+
+                <div class="testcase passed">
+                  <div class="testcase-name">
+                    <span class="status-icon passed"> ✓ </span>
+                    TestExternalPatientHandlerTestSuite
+                  </div>
+                  <div class="testcase-time">0.000s</div>
+                </div>
+
+                <div class="testcase passed">
+                  <div class="testcase-name">
+                    <span class="status-icon passed"> ✓ </span>
+                    TestPatientHandlerTestSuite/TestCreatePatient_BadRequest
+                  </div>
+                  <div class="testcase-time">0.000s</div>
+                </div>
+
+                <div class="testcase passed">
+                  <div class="testcase-name">
+                    <span class="status-icon passed"> ✓ </span>
+                    TestPatientHandlerTestSuite/TestCreatePatient_Error
+                  </div>
+                  <div class="testcase-time">0.000s</div>
+                </div>
+
+                <div class="testcase passed">
+                  <div class="testcase-name">
+                    <span class="status-icon passed"> ✓ </span>
+                    TestPatientHandlerTestSuite/TestCreatePatient_Success
+                  </div>
+                  <div class="testcase-time">0.000s</div>
+                </div>
+
+                <div class="testcase passed">
+                  <div class="testcase-name">
+                    <span class="status-icon passed"> ✓ </span>
+                    TestPatientHandlerTestSuite/TestDeletePatient_BadRequest
+                  </div>
+                  <div class="testcase-time">0.000s</div>
+                </div>
+
+                <div class="testcase passed">
+                  <div class="testcase-name">
+                    <span class="status-icon passed"> ✓ </span>
+                    TestPatientHandlerTestSuite/TestDeletePatient_Error
+                  </div>
+                  <div class="testcase-time">0.000s</div>
+                </div>
+
+                <div class="testcase passed">
+                  <div class="testcase-name">
+                    <span class="status-icon passed"> ✓ </span>
+                    TestPatientHandlerTestSuite/TestDeletePatient_Success
+                  </div>
+                  <div class="testcase-time">0.000s</div>
+                </div>
+
+                <div class="testcase passed">
+                  <div class="testcase-name">
+                    <span class="status-icon passed"> ✓ </span>
+                    TestPatientHandlerTestSuite/TestGetPatient_BadRequest
+                  </div>
+                  <div class="testcase-time">0.000s</div>
+                </div>
+
+                <div class="testcase passed">
+                  <div class="testcase-name">
+                    <span class="status-icon passed"> ✓ </span>
+                    TestPatientHandlerTestSuite/TestGetPatient_NotFound
+                  </div>
+                  <div class="testcase-time">0.000s</div>
+                </div>
+
+                <div class="testcase passed">
+                  <div class="testcase-name">
+                    <span class="status-icon passed"> ✓ </span>
+                    TestPatientHandlerTestSuite/TestGetPatient_Success
+                  </div>
+                  <div class="testcase-time">0.000s</div>
+                </div>
+
+                <div class="testcase passed">
+                  <div class="testcase-name">
+                    <span class="status-icon passed"> ✓ </span>
+                    TestPatientHandlerTestSuite/TestGetPatients_Success
+                  </div>
+                  <div class="testcase-time">0.000s</div>
+                </div>
+
+                <div class="testcase passed">
+                  <div class="testcase-name">
+                    <span class="status-icon passed"> ✓ </span>
+                    TestPatientHandlerTestSuite/TestPatchPatient_Success
+                  </div>
+                  <div class="testcase-time">0.000s</div>
+                </div>
+
+                <div class="testcase passed">
+                  <div class="testcase-name">
+                    <span class="status-icon passed"> ✓ </span>
+                    TestPatientHandlerTestSuite/TestUpdatePatient_Success
+                  </div>
+                  <div class="testcase-time">0.000s</div>
+                </div>
+
+                <div class="testcase passed">
+                  <div class="testcase-name">
+                    <span class="status-icon passed"> ✓ </span>
+                    TestPatientHandlerTestSuite
+                  </div>
+                  <div class="testcase-time">0.000s</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="tab-content" id="untested">
+          <div id="untested-suites">
+            <div class="testsuite">
+              <div
+                class="testsuite-header coverage-0"
+                onclick="toggleTestsuite(this)"
+              >
+                <div class="testsuite-title">
+                  <h3>go-fhir-demo/pkg/fhirclient</h3>
+                  <span class="coverage-indicator"> No Tests </span>
+                </div>
+                <div class="testsuite-stats">
+                  <span class="stat">Tests: 0</span>
+
+                  <span class="stat">Time: 0.110s</span>
+                </div>
+              </div>
+              <div class="testcases">
+                <div class="no-coverage">No tests found in this module</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="tab-content" id="analytics">
+          <div class="analytics-grid">
+            <div class="analytics-section">
+              <h3>Test Distribution</h3>
+              <canvas
+                id="testDistributionChart"
+                width="400"
+                height="200"
+              ></canvas>
+            </div>
+            <div class="analytics-section">
+              <h3>Performance Analysis</h3>
+              <canvas id="performanceChart" width="400" height="200"></canvas>
+            </div>
+            <div class="analytics-section">
+              <h3>Failure Analysis</h3>
+              <div id="failureAnalysis">
+                <div class="metric-card success">
+                  🎉 No failing tests detected!
+                </div>
+              </div>
+            </div>
+            <div class="analytics-section">
+              <h3>Performance Insights</h3>
+              <div id="performanceInsights">
+                <div class="insights-section">
+                  <h4>Performance Bottlenecks</h4>
+
+                  <div class="bottleneck-list">
+                    <div class="bottleneck-item">
+                      <span class="bottleneck-name"
+                        >go-fhir-demo/internal/repository</span
+                      >
+                      <span class="bottleneck-time">6.42s</span>
                     </div>
-                    <div class="analytics-section">
-                        <h3>Performance Analysis</h3>
-                        <canvas id="performanceChart" width="400" height="200"></canvas>
-                    </div>
-                    <div class="analytics-section">
-                        <h3>Failure Analysis</h3>
-                        <div id="failureAnalysis">
 
-<div class="metric-card success">🎉 No failing tests detected!</div>
+                    <div class="bottleneck-item">
+                      <span class="bottleneck-name"
+                        >go-fhir-demo/internal/service</span
+                      >
+                      <span class="bottleneck-time">0.70s</span>
+                    </div>
 
-</div>
+                    <div class="bottleneck-item">
+                      <span class="bottleneck-name"
+                        >go-fhir-demo/internal/api/handlers</span
+                      >
+                      <span class="bottleneck-time">0.63s</span>
                     </div>
-                    <div class="analytics-section">
-                        <h3>Performance Insights</h3>
-                        <div id="performanceInsights">
-<div class="insights-section">
-    <h4>Performance Bottlenecks</h4>
-    
-    <div class="bottleneck-list">
-        
-        <div class="bottleneck-item">
-            <span class="bottleneck-name">go-fhir-demo/internal/repository</span>
-            <span class="bottleneck-time">6.42s</span>
-        </div>
-        
-        <div class="bottleneck-item">
-            <span class="bottleneck-name">go-fhir-demo/internal/service</span>
-            <span class="bottleneck-time">0.70s</span>
-        </div>
-        
-        <div class="bottleneck-item">
-            <span class="bottleneck-name">go-fhir-demo/internal/api/handlers</span>
-            <span class="bottleneck-time">0.63s</span>
-        </div>
-        
-    </div>
-    
-</div>
-<div class="insights-section">
-    <h4>Recommendations</h4>
-    <div class="recommendations">
-        
-        <div class="recommendation">🎯 Focus on optimizing go-fhir-demo/internal/repository - it&#39;s the slowest module</div>
-        
-    </div>
-</div>
-</div>
-                    </div>
+                  </div>
                 </div>
+                <div class="insights-section">
+                  <h4>Recommendations</h4>
+                  <div class="recommendations">
+                    <div class="recommendation">
+                      🎯 Focus on optimizing go-fhir-demo/internal/repository -
+                      it&#39;s the slowest module
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
+          </div>
         </div>
+      </div>
     </div>
 
     <script>
-        const analyticsData = {"totalTests":51,"totalFailures":0,"totalErrors":0,"totalTime":7.853,"reliabilityScore":100,"avgTestTime":153.98039215686273,"slowTests":0,"coveragePercent":75,"testedSuites":[{"XMLName":{"Space":"","Local":"testsuite"},"Name":"go-fhir-demo/internal/repository","Tests":11,"Failures":0,"Errors":0,"Time":6.417,"Timestamp":"2025-06-17T20:36:44+05:30","TestCases":[{"XMLName":{"Space":"","Local":"testcase"},"Name":"TestPatientRepositoryTestSuite/TestCount_EmptyTable","ClassName":"go-fhir-demo/internal/repository","Time":0.01,"Failure":null,"Error":null,"Skipped":null},{"XMLName":{"Space":"","Local":"testcase"},"Name":"TestPatientRepositoryTestSuite/TestCount_Success","ClassName":"go-fhir-demo/internal/repository","Time":0.01,"Failure":null,"Error":null,"Skipped":null},{"XMLName":{"Space":"","Local":"testcase"},"Name":"TestPatientRepositoryTestSuite/TestCreate_Error","ClassName":"go-fhir-demo/internal/repository","Time":0.01,"Failure":null,"Error":null,"Skipped":null},{"XMLName":{"Space":"","Local":"testcase"},"Name":"TestPatientRepositoryTestSuite/TestCreate_Success","ClassName":"go-fhir-demo/internal/repository","Time":0.01,"Failure":null,"Error":null,"Skipped":null},{"XMLName":{"Space":"","Local":"testcase"},"Name":"TestPatientRepositoryTestSuite/TestDelete_Success","ClassName":"go-fhir-demo/internal/repository","Time":0.01,"Failure":null,"Error":null,"Skipped":null},{"XMLName":{"Space":"","Local":"testcase"},"Name":"TestPatientRepositoryTestSuite/TestGetAll_Success","ClassName":"go-fhir-demo/internal/repository","Time":0.01,"Failure":null,"Error":null,"Skipped":null},{"XMLName":{"Space":"","Local":"testcase"},"Name":"TestPatientRepositoryTestSuite/TestGetAll_WithPagination","ClassName":"go-fhir-demo/internal/repository","Time":0.01,"Failure":null,"Error":null,"Skipped":null},{"XMLName":{"Space":"","Local":"testcase"},"Name":"TestPatientRepositoryTestSuite/TestGetByID_NotFound","ClassName":"go-fhir-demo/internal/repository","Time":0.01,"Failure":null,"Error":null,"Skipped":null},{"XMLName":{"Space":"","Local":"testcase"},"Name":"TestPatientRepositoryTestSuite/TestGetByID_Success","ClassName":"go-fhir-demo/internal/repository","Time":0.01,"Failure":null,"Error":null,"Skipped":null},{"XMLName":{"Space":"","Local":"testcase"},"Name":"TestPatientRepositoryTestSuite/TestUpdate_Success","ClassName":"go-fhir-demo/internal/repository","Time":0.01,"Failure":null,"Error":null,"Skipped":null},{"XMLName":{"Space":"","Local":"testcase"},"Name":"TestPatientRepositoryTestSuite","ClassName":"go-fhir-demo/internal/repository","Time":5.74,"Failure":null,"Error":null,"Skipped":null}],"Properties":[{"Name":"go.version","Value":"go1.23.0 windows/amd64"}]},{"XMLName":{"Space":"","Local":"testsuite"},"Name":"go-fhir-demo/internal/service","Tests":21,"Failures":0,"Errors":0,"Time":0.696,"Timestamp":"2025-06-17T20:36:44+05:30","TestCases":[{"XMLName":{"Space":"","Local":"testcase"},"Name":"TestExternalPatientServiceTestSuite/TestGetExternalPatientByID_Error","ClassName":"go-fhir-demo/internal/service","Time":0,"Failure":null,"Error":null,"Skipped":null},{"XMLName":{"Space":"","Local":"testcase"},"Name":"TestExternalPatientServiceTestSuite/TestGetExternalPatientByID_Success","ClassName":"go-fhir-demo/internal/service","Time":0,"Failure":null,"Error":null,"Skipped":null},{"XMLName":{"Space":"","Local":"testcase"},"Name":"TestExternalPatientServiceTestSuite/TestSearchExternalPatients_EmptyParams","ClassName":"go-fhir-demo/internal/service","Time":0,"Failure":null,"Error":null,"Skipped":null},{"XMLName":{"Space":"","Local":"testcase"},"Name":"TestExternalPatientServiceTestSuite/TestSearchExternalPatients_Error","ClassName":"go-fhir-demo/internal/service","Time":0,"Failure":null,"Error":null,"Skipped":null},{"XMLName":{"Space":"","Local":"testcase"},"Name":"TestExternalPatientServiceTestSuite/TestSearchExternalPatients_Success","ClassName":"go-fhir-demo/internal/service","Time":0,"Failure":null,"Error":null,"Skipped":null},{"XMLName":{"Space":"","Local":"testcase"},"Name":"TestExternalPatientServiceTestSuite","ClassName":"go-fhir-demo/internal/service","Time":0,"Failure":null,"Error":null,"Skipped":null},{"XMLName":{"Space":"","Local":"testcase"},"Name":"TestPatientServiceTestSuite/TestConvertFromFHIR_Success","ClassName":"go-fhir-demo/internal/service","Time":0,"Failure":null,"Error":null,"Skipped":null},{"XMLName":{"Space":"","Local":"testcase"},"Name":"TestPatientServiceTestSuite/TestConvertToFHIR_InvalidJSON","ClassName":"go-fhir-demo/internal/service","Time":0,"Failure":null,"Error":null,"Skipped":null},{"XMLName":{"Space":"","Local":"testcase"},"Name":"TestPatientServiceTestSuite/TestConvertToFHIR_Success","ClassName":"go-fhir-demo/internal/service","Time":0,"Failure":null,"Error":null,"Skipped":null},{"XMLName":{"Space":"","Local":"testcase"},"Name":"TestPatientServiceTestSuite/TestCreatePatient_Error","ClassName":"go-fhir-demo/internal/service","Time":0,"Failure":null,"Error":null,"Skipped":null},{"XMLName":{"Space":"","Local":"testcase"},"Name":"TestPatientServiceTestSuite/TestCreatePatient_Success","ClassName":"go-fhir-demo/internal/service","Time":0,"Failure":null,"Error":null,"Skipped":null},{"XMLName":{"Space":"","Local":"testcase"},"Name":"TestPatientServiceTestSuite/TestDeletePatient_Error","ClassName":"go-fhir-demo/internal/service","Time":0,"Failure":null,"Error":null,"Skipped":null},{"XMLName":{"Space":"","Local":"testcase"},"Name":"TestPatientServiceTestSuite/TestDeletePatient_Success","ClassName":"go-fhir-demo/internal/service","Time":0,"Failure":null,"Error":null,"Skipped":null},{"XMLName":{"Space":"","Local":"testcase"},"Name":"TestPatientServiceTestSuite/TestGetPatient_NotFound","ClassName":"go-fhir-demo/internal/service","Time":0,"Failure":null,"Error":null,"Skipped":null},{"XMLName":{"Space":"","Local":"testcase"},"Name":"TestPatientServiceTestSuite/TestGetPatient_Success","ClassName":"go-fhir-demo/internal/service","Time":0,"Failure":null,"Error":null,"Skipped":null},{"XMLName":{"Space":"","Local":"testcase"},"Name":"TestPatientServiceTestSuite/TestGetPatients_Error","ClassName":"go-fhir-demo/internal/service","Time":0,"Failure":null,"Error":null,"Skipped":null},{"XMLName":{"Space":"","Local":"testcase"},"Name":"TestPatientServiceTestSuite/TestGetPatients_Success","ClassName":"go-fhir-demo/internal/service","Time":0,"Failure":null,"Error":null,"Skipped":null},{"XMLName":{"Space":"","Local":"testcase"},"Name":"TestPatientServiceTestSuite/TestPatchPatient_Success","ClassName":"go-fhir-demo/internal/service","Time":0,"Failure":null,"Error":null,"Skipped":null},{"XMLName":{"Space":"","Local":"testcase"},"Name":"TestPatientServiceTestSuite/TestUpdatePatient_NotFound","ClassName":"go-fhir-demo/internal/service","Time":0,"Failure":null,"Error":null,"Skipped":null},{"XMLName":{"Space":"","Local":"testcase"},"Name":"TestPatientServiceTestSuite/TestUpdatePatient_Success","ClassName":"go-fhir-demo/internal/service","Time":0,"Failure":null,"Error":null,"Skipped":null},{"XMLName":{"Space":"","Local":"testcase"},"Name":"TestPatientServiceTestSuite","ClassName":"go-fhir-demo/internal/service","Time":0,"Failure":null,"Error":null,"Skipped":null}],"Properties":[{"Name":"go.version","Value":"go1.23.0 windows/amd64"}]},{"XMLName":{"Space":"","Local":"testsuite"},"Name":"go-fhir-demo/internal/api/handlers","Tests":19,"Failures":0,"Errors":0,"Time":0.63,"Timestamp":"2025-06-17T20:36:44+05:30","TestCases":[{"XMLName":{"Space":"","Local":"testcase"},"Name":"TestExternalPatientHandlerTestSuite/TestGetExternalPatientByID_BadRequest","ClassName":"go-fhir-demo/internal/api/handlers","Time":0,"Failure":null,"Error":null,"Skipped":null},{"XMLName":{"Space":"","Local":"testcase"},"Name":"TestExternalPatientHandlerTestSuite/TestGetExternalPatientByID_Error","ClassName":"go-fhir-demo/internal/api/handlers","Time":0,"Failure":null,"Error":null,"Skipped":null},{"XMLName":{"Space":"","Local":"testcase"},"Name":"TestExternalPatientHandlerTestSuite/TestGetExternalPatientByID_Success","ClassName":"go-fhir-demo/internal/api/handlers","Time":0,"Failure":null,"Error":null,"Skipped":null},{"XMLName":{"Space":"","Local":"testcase"},"Name":"TestExternalPatientHandlerTestSuite/TestSearchExternalPatients_Error","ClassName":"go-fhir-demo/internal/api/handlers","Time":0,"Failure":null,"Error":null,"Skipped":null},{"XMLName":{"Space":"","Local":"testcase"},"Name":"TestExternalPatientHandlerTestSuite/TestSearchExternalPatients_Success","ClassName":"go-fhir-demo/internal/api/handlers","Time":0,"Failure":null,"Error":null,"Skipped":null},{"XMLName":{"Space":"","Local":"testcase"},"Name":"TestExternalPatientHandlerTestSuite","ClassName":"go-fhir-demo/internal/api/handlers","Time":0,"Failure":null,"Error":null,"Skipped":null},{"XMLName":{"Space":"","Local":"testcase"},"Name":"TestPatientHandlerTestSuite/TestCreatePatient_BadRequest","ClassName":"go-fhir-demo/internal/api/handlers","Time":0,"Failure":null,"Error":null,"Skipped":null},{"XMLName":{"Space":"","Local":"testcase"},"Name":"TestPatientHandlerTestSuite/TestCreatePatient_Error","ClassName":"go-fhir-demo/internal/api/handlers","Time":0,"Failure":null,"Error":null,"Skipped":null},{"XMLName":{"Space":"","Local":"testcase"},"Name":"TestPatientHandlerTestSuite/TestCreatePatient_Success","ClassName":"go-fhir-demo/internal/api/handlers","Time":0,"Failure":null,"Error":null,"Skipped":null},{"XMLName":{"Space":"","Local":"testcase"},"Name":"TestPatientHandlerTestSuite/TestDeletePatient_BadRequest","ClassName":"go-fhir-demo/internal/api/handlers","Time":0,"Failure":null,"Error":null,"Skipped":null},{"XMLName":{"Space":"","Local":"testcase"},"Name":"TestPatientHandlerTestSuite/TestDeletePatient_Error","ClassName":"go-fhir-demo/internal/api/handlers","Time":0,"Failure":null,"Error":null,"Skipped":null},{"XMLName":{"Space":"","Local":"testcase"},"Name":"TestPatientHandlerTestSuite/TestDeletePatient_Success","ClassName":"go-fhir-demo/internal/api/handlers","Time":0,"Failure":null,"Error":null,"Skipped":null},{"XMLName":{"Space":"","Local":"testcase"},"Name":"TestPatientHandlerTestSuite/TestGetPatient_BadRequest","ClassName":"go-fhir-demo/internal/api/handlers","Time":0,"Failure":null,"Error":null,"Skipped":null},{"XMLName":{"Space":"","Local":"testcase"},"Name":"TestPatientHandlerTestSuite/TestGetPatient_NotFound","ClassName":"go-fhir-demo/internal/api/handlers","Time":0,"Failure":null,"Error":null,"Skipped":null},{"XMLName":{"Space":"","Local":"testcase"},"Name":"TestPatientHandlerTestSuite/TestGetPatient_Success","ClassName":"go-fhir-demo/internal/api/handlers","Time":0,"Failure":null,"Error":null,"Skipped":null},{"XMLName":{"Space":"","Local":"testcase"},"Name":"TestPatientHandlerTestSuite/TestGetPatients_Success","ClassName":"go-fhir-demo/internal/api/handlers","Time":0,"Failure":null,"Error":null,"Skipped":null},{"XMLName":{"Space":"","Local":"testcase"},"Name":"TestPatientHandlerTestSuite/TestPatchPatient_Success","ClassName":"go-fhir-demo/internal/api/handlers","Time":0,"Failure":null,"Error":null,"Skipped":null},{"XMLName":{"Space":"","Local":"testcase"},"Name":"TestPatientHandlerTestSuite/TestUpdatePatient_Success","ClassName":"go-fhir-demo/internal/api/handlers","Time":0,"Failure":null,"Error":null,"Skipped":null},{"XMLName":{"Space":"","Local":"testcase"},"Name":"TestPatientHandlerTestSuite","ClassName":"go-fhir-demo/internal/api/handlers","Time":0,"Failure":null,"Error":null,"Skipped":null}],"Properties":[{"Name":"go.version","Value":"go1.23.0 windows/amd64"}]}],"untestedSuites":[{"XMLName":{"Space":"","Local":"testsuite"},"Name":"go-fhir-demo/pkg/fhirclient","Tests":0,"Failures":0,"Errors":0,"Time":0.11,"Timestamp":"2025-06-17T20:36:44+05:30","TestCases":null,"Properties":[{"Name":"go.version","Value":"go1.23.0 windows/amd64"}]}],"performanceData":{"fastTests":50,"mediumTests":0,"slowTests":1,"testVelocity":6.586594343277799,"bottlenecks":[{"name":"go-fhir-demo/internal/repository","time":6.417},{"name":"go-fhir-demo/internal/service","time":0.696},{"name":"go-fhir-demo/internal/api/handlers","time":0.63}]},"failurePatterns":{},"recommendations":["🎯 Focus on optimizing go-fhir-demo/internal/repository - it's the slowest module"]};
-        
-        document.addEventListener("DOMContentLoaded", function() {
-            if (window.Chart && analyticsData && analyticsData.TestedSuites && analyticsData.UntestedSuites) {
-                const ctx = document.getElementById('testDistributionChart').getContext('2d');
-                const tested = analyticsData.TestedSuites.length;
-                const untested = analyticsData.UntestedSuites.length;
-                new Chart(ctx, {
-                    type: 'doughnut',
-                    data: {
-                        labels: ['Tested', 'Untested'],
-                        datasets: [{
-                            data: [tested, untested],
-                            backgroundColor: ['#4caf50', '#f44336'],
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        plugins: {
-                            legend: { position: 'bottom' }
-                        }
-                    }
-                });
-            }
+      const analyticsData = {
+        totalTests: 51,
+        totalFailures: 0,
+        totalErrors: 0,
+        totalTime: 7.853,
+        reliabilityScore: 100,
+        avgTestTime: 153.98039215686273,
+        slowTests: 0,
+        coveragePercent: 75,
+        testedSuites: [
+          {
+            XMLName: { Space: "", Local: "testsuite" },
+            Name: "go-fhir-demo/internal/repository",
+            Tests: 11,
+            Failures: 0,
+            Errors: 0,
+            Time: 6.417,
+            Timestamp: "2025-06-17T20:36:44+05:30",
+            TestCases: [
+              {
+                XMLName: { Space: "", Local: "testcase" },
+                Name: "TestPatientRepositoryTestSuite/TestCount_EmptyTable",
+                ClassName: "go-fhir-demo/internal/repository",
+                Time: 0.01,
+                Failure: null,
+                Error: null,
+                Skipped: null,
+              },
+              {
+                XMLName: { Space: "", Local: "testcase" },
+                Name: "TestPatientRepositoryTestSuite/TestCount_Success",
+                ClassName: "go-fhir-demo/internal/repository",
+                Time: 0.01,
+                Failure: null,
+                Error: null,
+                Skipped: null,
+              },
+              {
+                XMLName: { Space: "", Local: "testcase" },
+                Name: "TestPatientRepositoryTestSuite/TestCreate_Error",
+                ClassName: "go-fhir-demo/internal/repository",
+                Time: 0.01,
+                Failure: null,
+                Error: null,
+                Skipped: null,
+              },
+              {
+                XMLName: { Space: "", Local: "testcase" },
+                Name: "TestPatientRepositoryTestSuite/TestCreate_Success",
+                ClassName: "go-fhir-demo/internal/repository",
+                Time: 0.01,
+                Failure: null,
+                Error: null,
+                Skipped: null,
+              },
+              {
+                XMLName: { Space: "", Local: "testcase" },
+                Name: "TestPatientRepositoryTestSuite/TestDelete_Success",
+                ClassName: "go-fhir-demo/internal/repository",
+                Time: 0.01,
+                Failure: null,
+                Error: null,
+                Skipped: null,
+              },
+              {
+                XMLName: { Space: "", Local: "testcase" },
+                Name: "TestPatientRepositoryTestSuite/TestGetAll_Success",
+                ClassName: "go-fhir-demo/internal/repository",
+                Time: 0.01,
+                Failure: null,
+                Error: null,
+                Skipped: null,
+              },
+              {
+                XMLName: { Space: "", Local: "testcase" },
+                Name: "TestPatientRepositoryTestSuite/TestGetAll_WithPagination",
+                ClassName: "go-fhir-demo/internal/repository",
+                Time: 0.01,
+                Failure: null,
+                Error: null,
+                Skipped: null,
+              },
+              {
+                XMLName: { Space: "", Local: "testcase" },
+                Name: "TestPatientRepositoryTestSuite/TestGetByID_NotFound",
+                ClassName: "go-fhir-demo/internal/repository",
+                Time: 0.01,
+                Failure: null,
+                Error: null,
+                Skipped: null,
+              },
+              {
+                XMLName: { Space: "", Local: "testcase" },
+                Name: "TestPatientRepositoryTestSuite/TestGetByID_Success",
+                ClassName: "go-fhir-demo/internal/repository",
+                Time: 0.01,
+                Failure: null,
+                Error: null,
+                Skipped: null,
+              },
+              {
+                XMLName: { Space: "", Local: "testcase" },
+                Name: "TestPatientRepositoryTestSuite/TestUpdate_Success",
+                ClassName: "go-fhir-demo/internal/repository",
+                Time: 0.01,
+                Failure: null,
+                Error: null,
+                Skipped: null,
+              },
+              {
+                XMLName: { Space: "", Local: "testcase" },
+                Name: "TestPatientRepositoryTestSuite",
+                ClassName: "go-fhir-demo/internal/repository",
+                Time: 5.74,
+                Failure: null,
+                Error: null,
+                Skipped: null,
+              },
+            ],
+            Properties: [
+              { Name: "go.version", Value: "go1.23.0 windows/amd64" },
+            ],
+          },
+          {
+            XMLName: { Space: "", Local: "testsuite" },
+            Name: "go-fhir-demo/internal/service",
+            Tests: 21,
+            Failures: 0,
+            Errors: 0,
+            Time: 0.696,
+            Timestamp: "2025-06-17T20:36:44+05:30",
+            TestCases: [
+              {
+                XMLName: { Space: "", Local: "testcase" },
+                Name: "TestExternalPatientServiceTestSuite/TestGetExternalPatientByID_Error",
+                ClassName: "go-fhir-demo/internal/service",
+                Time: 0,
+                Failure: null,
+                Error: null,
+                Skipped: null,
+              },
+              {
+                XMLName: { Space: "", Local: "testcase" },
+                Name: "TestExternalPatientServiceTestSuite/TestGetExternalPatientByID_Success",
+                ClassName: "go-fhir-demo/internal/service",
+                Time: 0,
+                Failure: null,
+                Error: null,
+                Skipped: null,
+              },
+              {
+                XMLName: { Space: "", Local: "testcase" },
+                Name: "TestExternalPatientServiceTestSuite/TestSearchExternalPatients_EmptyParams",
+                ClassName: "go-fhir-demo/internal/service",
+                Time: 0,
+                Failure: null,
+                Error: null,
+                Skipped: null,
+              },
+              {
+                XMLName: { Space: "", Local: "testcase" },
+                Name: "TestExternalPatientServiceTestSuite/TestSearchExternalPatients_Error",
+                ClassName: "go-fhir-demo/internal/service",
+                Time: 0,
+                Failure: null,
+                Error: null,
+                Skipped: null,
+              },
+              {
+                XMLName: { Space: "", Local: "testcase" },
+                Name: "TestExternalPatientServiceTestSuite/TestSearchExternalPatients_Success",
+                ClassName: "go-fhir-demo/internal/service",
+                Time: 0,
+                Failure: null,
+                Error: null,
+                Skipped: null,
+              },
+              {
+                XMLName: { Space: "", Local: "testcase" },
+                Name: "TestExternalPatientServiceTestSuite",
+                ClassName: "go-fhir-demo/internal/service",
+                Time: 0,
+                Failure: null,
+                Error: null,
+                Skipped: null,
+              },
+              {
+                XMLName: { Space: "", Local: "testcase" },
+                Name: "TestPatientServiceTestSuite/TestConvertFromFHIR_Success",
+                ClassName: "go-fhir-demo/internal/service",
+                Time: 0,
+                Failure: null,
+                Error: null,
+                Skipped: null,
+              },
+              {
+                XMLName: { Space: "", Local: "testcase" },
+                Name: "TestPatientServiceTestSuite/TestConvertToFHIR_InvalidJSON",
+                ClassName: "go-fhir-demo/internal/service",
+                Time: 0,
+                Failure: null,
+                Error: null,
+                Skipped: null,
+              },
+              {
+                XMLName: { Space: "", Local: "testcase" },
+                Name: "TestPatientServiceTestSuite/TestConvertToFHIR_Success",
+                ClassName: "go-fhir-demo/internal/service",
+                Time: 0,
+                Failure: null,
+                Error: null,
+                Skipped: null,
+              },
+              {
+                XMLName: { Space: "", Local: "testcase" },
+                Name: "TestPatientServiceTestSuite/TestCreatePatient_Error",
+                ClassName: "go-fhir-demo/internal/service",
+                Time: 0,
+                Failure: null,
+                Error: null,
+                Skipped: null,
+              },
+              {
+                XMLName: { Space: "", Local: "testcase" },
+                Name: "TestPatientServiceTestSuite/TestCreatePatient_Success",
+                ClassName: "go-fhir-demo/internal/service",
+                Time: 0,
+                Failure: null,
+                Error: null,
+                Skipped: null,
+              },
+              {
+                XMLName: { Space: "", Local: "testcase" },
+                Name: "TestPatientServiceTestSuite/TestDeletePatient_Error",
+                ClassName: "go-fhir-demo/internal/service",
+                Time: 0,
+                Failure: null,
+                Error: null,
+                Skipped: null,
+              },
+              {
+                XMLName: { Space: "", Local: "testcase" },
+                Name: "TestPatientServiceTestSuite/TestDeletePatient_Success",
+                ClassName: "go-fhir-demo/internal/service",
+                Time: 0,
+                Failure: null,
+                Error: null,
+                Skipped: null,
+              },
+              {
+                XMLName: { Space: "", Local: "testcase" },
+                Name: "TestPatientServiceTestSuite/TestGetPatient_NotFound",
+                ClassName: "go-fhir-demo/internal/service",
+                Time: 0,
+                Failure: null,
+                Error: null,
+                Skipped: null,
+              },
+              {
+                XMLName: { Space: "", Local: "testcase" },
+                Name: "TestPatientServiceTestSuite/TestGetPatient_Success",
+                ClassName: "go-fhir-demo/internal/service",
+                Time: 0,
+                Failure: null,
+                Error: null,
+                Skipped: null,
+              },
+              {
+                XMLName: { Space: "", Local: "testcase" },
+                Name: "TestPatientServiceTestSuite/TestGetPatients_Error",
+                ClassName: "go-fhir-demo/internal/service",
+                Time: 0,
+                Failure: null,
+                Error: null,
+                Skipped: null,
+              },
+              {
+                XMLName: { Space: "", Local: "testcase" },
+                Name: "TestPatientServiceTestSuite/TestGetPatients_Success",
+                ClassName: "go-fhir-demo/internal/service",
+                Time: 0,
+                Failure: null,
+                Error: null,
+                Skipped: null,
+              },
+              {
+                XMLName: { Space: "", Local: "testcase" },
+                Name: "TestPatientServiceTestSuite/TestPatchPatient_Success",
+                ClassName: "go-fhir-demo/internal/service",
+                Time: 0,
+                Failure: null,
+                Error: null,
+                Skipped: null,
+              },
+              {
+                XMLName: { Space: "", Local: "testcase" },
+                Name: "TestPatientServiceTestSuite/TestUpdatePatient_NotFound",
+                ClassName: "go-fhir-demo/internal/service",
+                Time: 0,
+                Failure: null,
+                Error: null,
+                Skipped: null,
+              },
+              {
+                XMLName: { Space: "", Local: "testcase" },
+                Name: "TestPatientServiceTestSuite/TestUpdatePatient_Success",
+                ClassName: "go-fhir-demo/internal/service",
+                Time: 0,
+                Failure: null,
+                Error: null,
+                Skipped: null,
+              },
+              {
+                XMLName: { Space: "", Local: "testcase" },
+                Name: "TestPatientServiceTestSuite",
+                ClassName: "go-fhir-demo/internal/service",
+                Time: 0,
+                Failure: null,
+                Error: null,
+                Skipped: null,
+              },
+            ],
+            Properties: [
+              { Name: "go.version", Value: "go1.23.0 windows/amd64" },
+            ],
+          },
+          {
+            XMLName: { Space: "", Local: "testsuite" },
+            Name: "go-fhir-demo/internal/api/handlers",
+            Tests: 19,
+            Failures: 0,
+            Errors: 0,
+            Time: 0.63,
+            Timestamp: "2025-06-17T20:36:44+05:30",
+            TestCases: [
+              {
+                XMLName: { Space: "", Local: "testcase" },
+                Name: "TestExternalPatientHandlerTestSuite/TestGetExternalPatientByID_BadRequest",
+                ClassName: "go-fhir-demo/internal/api/handlers",
+                Time: 0,
+                Failure: null,
+                Error: null,
+                Skipped: null,
+              },
+              {
+                XMLName: { Space: "", Local: "testcase" },
+                Name: "TestExternalPatientHandlerTestSuite/TestGetExternalPatientByID_Error",
+                ClassName: "go-fhir-demo/internal/api/handlers",
+                Time: 0,
+                Failure: null,
+                Error: null,
+                Skipped: null,
+              },
+              {
+                XMLName: { Space: "", Local: "testcase" },
+                Name: "TestExternalPatientHandlerTestSuite/TestGetExternalPatientByID_Success",
+                ClassName: "go-fhir-demo/internal/api/handlers",
+                Time: 0,
+                Failure: null,
+                Error: null,
+                Skipped: null,
+              },
+              {
+                XMLName: { Space: "", Local: "testcase" },
+                Name: "TestExternalPatientHandlerTestSuite/TestSearchExternalPatients_Error",
+                ClassName: "go-fhir-demo/internal/api/handlers",
+                Time: 0,
+                Failure: null,
+                Error: null,
+                Skipped: null,
+              },
+              {
+                XMLName: { Space: "", Local: "testcase" },
+                Name: "TestExternalPatientHandlerTestSuite/TestSearchExternalPatients_Success",
+                ClassName: "go-fhir-demo/internal/api/handlers",
+                Time: 0,
+                Failure: null,
+                Error: null,
+                Skipped: null,
+              },
+              {
+                XMLName: { Space: "", Local: "testcase" },
+                Name: "TestExternalPatientHandlerTestSuite",
+                ClassName: "go-fhir-demo/internal/api/handlers",
+                Time: 0,
+                Failure: null,
+                Error: null,
+                Skipped: null,
+              },
+              {
+                XMLName: { Space: "", Local: "testcase" },
+                Name: "TestPatientHandlerTestSuite/TestCreatePatient_BadRequest",
+                ClassName: "go-fhir-demo/internal/api/handlers",
+                Time: 0,
+                Failure: null,
+                Error: null,
+                Skipped: null,
+              },
+              {
+                XMLName: { Space: "", Local: "testcase" },
+                Name: "TestPatientHandlerTestSuite/TestCreatePatient_Error",
+                ClassName: "go-fhir-demo/internal/api/handlers",
+                Time: 0,
+                Failure: null,
+                Error: null,
+                Skipped: null,
+              },
+              {
+                XMLName: { Space: "", Local: "testcase" },
+                Name: "TestPatientHandlerTestSuite/TestCreatePatient_Success",
+                ClassName: "go-fhir-demo/internal/api/handlers",
+                Time: 0,
+                Failure: null,
+                Error: null,
+                Skipped: null,
+              },
+              {
+                XMLName: { Space: "", Local: "testcase" },
+                Name: "TestPatientHandlerTestSuite/TestDeletePatient_BadRequest",
+                ClassName: "go-fhir-demo/internal/api/handlers",
+                Time: 0,
+                Failure: null,
+                Error: null,
+                Skipped: null,
+              },
+              {
+                XMLName: { Space: "", Local: "testcase" },
+                Name: "TestPatientHandlerTestSuite/TestDeletePatient_Error",
+                ClassName: "go-fhir-demo/internal/api/handlers",
+                Time: 0,
+                Failure: null,
+                Error: null,
+                Skipped: null,
+              },
+              {
+                XMLName: { Space: "", Local: "testcase" },
+                Name: "TestPatientHandlerTestSuite/TestDeletePatient_Success",
+                ClassName: "go-fhir-demo/internal/api/handlers",
+                Time: 0,
+                Failure: null,
+                Error: null,
+                Skipped: null,
+              },
+              {
+                XMLName: { Space: "", Local: "testcase" },
+                Name: "TestPatientHandlerTestSuite/TestGetPatient_BadRequest",
+                ClassName: "go-fhir-demo/internal/api/handlers",
+                Time: 0,
+                Failure: null,
+                Error: null,
+                Skipped: null,
+              },
+              {
+                XMLName: { Space: "", Local: "testcase" },
+                Name: "TestPatientHandlerTestSuite/TestGetPatient_NotFound",
+                ClassName: "go-fhir-demo/internal/api/handlers",
+                Time: 0,
+                Failure: null,
+                Error: null,
+                Skipped: null,
+              },
+              {
+                XMLName: { Space: "", Local: "testcase" },
+                Name: "TestPatientHandlerTestSuite/TestGetPatient_Success",
+                ClassName: "go-fhir-demo/internal/api/handlers",
+                Time: 0,
+                Failure: null,
+                Error: null,
+                Skipped: null,
+              },
+              {
+                XMLName: { Space: "", Local: "testcase" },
+                Name: "TestPatientHandlerTestSuite/TestGetPatients_Success",
+                ClassName: "go-fhir-demo/internal/api/handlers",
+                Time: 0,
+                Failure: null,
+                Error: null,
+                Skipped: null,
+              },
+              {
+                XMLName: { Space: "", Local: "testcase" },
+                Name: "TestPatientHandlerTestSuite/TestPatchPatient_Success",
+                ClassName: "go-fhir-demo/internal/api/handlers",
+                Time: 0,
+                Failure: null,
+                Error: null,
+                Skipped: null,
+              },
+              {
+                XMLName: { Space: "", Local: "testcase" },
+                Name: "TestPatientHandlerTestSuite/TestUpdatePatient_Success",
+                ClassName: "go-fhir-demo/internal/api/handlers",
+                Time: 0,
+                Failure: null,
+                Error: null,
+                Skipped: null,
+              },
+              {
+                XMLName: { Space: "", Local: "testcase" },
+                Name: "TestPatientHandlerTestSuite",
+                ClassName: "go-fhir-demo/internal/api/handlers",
+                Time: 0,
+                Failure: null,
+                Error: null,
+                Skipped: null,
+              },
+            ],
+            Properties: [
+              { Name: "go.version", Value: "go1.23.0 windows/amd64" },
+            ],
+          },
+        ],
+        untestedSuites: [
+          {
+            XMLName: { Space: "", Local: "testsuite" },
+            Name: "go-fhir-demo/pkg/fhirclient",
+            Tests: 0,
+            Failures: 0,
+            Errors: 0,
+            Time: 0.11,
+            Timestamp: "2025-06-17T20:36:44+05:30",
+            TestCases: null,
+            Properties: [
+              { Name: "go.version", Value: "go1.23.0 windows/amd64" },
+            ],
+          },
+        ],
+        performanceData: {
+          fastTests: 50,
+          mediumTests: 0,
+          slowTests: 1,
+          testVelocity: 6.586594343277799,
+          bottlenecks: [
+            { name: "go-fhir-demo/internal/repository", time: 6.417 },
+            { name: "go-fhir-demo/internal/service", time: 0.696 },
+            { name: "go-fhir-demo/internal/api/handlers", time: 0.63 },
+          ],
+        },
+        failurePatterns: {},
+        recommendations: [
+          "🎯 Focus on optimizing go-fhir-demo/internal/repository - it's the slowest module",
+        ],
+      };
+
+      // Initialize charts when DOM is ready
+      document.addEventListener("DOMContentLoaded", function () {
+        console.log("DOM loaded, initializing charts...");
+        console.log("Analytics data:", analyticsData);
+
+        // Initialize both charts
+        renderTestDistributionChart();
+        renderPerformanceChart();
+      });
+
+      // Function to render test distribution chart
+      function renderTestDistributionChart() {
+        const chartElement = document.getElementById("testDistributionChart");
+        if (!chartElement || !window.Chart || !analyticsData) {
+          console.log(
+            "Test Distribution Chart: Missing element, Chart.js, or data"
+          );
+          return;
+        }
+
+        const ctx = chartElement.getContext("2d");
+
+        // Calculate data from analyticsData
+        const passing =
+          analyticsData.totalTests -
+          analyticsData.totalFailures -
+          analyticsData.totalErrors;
+        const failing = analyticsData.totalFailures;
+        const errors = analyticsData.totalErrors;
+        const noTests = analyticsData.untestedSuites
+          ? analyticsData.untestedSuites.length
+          : 0;
+
+        const data = {
+          labels: ["Passing", "Failing", "Error", "No Tests"],
+          datasets: [
+            {
+              data: [passing, failing, errors, noTests],
+              backgroundColor: ["#4ade80", "#ef4444", "#f97316", "#6b7280"],
+              borderWidth: 0,
+            },
+          ],
+        };
+
+        new Chart(ctx, {
+          type: "doughnut",
+          data: data,
+          options: {
+            responsive: true,
+            plugins: {
+              legend: {
+                position: "bottom",
+                labels: { color: "var(--text-color)" },
+              },
+            },
+          },
         });
-        
-        
-        
+        console.log("Test Distribution Chart rendered successfully");
+      }
+
+      // Function to render performance chart
+      function renderPerformanceChart() {
+        const chartElement = document.getElementById("performanceChart");
+        if (
+          !chartElement ||
+          !window.Chart ||
+          !analyticsData ||
+          !analyticsData.testedSuites
+        ) {
+          console.log("Performance Chart: Missing element, Chart.js, or data");
+          return;
+        }
+
+        const ctx = chartElement.getContext("2d");
+
+        // Get top 10 slowest suites
+        const suiteData = analyticsData.testedSuites
+          .slice(0, 10)
+          .map((suite) => ({
+            label: suite.Name.includes("/")
+              ? suite.Name.substring(suite.Name.lastIndexOf("/") + 1)
+              : suite.Name,
+            time: suite.Time,
+            tests: suite.Tests,
+          }));
+
+        new Chart(ctx, {
+          type: "bar",
+          data: {
+            labels: suiteData.map((s) => s.label),
+            datasets: [
+              {
+                label: "Execution Time (s)",
+                data: suiteData.map((s) => s.time),
+                backgroundColor: "#3b82f6",
+                borderRadius: 4,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            scales: {
+              y: {
+                beginAtZero: true,
+                ticks: { color: "var(--text-color)" },
+              },
+              x: {
+                ticks: {
+                  color: "var(--text-color)",
+                  maxRotation: 45,
+                },
+              },
+            },
+            plugins: {
+              legend: {
+                labels: { color: "var(--text-color)" },
+              },
+            },
+          },
+        });
+        console.log("Performance Chart rendered successfully");
+      }
     </script>
-</body>
+  </body>
 </html>
-
-
-
-
-

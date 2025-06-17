@@ -1,4 +1,3 @@
-
 function showFileInput() {
   const loadingElem = document.getElementById("loading");
   if (loadingElem) {
@@ -278,25 +277,25 @@ function renderAnalytics() {
 }
 
 function renderTestDistributionChart() {
-  const ctx = document
-    .getElementById("testDistributionChart")
-    .getContext("2d");
+  const chartElement = document.getElementById("testDistributionChart");
+  if (!chartElement || !window.Chart || !analyticsData) {
+    console.log("Chart.js not loaded or analyticsData not available");
+    return;
+  }
+
+  const ctx = chartElement.getContext("2d");
+  
+  // Calculate data from analyticsData - use the correct property names
+  const passing = analyticsData.totalTests - analyticsData.totalFailures - analyticsData.totalErrors;
+  const failing = analyticsData.totalFailures || 0;
+  const errors = analyticsData.totalErrors || 0;
+  const noTests = analyticsData.untestedSuites ? analyticsData.untestedSuites.length : 0;
+
   const data = {
     labels: ["Passing", "Failing", "Error", "No Tests"],
     datasets: [
       {
-        data: [
-          analyticsData.totalTests - analyticsData.totalFailures,
-          analyticsData.testedSuites.reduce(
-            (sum, suite) => sum + suite.failures,
-            0
-          ),
-          analyticsData.testedSuites.reduce(
-            (sum, suite) => sum + suite.errors,
-            0
-          ),
-          analyticsData.untestedSuites.length,
-        ],
+        data: [passing, failing, errors, noTests],
         backgroundColor: ["#4ade80", "#ef4444", "#f97316", "#6b7280"],
         borderWidth: 0,
       },
@@ -319,18 +318,23 @@ function renderTestDistributionChart() {
 }
 
 function renderPerformanceChart() {
-  const ctx = document
-    .getElementById("performanceChart")
-    .getContext("2d");
+  const chartElement = document.getElementById("performanceChart");
+  if (!chartElement || !window.Chart || !analyticsData || !analyticsData.testedSuites) {
+    console.log("Performance chart: Chart.js not loaded or data not available");
+    return;
+  }
+
+  const ctx = chartElement.getContext("2d");
+  
+  // Get top 10 slowest suites - use correct property names
   const suiteData = analyticsData.testedSuites
     .slice(0, 10)
     .map((suite) => ({
-      label:
-        suite.name.length > 20
-          ? suite.name.substring(0, 20) + "..."
-          : suite.name,
-      time: suite.time,
-      tests: suite.tests,
+      label: suite.Name.includes('/') 
+        ? suite.Name.substring(suite.Name.lastIndexOf('/') + 1) 
+        : suite.Name,
+      time: suite.Time,
+      tests: suite.Tests,
     }));
 
   new Chart(ctx, {
