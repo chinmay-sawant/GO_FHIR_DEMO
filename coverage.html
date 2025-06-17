@@ -59,29 +59,29 @@
 				
 				<option value="file1">go-fhir-demo/docs/docs.go (0.0%)</option>
 				
-				<option value="file2">go-fhir-demo/internal/api/handlers/external_patient_handler.go (0.0%)</option>
+				<option value="file2">go-fhir-demo/internal/api/handlers/external_patient_handler.go (90.5%)</option>
 				
 				<option value="file3">go-fhir-demo/internal/api/handlers/mocks/mock_external_patient_handler.go (0.0%)</option>
 				
 				<option value="file4">go-fhir-demo/internal/api/handlers/mocks/mock_patient_handler.go (0.0%)</option>
 				
-				<option value="file5">go-fhir-demo/internal/api/handlers/patient_handler.go (0.0%)</option>
+				<option value="file5">go-fhir-demo/internal/api/handlers/patient_handler.go (67.3%)</option>
 				
 				<option value="file6">go-fhir-demo/internal/api/routes/mocks/mock_routes.go (0.0%)</option>
 				
 				<option value="file7">go-fhir-demo/internal/api/routes/routes.go (0.0%)</option>
 				
-				<option value="file8">go-fhir-demo/internal/domain/mocks/mock_external_patient.go (0.0%)</option>
+				<option value="file8">go-fhir-demo/internal/domain/mocks/mock_external_patient.go (100.0%)</option>
 				
-				<option value="file9">go-fhir-demo/internal/domain/mocks/mock_patient.go (41.7%)</option>
+				<option value="file9">go-fhir-demo/internal/domain/mocks/mock_patient.go (93.2%)</option>
 				
-				<option value="file10">go-fhir-demo/internal/domain/patient.go (0.0%)</option>
+				<option value="file10">go-fhir-demo/internal/domain/patient.go (100.0%)</option>
 				
 				<option value="file11">go-fhir-demo/internal/middleware/middleware.go (0.0%)</option>
 				
 				<option value="file12">go-fhir-demo/internal/repository/mocks/mock_patient_repository.go (0.0%)</option>
 				
-				<option value="file13">go-fhir-demo/internal/repository/patient_repository.go (0.0%)</option>
+				<option value="file13">go-fhir-demo/internal/repository/patient_repository.go (72.2%)</option>
 				
 				<option value="file14">go-fhir-demo/internal/service/external_patient_service.go (100.0%)</option>
 				
@@ -97,9 +97,11 @@
 				
 				<option value="file20">go-fhir-demo/pkg/fhirclient/client.go (0.0%)</option>
 				
-				<option value="file21">go-fhir-demo/pkg/logger/logger.go (0.0%)</option>
+				<option value="file21">go-fhir-demo/pkg/fhirclient/mocks/client_mock.go (0.0%)</option>
 				
-				<option value="file22">go-fhir-demo/pkg/utils/utils.go (29.4%)</option>
+				<option value="file22">go-fhir-demo/pkg/logger/logger.go (20.7%)</option>
+				
+				<option value="file23">go-fhir-demo/pkg/utils/utils.go (38.1%)</option>
 				
 				</select>
 			</div>
@@ -2842,7 +2844,7 @@ type ExternalPatientHandler struct {
 }
 
 // NewExternalPatientHandler creates a new ExternalPatientHandler.
-func NewExternalPatientHandler(service domain.ExternalPatientService) ExternalPatientHandlerInterface <span class="cov0" title="0">{
+func NewExternalPatientHandler(service domain.ExternalPatientService) ExternalPatientHandlerInterface <span class="cov10" title="5">{
         return &amp;ExternalPatientHandler{
                 service: service,
         }
@@ -2859,22 +2861,22 @@ func NewExternalPatientHandler(service domain.ExternalPatientService) ExternalPa
 // @Failure 404 {object} map[string]string "Patient not found"
 // @Failure 500 {object} map[string]string "Internal server error"
 // @Router /external-patients/{id} [get]
-func (h *ExternalPatientHandler) GetExternalPatientByID(c *gin.Context) <span class="cov0" title="0">{
+func (h *ExternalPatientHandler) GetExternalPatientByID(c *gin.Context) <span class="cov4" title="2">{
         id := c.Param("id")
         if id == "" </span><span class="cov0" title="0">{
                 c.JSON(http.StatusBadRequest, gin.H{"error": "Patient ID is required"})
                 return
         }</span>
 
-        <span class="cov0" title="0">patient, err := h.service.GetExternalPatientByID(id)
-        if err != nil </span><span class="cov0" title="0">{
+        <span class="cov4" title="2">patient, err := h.service.GetExternalPatientByID(id)
+        if err != nil </span><span class="cov1" title="1">{
                 // Basic error handling, can be improved to differentiate 404 from 500
                 logger.Errorf("Failed to get external patient by ID %s: %v", id, err)
                 c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve patient from external server", "details": err.Error()})
                 return
         }</span>
 
-        <span class="cov0" title="0">c.JSON(http.StatusOK, patient)</span>
+        <span class="cov1" title="1">c.JSON(http.StatusOK, patient)</span>
 }
 
 // SearchExternalPatients godoc
@@ -2887,22 +2889,22 @@ func (h *ExternalPatientHandler) GetExternalPatientByID(c *gin.Context) <span cl
 // @Failure 400 {object} map[string]string "Invalid request"
 // @Failure 500 {object} map[string]string "Internal server error"
 // @Router /external-patients [get]
-func (h *ExternalPatientHandler) SearchExternalPatients(c *gin.Context) <span class="cov0" title="0">{
+func (h *ExternalPatientHandler) SearchExternalPatients(c *gin.Context) <span class="cov4" title="2">{
         queryParams := make(map[string]string)
-        for key, values := range c.Request.URL.Query() </span><span class="cov0" title="0">{
-                if len(values) &gt; 0 </span><span class="cov0" title="0">{
+        for key, values := range c.Request.URL.Query() </span><span class="cov7" title="3">{
+                if len(values) &gt; 0 </span><span class="cov7" title="3">{
                         queryParams[key] = values[0] // Taking the first value for simplicity
                 }</span>
         }
 
-        <span class="cov0" title="0">bundle, err := h.service.SearchExternalPatients(queryParams)
-        if err != nil </span><span class="cov0" title="0">{
+        <span class="cov4" title="2">bundle, err := h.service.SearchExternalPatients(queryParams)
+        if err != nil </span><span class="cov1" title="1">{
                 logger.Errorf("Failed to search external patients: %v", err)
                 c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to search patients on external server", "details": err.Error()})
                 return
         }</span>
 
-        <span class="cov0" title="0">c.JSON(http.StatusOK, bundle)</span>
+        <span class="cov1" title="1">c.JSON(http.StatusOK, bundle)</span>
 }
 </pre>
 		
@@ -3117,7 +3119,7 @@ type PatientHandler struct {
 }
 
 // NewPatientHandler creates a new patient handler
-func NewPatientHandler(service domain.PatientService) PatientHandlerInterface <span class="cov0" title="0">{
+func NewPatientHandler(service domain.PatientService) PatientHandlerInterface <span class="cov10" title="12">{
         return &amp;PatientHandler{
                 service: service,
         }
@@ -3134,10 +3136,10 @@ func NewPatientHandler(service domain.PatientService) PatientHandlerInterface <s
 // @Failure 400 {object} map[string]interface{}
 // @Failure 500 {object} map[string]interface{}
 // @Router /patients [post]
-func (h *PatientHandler) CreatePatient(c *gin.Context) <span class="cov0" title="0">{
+func (h *PatientHandler) CreatePatient(c *gin.Context) <span class="cov4" title="3">{
         var fhirPatient fhir.Patient
 
-        if err := c.ShouldBindJSON(&amp;fhirPatient); err != nil </span><span class="cov0" title="0">{
+        if err := c.ShouldBindJSON(&amp;fhirPatient); err != nil </span><span class="cov1" title="1">{
                 logger.Errorf("Failed to bind JSON: %v", err)
                 c.JSON(http.StatusBadRequest, gin.H{
                         "error":   "Invalid JSON",
@@ -3147,8 +3149,8 @@ func (h *PatientHandler) CreatePatient(c *gin.Context) <span class="cov0" title=
         }</span>
 
         // Create patient
-        <span class="cov0" title="0">patient, err := h.service.CreatePatient(&amp;fhirPatient)
-        if err != nil </span><span class="cov0" title="0">{
+        <span class="cov3" title="2">patient, err := h.service.CreatePatient(&amp;fhirPatient)
+        if err != nil </span><span class="cov1" title="1">{
                 logger.Errorf("Failed to create patient: %v", err)
                 c.JSON(http.StatusInternalServerError, gin.H{
                         "error":   "Failed to create patient",
@@ -3158,7 +3160,7 @@ func (h *PatientHandler) CreatePatient(c *gin.Context) <span class="cov0" title=
         }</span>
 
         // Convert back to FHIR for response
-        <span class="cov0" title="0">fhirResponse, err := h.service.ConvertToFHIR(patient)
+        <span class="cov1" title="1">fhirResponse, err := h.service.ConvertToFHIR(patient)
         if err != nil </span><span class="cov0" title="0">{
                 logger.Errorf("Failed to convert to FHIR: %v", err)
                 c.JSON(http.StatusInternalServerError, gin.H{
@@ -3168,7 +3170,7 @@ func (h *PatientHandler) CreatePatient(c *gin.Context) <span class="cov0" title=
                 return
         }</span>
 
-        <span class="cov0" title="0">c.JSON(http.StatusCreated, fhirResponse)</span>
+        <span class="cov1" title="1">c.JSON(http.StatusCreated, fhirResponse)</span>
 }
 
 // GetPatient handles GET /patients/:id
@@ -3182,10 +3184,10 @@ func (h *PatientHandler) CreatePatient(c *gin.Context) <span class="cov0" title=
 // @Failure 404 {object} map[string]interface{}
 // @Failure 500 {object} map[string]interface{}
 // @Router /patients/{id} [get]
-func (h *PatientHandler) GetPatient(c *gin.Context) <span class="cov0" title="0">{
+func (h *PatientHandler) GetPatient(c *gin.Context) <span class="cov4" title="3">{
         idStr := c.Param("id")
         id, err := strconv.ParseUint(idStr, 10, 64)
-        if err != nil </span><span class="cov0" title="0">{
+        if err != nil </span><span class="cov1" title="1">{
                 c.JSON(http.StatusBadRequest, gin.H{
                         "error":   "Invalid patient ID",
                         "message": "Patient ID must be a valid number",
@@ -3193,8 +3195,8 @@ func (h *PatientHandler) GetPatient(c *gin.Context) <span class="cov0" title="0"
                 return
         }</span>
 
-        <span class="cov0" title="0">patient, err := h.service.GetPatient(uint(id))
-        if err != nil </span><span class="cov0" title="0">{
+        <span class="cov3" title="2">patient, err := h.service.GetPatient(uint(id))
+        if err != nil </span><span class="cov1" title="1">{
                 logger.Errorf("Failed to get patient: %v", err)
                 c.JSON(http.StatusNotFound, gin.H{
                         "error":   "Patient not found",
@@ -3203,7 +3205,7 @@ func (h *PatientHandler) GetPatient(c *gin.Context) <span class="cov0" title="0"
                 return
         }</span>
 
-        <span class="cov0" title="0">fhirPatient, err := h.service.ConvertToFHIR(patient)
+        <span class="cov1" title="1">fhirPatient, err := h.service.ConvertToFHIR(patient)
         if err != nil </span><span class="cov0" title="0">{
                 logger.Errorf("Failed to convert to FHIR: %v", err)
                 c.JSON(http.StatusInternalServerError, gin.H{
@@ -3213,7 +3215,7 @@ func (h *PatientHandler) GetPatient(c *gin.Context) <span class="cov0" title="0"
                 return
         }</span>
 
-        <span class="cov0" title="0">c.JSON(http.StatusOK, fhirPatient)</span>
+        <span class="cov1" title="1">c.JSON(http.StatusOK, fhirPatient)</span>
 }
 
 // GetPatients handles GET /patients
@@ -3226,7 +3228,7 @@ func (h *PatientHandler) GetPatient(c *gin.Context) <span class="cov0" title="0"
 // @Success 200 {object} map[string]interface{}
 // @Failure 500 {object} map[string]interface{}
 // @Router /patients [get]
-func (h *PatientHandler) GetPatients(c *gin.Context) <span class="cov0" title="0">{
+func (h *PatientHandler) GetPatients(c *gin.Context) <span class="cov1" title="1">{
         limitStr := c.DefaultQuery("limit", "10")
         offsetStr := c.DefaultQuery("offset", "0")
 
@@ -3235,12 +3237,12 @@ func (h *PatientHandler) GetPatients(c *gin.Context) <span class="cov0" title="0
                 limit = 10
         }</span>
 
-        <span class="cov0" title="0">offset, err := strconv.Atoi(offsetStr)
+        <span class="cov1" title="1">offset, err := strconv.Atoi(offsetStr)
         if err != nil || offset &lt; 0 </span><span class="cov0" title="0">{
                 offset = 0
         }</span>
 
-        <span class="cov0" title="0">patients, total, err := h.service.GetPatients(limit, offset)
+        <span class="cov1" title="1">patients, total, err := h.service.GetPatients(limit, offset)
         if err != nil </span><span class="cov0" title="0">{
                 logger.Errorf("Failed to get patients: %v", err)
                 c.JSON(http.StatusInternalServerError, gin.H{
@@ -3251,17 +3253,17 @@ func (h *PatientHandler) GetPatients(c *gin.Context) <span class="cov0" title="0
         }</span>
 
         // Convert patients to FHIR format
-        <span class="cov0" title="0">fhirPatients := make([]*fhir.Patient, 0, len(patients))
-        for _, patient := range patients </span><span class="cov0" title="0">{
+        <span class="cov1" title="1">fhirPatients := make([]*fhir.Patient, 0, len(patients))
+        for _, patient := range patients </span><span class="cov3" title="2">{
                 fhirPatient, err := h.service.ConvertToFHIR(patient)
                 if err != nil </span><span class="cov0" title="0">{
                         logger.Warnf("Failed to convert patient %d to FHIR: %v", patient.ID, err)
                         continue</span>
                 }
-                <span class="cov0" title="0">fhirPatients = append(fhirPatients, fhirPatient)</span>
+                <span class="cov3" title="2">fhirPatients = append(fhirPatients, fhirPatient)</span>
         }
 
-        <span class="cov0" title="0">c.JSON(http.StatusOK, gin.H{
+        <span class="cov1" title="1">c.JSON(http.StatusOK, gin.H{
                 "patients": fhirPatients,
                 "total":    total,
                 "limit":    limit,
@@ -3282,7 +3284,7 @@ func (h *PatientHandler) GetPatients(c *gin.Context) <span class="cov0" title="0
 // @Failure 404 {object} map[string]interface{}
 // @Failure 500 {object} map[string]interface{}
 // @Router /patients/{id} [put]
-func (h *PatientHandler) UpdatePatient(c *gin.Context) <span class="cov0" title="0">{
+func (h *PatientHandler) UpdatePatient(c *gin.Context) <span class="cov1" title="1">{
         idStr := c.Param("id")
         id, err := strconv.ParseUint(idStr, 10, 64)
         if err != nil </span><span class="cov0" title="0">{
@@ -3293,7 +3295,7 @@ func (h *PatientHandler) UpdatePatient(c *gin.Context) <span class="cov0" title=
                 return
         }</span>
 
-        <span class="cov0" title="0">var fhirPatient fhir.Patient
+        <span class="cov1" title="1">var fhirPatient fhir.Patient
         if err := c.ShouldBindJSON(&amp;fhirPatient); err != nil </span><span class="cov0" title="0">{
                 logger.Errorf("Failed to bind JSON: %v", err)
                 c.JSON(http.StatusBadRequest, gin.H{
@@ -3303,7 +3305,7 @@ func (h *PatientHandler) UpdatePatient(c *gin.Context) <span class="cov0" title=
                 return
         }</span>
 
-        <span class="cov0" title="0">patient, err := h.service.UpdatePatient(uint(id), &amp;fhirPatient)
+        <span class="cov1" title="1">patient, err := h.service.UpdatePatient(uint(id), &amp;fhirPatient)
         if err != nil </span><span class="cov0" title="0">{
                 logger.Errorf("Failed to update patient %d: %v", id, err)
                 c.JSON(http.StatusInternalServerError, gin.H{
@@ -3313,7 +3315,7 @@ func (h *PatientHandler) UpdatePatient(c *gin.Context) <span class="cov0" title=
                 return
         }</span>
 
-        <span class="cov0" title="0">fhirResponse, err := h.service.ConvertToFHIR(patient)
+        <span class="cov1" title="1">fhirResponse, err := h.service.ConvertToFHIR(patient)
         if err != nil </span><span class="cov0" title="0">{
                 logger.Errorf("Failed to convert to FHIR: %v", err)
                 c.JSON(http.StatusInternalServerError, gin.H{
@@ -3323,7 +3325,7 @@ func (h *PatientHandler) UpdatePatient(c *gin.Context) <span class="cov0" title=
                 return
         }</span>
 
-        <span class="cov0" title="0">c.JSON(http.StatusOK, fhirResponse)</span>
+        <span class="cov1" title="1">c.JSON(http.StatusOK, fhirResponse)</span>
 }
 
 // PatchPatient handles PATCH /patients/:id
@@ -3339,7 +3341,7 @@ func (h *PatientHandler) UpdatePatient(c *gin.Context) <span class="cov0" title=
 // @Failure 404 {object} map[string]interface{}
 // @Failure 500 {object} map[string]interface{}
 // @Router /patients/{id} [patch]
-func (h *PatientHandler) PatchPatient(c *gin.Context) <span class="cov0" title="0">{
+func (h *PatientHandler) PatchPatient(c *gin.Context) <span class="cov1" title="1">{
         idStr := c.Param("id")
         id, err := strconv.ParseUint(idStr, 10, 64)
         if err != nil </span><span class="cov0" title="0">{
@@ -3350,7 +3352,7 @@ func (h *PatientHandler) PatchPatient(c *gin.Context) <span class="cov0" title="
                 return
         }</span>
 
-        <span class="cov0" title="0">var updates map[string]interface{}
+        <span class="cov1" title="1">var updates map[string]interface{}
         if err := c.ShouldBindJSON(&amp;updates); err != nil </span><span class="cov0" title="0">{
                 logger.Errorf("Failed to bind JSON: %v", err)
                 c.JSON(http.StatusBadRequest, gin.H{
@@ -3360,7 +3362,7 @@ func (h *PatientHandler) PatchPatient(c *gin.Context) <span class="cov0" title="
                 return
         }</span>
 
-        <span class="cov0" title="0">patient, err := h.service.PatchPatient(uint(id), updates)
+        <span class="cov1" title="1">patient, err := h.service.PatchPatient(uint(id), updates)
         if err != nil </span><span class="cov0" title="0">{
                 logger.Errorf("Failed to patch patient %d: %v", id, err)
                 c.JSON(http.StatusInternalServerError, gin.H{
@@ -3370,7 +3372,7 @@ func (h *PatientHandler) PatchPatient(c *gin.Context) <span class="cov0" title="
                 return
         }</span>
 
-        <span class="cov0" title="0">fhirResponse, err := h.service.ConvertToFHIR(patient)
+        <span class="cov1" title="1">fhirResponse, err := h.service.ConvertToFHIR(patient)
         if err != nil </span><span class="cov0" title="0">{
                 logger.Errorf("Failed to convert to FHIR: %v", err)
                 c.JSON(http.StatusInternalServerError, gin.H{
@@ -3380,7 +3382,7 @@ func (h *PatientHandler) PatchPatient(c *gin.Context) <span class="cov0" title="
                 return
         }</span>
 
-        <span class="cov0" title="0">c.JSON(http.StatusOK, fhirResponse)</span>
+        <span class="cov1" title="1">c.JSON(http.StatusOK, fhirResponse)</span>
 }
 
 // DeletePatient handles DELETE /patients/:id
@@ -3393,10 +3395,10 @@ func (h *PatientHandler) PatchPatient(c *gin.Context) <span class="cov0" title="
 // @Failure 400 {object} map[string]interface{}
 // @Failure 500 {object} map[string]interface{}
 // @Router /patients/{id} [delete]
-func (h *PatientHandler) DeletePatient(c *gin.Context) <span class="cov0" title="0">{
+func (h *PatientHandler) DeletePatient(c *gin.Context) <span class="cov4" title="3">{
         idStr := c.Param("id")
         id, err := strconv.ParseUint(idStr, 10, 64)
-        if err != nil </span><span class="cov0" title="0">{
+        if err != nil </span><span class="cov1" title="1">{
                 c.JSON(http.StatusBadRequest, gin.H{
                         "error":   "Invalid patient ID",
                         "message": "Patient ID must be a valid number",
@@ -3404,8 +3406,8 @@ func (h *PatientHandler) DeletePatient(c *gin.Context) <span class="cov0" title=
                 return
         }</span>
 
-        <span class="cov0" title="0">err = h.service.DeletePatient(uint(id))
-        if err != nil </span><span class="cov0" title="0">{
+        <span class="cov3" title="2">err = h.service.DeletePatient(uint(id))
+        if err != nil </span><span class="cov1" title="1">{
                 logger.Errorf("Failed to delete patient %d: %v", id, err)
                 c.JSON(http.StatusInternalServerError, gin.H{
                         "error":   "Failed to delete patient",
@@ -3414,7 +3416,7 @@ func (h *PatientHandler) DeletePatient(c *gin.Context) <span class="cov0" title=
                 return
         }</span>
 
-        <span class="cov0" title="0">c.Status(http.StatusNoContent)</span>
+        <span class="cov1" title="1">c.Status(http.StatusNoContent)</span>
 }
 </pre>
 		
@@ -3616,19 +3618,19 @@ type MockExternalPatientServiceMockRecorder struct {
 }
 
 // NewMockExternalPatientService creates a new mock instance.
-func NewMockExternalPatientService(ctrl *gomock.Controller) *MockExternalPatientService <span class="cov0" title="0">{
+func NewMockExternalPatientService(ctrl *gomock.Controller) *MockExternalPatientService <span class="cov10" title="5">{
         mock := &amp;MockExternalPatientService{ctrl: ctrl}
         mock.recorder = &amp;MockExternalPatientServiceMockRecorder{mock}
         return mock
 }</span>
 
 // EXPECT returns an object that allows the caller to indicate expected use.
-func (m *MockExternalPatientService) EXPECT() *MockExternalPatientServiceMockRecorder <span class="cov0" title="0">{
+func (m *MockExternalPatientService) EXPECT() *MockExternalPatientServiceMockRecorder <span class="cov8" title="4">{
         return m.recorder
 }</span>
 
 // GetExternalPatientByID mocks base method.
-func (m *MockExternalPatientService) GetExternalPatientByID(id string) (*fhir.Patient, error) <span class="cov0" title="0">{
+func (m *MockExternalPatientService) GetExternalPatientByID(id string) (*fhir.Patient, error) <span class="cov4" title="2">{
         m.ctrl.T.Helper()
         ret := m.ctrl.Call(m, "GetExternalPatientByID", id)
         ret0, _ := ret[0].(*fhir.Patient)
@@ -3637,13 +3639,13 @@ func (m *MockExternalPatientService) GetExternalPatientByID(id string) (*fhir.Pa
 }</span>
 
 // GetExternalPatientByID indicates an expected call of GetExternalPatientByID.
-func (mr *MockExternalPatientServiceMockRecorder) GetExternalPatientByID(id any) *gomock.Call <span class="cov0" title="0">{
+func (mr *MockExternalPatientServiceMockRecorder) GetExternalPatientByID(id any) *gomock.Call <span class="cov4" title="2">{
         mr.mock.ctrl.T.Helper()
         return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetExternalPatientByID", reflect.TypeOf((*MockExternalPatientService)(nil).GetExternalPatientByID), id)
 }</span>
 
 // SearchExternalPatients mocks base method.
-func (m *MockExternalPatientService) SearchExternalPatients(params map[string]string) (*fhir.Bundle, error) <span class="cov0" title="0">{
+func (m *MockExternalPatientService) SearchExternalPatients(params map[string]string) (*fhir.Bundle, error) <span class="cov4" title="2">{
         m.ctrl.T.Helper()
         ret := m.ctrl.Call(m, "SearchExternalPatients", params)
         ret0, _ := ret[0].(*fhir.Bundle)
@@ -3652,7 +3654,7 @@ func (m *MockExternalPatientService) SearchExternalPatients(params map[string]st
 }</span>
 
 // SearchExternalPatients indicates an expected call of SearchExternalPatients.
-func (mr *MockExternalPatientServiceMockRecorder) SearchExternalPatients(params any) *gomock.Call <span class="cov0" title="0">{
+func (mr *MockExternalPatientServiceMockRecorder) SearchExternalPatients(params any) *gomock.Call <span class="cov4" title="2">{
         mr.mock.ctrl.T.Helper()
         return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SearchExternalPatients", reflect.TypeOf((*MockExternalPatientService)(nil).SearchExternalPatients), params)
 }</span>
@@ -3690,14 +3692,14 @@ type MockPatientRepositoryMockRecorder struct {
 }
 
 // NewMockPatientRepository creates a new mock instance.
-func NewMockPatientRepository(ctrl *gomock.Controller) *MockPatientRepository <span class="cov10" title="14">{
+func NewMockPatientRepository(ctrl *gomock.Controller) *MockPatientRepository <span class="cov8" title="14">{
         mock := &amp;MockPatientRepository{ctrl: ctrl}
         mock.recorder = &amp;MockPatientRepositoryMockRecorder{mock}
         return mock
 }</span>
 
 // EXPECT returns an object that allows the caller to indicate expected use.
-func (m *MockPatientRepository) EXPECT() *MockPatientRepositoryMockRecorder <span class="cov10" title="14">{
+func (m *MockPatientRepository) EXPECT() *MockPatientRepositoryMockRecorder <span class="cov8" title="14">{
         return m.recorder
 }</span>
 
@@ -3760,7 +3762,7 @@ func (mr *MockPatientRepositoryMockRecorder) GetAll(limit, offset any) *gomock.C
 }</span>
 
 // GetByID mocks base method.
-func (m *MockPatientRepository) GetByID(id uint) (*domain.Patient, error) <span class="cov6" title="5">{
+func (m *MockPatientRepository) GetByID(id uint) (*domain.Patient, error) <span class="cov5" title="5">{
         m.ctrl.T.Helper()
         ret := m.ctrl.Call(m, "GetByID", id)
         ret0, _ := ret[0].(*domain.Patient)
@@ -3769,7 +3771,7 @@ func (m *MockPatientRepository) GetByID(id uint) (*domain.Patient, error) <span 
 }</span>
 
 // GetByID indicates an expected call of GetByID.
-func (mr *MockPatientRepositoryMockRecorder) GetByID(id any) *gomock.Call <span class="cov6" title="5">{
+func (mr *MockPatientRepositoryMockRecorder) GetByID(id any) *gomock.Call <span class="cov5" title="5">{
         mr.mock.ctrl.T.Helper()
         return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetByID", reflect.TypeOf((*MockPatientRepository)(nil).GetByID), id)
 }</span>
@@ -3801,14 +3803,14 @@ type MockPatientServiceMockRecorder struct {
 }
 
 // NewMockPatientService creates a new mock instance.
-func NewMockPatientService(ctrl *gomock.Controller) *MockPatientService <span class="cov0" title="0">{
+func NewMockPatientService(ctrl *gomock.Controller) *MockPatientService <span class="cov8" title="12">{
         mock := &amp;MockPatientService{ctrl: ctrl}
         mock.recorder = &amp;MockPatientServiceMockRecorder{mock}
         return mock
 }</span>
 
 // EXPECT returns an object that allows the caller to indicate expected use.
-func (m *MockPatientService) EXPECT() *MockPatientServiceMockRecorder <span class="cov0" title="0">{
+func (m *MockPatientService) EXPECT() *MockPatientServiceMockRecorder <span class="cov10" title="21">{
         return m.recorder
 }</span>
 
@@ -3828,7 +3830,7 @@ func (mr *MockPatientServiceMockRecorder) ConvertFromFHIR(fhirPatient any) *gomo
 }</span>
 
 // ConvertToFHIR mocks base method.
-func (m *MockPatientService) ConvertToFHIR(patient *domain.Patient) (*fhir.Patient, error) <span class="cov0" title="0">{
+func (m *MockPatientService) ConvertToFHIR(patient *domain.Patient) (*fhir.Patient, error) <span class="cov6" title="6">{
         m.ctrl.T.Helper()
         ret := m.ctrl.Call(m, "ConvertToFHIR", patient)
         ret0, _ := ret[0].(*fhir.Patient)
@@ -3837,13 +3839,13 @@ func (m *MockPatientService) ConvertToFHIR(patient *domain.Patient) (*fhir.Patie
 }</span>
 
 // ConvertToFHIR indicates an expected call of ConvertToFHIR.
-func (mr *MockPatientServiceMockRecorder) ConvertToFHIR(patient any) *gomock.Call <span class="cov0" title="0">{
+func (mr *MockPatientServiceMockRecorder) ConvertToFHIR(patient any) *gomock.Call <span class="cov8" title="12">{
         mr.mock.ctrl.T.Helper()
         return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ConvertToFHIR", reflect.TypeOf((*MockPatientService)(nil).ConvertToFHIR), patient)
 }</span>
 
 // CreatePatient mocks base method.
-func (m *MockPatientService) CreatePatient(fhirPatient *fhir.Patient) (*domain.Patient, error) <span class="cov0" title="0">{
+func (m *MockPatientService) CreatePatient(fhirPatient *fhir.Patient) (*domain.Patient, error) <span class="cov3" title="2">{
         m.ctrl.T.Helper()
         ret := m.ctrl.Call(m, "CreatePatient", fhirPatient)
         ret0, _ := ret[0].(*domain.Patient)
@@ -3852,13 +3854,13 @@ func (m *MockPatientService) CreatePatient(fhirPatient *fhir.Patient) (*domain.P
 }</span>
 
 // CreatePatient indicates an expected call of CreatePatient.
-func (mr *MockPatientServiceMockRecorder) CreatePatient(fhirPatient any) *gomock.Call <span class="cov0" title="0">{
+func (mr *MockPatientServiceMockRecorder) CreatePatient(fhirPatient any) *gomock.Call <span class="cov3" title="2">{
         mr.mock.ctrl.T.Helper()
         return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreatePatient", reflect.TypeOf((*MockPatientService)(nil).CreatePatient), fhirPatient)
 }</span>
 
 // DeletePatient mocks base method.
-func (m *MockPatientService) DeletePatient(id uint) error <span class="cov0" title="0">{
+func (m *MockPatientService) DeletePatient(id uint) error <span class="cov3" title="2">{
         m.ctrl.T.Helper()
         ret := m.ctrl.Call(m, "DeletePatient", id)
         ret0, _ := ret[0].(error)
@@ -3866,13 +3868,13 @@ func (m *MockPatientService) DeletePatient(id uint) error <span class="cov0" tit
 }</span>
 
 // DeletePatient indicates an expected call of DeletePatient.
-func (mr *MockPatientServiceMockRecorder) DeletePatient(id any) *gomock.Call <span class="cov0" title="0">{
+func (mr *MockPatientServiceMockRecorder) DeletePatient(id any) *gomock.Call <span class="cov3" title="2">{
         mr.mock.ctrl.T.Helper()
         return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeletePatient", reflect.TypeOf((*MockPatientService)(nil).DeletePatient), id)
 }</span>
 
 // GetPatient mocks base method.
-func (m *MockPatientService) GetPatient(id uint) (*domain.Patient, error) <span class="cov0" title="0">{
+func (m *MockPatientService) GetPatient(id uint) (*domain.Patient, error) <span class="cov3" title="2">{
         m.ctrl.T.Helper()
         ret := m.ctrl.Call(m, "GetPatient", id)
         ret0, _ := ret[0].(*domain.Patient)
@@ -3881,13 +3883,13 @@ func (m *MockPatientService) GetPatient(id uint) (*domain.Patient, error) <span 
 }</span>
 
 // GetPatient indicates an expected call of GetPatient.
-func (mr *MockPatientServiceMockRecorder) GetPatient(id any) *gomock.Call <span class="cov0" title="0">{
+func (mr *MockPatientServiceMockRecorder) GetPatient(id any) *gomock.Call <span class="cov3" title="2">{
         mr.mock.ctrl.T.Helper()
         return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPatient", reflect.TypeOf((*MockPatientService)(nil).GetPatient), id)
 }</span>
 
 // GetPatients mocks base method.
-func (m *MockPatientService) GetPatients(limit, offset int) ([]*domain.Patient, int64, error) <span class="cov0" title="0">{
+func (m *MockPatientService) GetPatients(limit, offset int) ([]*domain.Patient, int64, error) <span class="cov1" title="1">{
         m.ctrl.T.Helper()
         ret := m.ctrl.Call(m, "GetPatients", limit, offset)
         ret0, _ := ret[0].([]*domain.Patient)
@@ -3897,13 +3899,13 @@ func (m *MockPatientService) GetPatients(limit, offset int) ([]*domain.Patient, 
 }</span>
 
 // GetPatients indicates an expected call of GetPatients.
-func (mr *MockPatientServiceMockRecorder) GetPatients(limit, offset any) *gomock.Call <span class="cov0" title="0">{
+func (mr *MockPatientServiceMockRecorder) GetPatients(limit, offset any) *gomock.Call <span class="cov1" title="1">{
         mr.mock.ctrl.T.Helper()
         return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPatients", reflect.TypeOf((*MockPatientService)(nil).GetPatients), limit, offset)
 }</span>
 
 // PatchPatient mocks base method.
-func (m *MockPatientService) PatchPatient(id uint, updates map[string]any) (*domain.Patient, error) <span class="cov0" title="0">{
+func (m *MockPatientService) PatchPatient(id uint, updates map[string]any) (*domain.Patient, error) <span class="cov1" title="1">{
         m.ctrl.T.Helper()
         ret := m.ctrl.Call(m, "PatchPatient", id, updates)
         ret0, _ := ret[0].(*domain.Patient)
@@ -3912,13 +3914,13 @@ func (m *MockPatientService) PatchPatient(id uint, updates map[string]any) (*dom
 }</span>
 
 // PatchPatient indicates an expected call of PatchPatient.
-func (mr *MockPatientServiceMockRecorder) PatchPatient(id, updates any) *gomock.Call <span class="cov0" title="0">{
+func (mr *MockPatientServiceMockRecorder) PatchPatient(id, updates any) *gomock.Call <span class="cov1" title="1">{
         mr.mock.ctrl.T.Helper()
         return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "PatchPatient", reflect.TypeOf((*MockPatientService)(nil).PatchPatient), id, updates)
 }</span>
 
 // UpdatePatient mocks base method.
-func (m *MockPatientService) UpdatePatient(id uint, fhirPatient *fhir.Patient) (*domain.Patient, error) <span class="cov0" title="0">{
+func (m *MockPatientService) UpdatePatient(id uint, fhirPatient *fhir.Patient) (*domain.Patient, error) <span class="cov1" title="1">{
         m.ctrl.T.Helper()
         ret := m.ctrl.Call(m, "UpdatePatient", id, fhirPatient)
         ret0, _ := ret[0].(*domain.Patient)
@@ -3927,7 +3929,7 @@ func (m *MockPatientService) UpdatePatient(id uint, fhirPatient *fhir.Patient) (
 }</span>
 
 // UpdatePatient indicates an expected call of UpdatePatient.
-func (mr *MockPatientServiceMockRecorder) UpdatePatient(id, fhirPatient any) *gomock.Call <span class="cov0" title="0">{
+func (mr *MockPatientServiceMockRecorder) UpdatePatient(id, fhirPatient any) *gomock.Call <span class="cov1" title="1">{
         mr.mock.ctrl.T.Helper()
         return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdatePatient", reflect.TypeOf((*MockPatientService)(nil).UpdatePatient), id, fhirPatient)
 }</span>
@@ -3979,7 +3981,7 @@ type PatientService interface {
 }
 
 // TableName specifies the table name for Patient model
-func (Patient) TableName() string <span class="cov0" title="0">{
+func (Patient) TableName() string <span class="cov8" title="1">{
         return "patients"
 }</span>
 </pre>
@@ -4230,40 +4232,40 @@ type patientRepository struct {
 }
 
 // NewPatientRepository creates a new patient repository
-func NewPatientRepository(db *gorm.DB) PatientRepositoryInterface <span class="cov0" title="0">{
+func NewPatientRepository(db *gorm.DB) PatientRepositoryInterface <span class="cov1" title="1">{
         return &amp;patientRepository{
                 db: db,
         }
 }</span>
 
 // Create creates a new patient record
-func (r *patientRepository) Create(patient *domain.Patient) error <span class="cov0" title="0">{
+func (r *patientRepository) Create(patient *domain.Patient) error <span class="cov10" title="14">{
         // Ensure FHIRData is valid UTF-8 and does not contain null bytes
 
-        if err := r.db.Create(patient).Error; err != nil </span><span class="cov0" title="0">{
+        if err := r.db.Create(patient).Error; err != nil </span><span class="cov1" title="1">{
                 logger.Errorf("Failed to create patient: %v", err)
                 return err
         }</span>
-        <span class="cov0" title="0">logger.Infof("Patient created successfully with ID: %d", patient.ID)
+        <span class="cov9" title="13">logger.Infof("Patient created successfully with ID: %d", patient.ID)
         return nil</span>
 }
 
 // GetByID retrieves a patient by ID
-func (r *patientRepository) GetByID(id uint) (*domain.Patient, error) <span class="cov0" title="0">{
+func (r *patientRepository) GetByID(id uint) (*domain.Patient, error) <span class="cov5" title="4">{
         var patient domain.Patient
-        if err := r.db.First(&amp;patient, id).Error; err != nil </span><span class="cov0" title="0">{
-                if err == gorm.ErrRecordNotFound </span><span class="cov0" title="0">{
+        if err := r.db.First(&amp;patient, id).Error; err != nil </span><span class="cov3" title="2">{
+                if err == gorm.ErrRecordNotFound </span><span class="cov3" title="2">{
                         logger.Warnf("Patient not found with ID: %d", id)
                         return nil, err
                 }</span>
                 <span class="cov0" title="0">logger.Errorf("Failed to get patient by ID %d: %v", id, err)
                 return nil, err</span>
         }
-        <span class="cov0" title="0">return &amp;patient, nil</span>
+        <span class="cov3" title="2">return &amp;patient, nil</span>
 }
 
 // GetAll retrieves all patients with pagination
-func (r *patientRepository) GetAll(limit, offset int) ([]*domain.Patient, error) <span class="cov0" title="0">{
+func (r *patientRepository) GetAll(limit, offset int) ([]*domain.Patient, error) <span class="cov4" title="3">{
         var patients []*domain.Patient
         query := r.db.Limit(limit).Offset(offset)
 
@@ -4272,38 +4274,38 @@ func (r *patientRepository) GetAll(limit, offset int) ([]*domain.Patient, error)
                 return nil, err
         }</span>
 
-        <span class="cov0" title="0">logger.Infof("Retrieved %d patients", len(patients))
+        <span class="cov4" title="3">logger.Infof("Retrieved %d patients", len(patients))
         return patients, nil</span>
 }
 
 // Update updates an existing patient record
-func (r *patientRepository) Update(patient *domain.Patient) error <span class="cov0" title="0">{
+func (r *patientRepository) Update(patient *domain.Patient) error <span class="cov1" title="1">{
         if err := r.db.Save(patient).Error; err != nil </span><span class="cov0" title="0">{
                 logger.Errorf("Failed to update patient with ID %d: %v", patient.ID, err)
                 return err
         }</span>
-        <span class="cov0" title="0">logger.Infof("Patient updated successfully with ID: %d", patient.ID)
+        <span class="cov1" title="1">logger.Infof("Patient updated successfully with ID: %d", patient.ID)
         return nil</span>
 }
 
 // Delete soft deletes a patient record
-func (r *patientRepository) Delete(id uint) error <span class="cov0" title="0">{
+func (r *patientRepository) Delete(id uint) error <span class="cov1" title="1">{
         if err := r.db.Delete(&amp;domain.Patient{}, id).Error; err != nil </span><span class="cov0" title="0">{
                 logger.Errorf("Failed to delete patient with ID %d: %v", id, err)
                 return err
         }</span>
-        <span class="cov0" title="0">logger.Infof("Patient deleted successfully with ID: %d", id)
+        <span class="cov1" title="1">logger.Infof("Patient deleted successfully with ID: %d", id)
         return nil</span>
 }
 
 // Count returns the total number of patients
-func (r *patientRepository) Count() (int64, error) <span class="cov0" title="0">{
+func (r *patientRepository) Count() (int64, error) <span class="cov3" title="2">{
         var count int64
         if err := r.db.Model(&amp;domain.Patient{}).Count(&amp;count).Error; err != nil </span><span class="cov0" title="0">{
                 logger.Errorf("Failed to count patients: %v", err)
                 return 0, err
         }</span>
-        <span class="cov0" title="0">return count, nil</span>
+        <span class="cov3" title="2">return count, nil</span>
 }
 </pre>
 		
@@ -5246,7 +5248,80 @@ func (c *Client) SearchPatients(queryParams map[string]string) (*fhir.Bundle, er
 }
 </pre>
 		
-		<pre class="file" id="file21" style="display: none">package logger
+		<pre class="file" id="file21" style="display: none">// Code generated by MockGen. DO NOT EDIT.
+// Source: client.go
+//
+// Generated by this command:
+//
+//        mockgen -source=client.go -destination=mocks\client_mock.go -package=mocks
+//
+
+// Package mocks is a generated GoMock package.
+package mocks
+
+import (
+        reflect "reflect"
+
+        fhir "github.com/samply/golang-fhir-models/fhir-models/fhir"
+        gomock "go.uber.org/mock/gomock"
+)
+
+// MockClientInterface is a mock of ClientInterface interface.
+type MockClientInterface struct {
+        ctrl     *gomock.Controller
+        recorder *MockClientInterfaceMockRecorder
+        isgomock struct{}
+}
+
+// MockClientInterfaceMockRecorder is the mock recorder for MockClientInterface.
+type MockClientInterfaceMockRecorder struct {
+        mock *MockClientInterface
+}
+
+// NewMockClientInterface creates a new mock instance.
+func NewMockClientInterface(ctrl *gomock.Controller) *MockClientInterface <span class="cov0" title="0">{
+        mock := &amp;MockClientInterface{ctrl: ctrl}
+        mock.recorder = &amp;MockClientInterfaceMockRecorder{mock}
+        return mock
+}</span>
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockClientInterface) EXPECT() *MockClientInterfaceMockRecorder <span class="cov0" title="0">{
+        return m.recorder
+}</span>
+
+// GetPatientByID mocks base method.
+func (m *MockClientInterface) GetPatientByID(id string) (*fhir.Patient, error) <span class="cov0" title="0">{
+        m.ctrl.T.Helper()
+        ret := m.ctrl.Call(m, "GetPatientByID", id)
+        ret0, _ := ret[0].(*fhir.Patient)
+        ret1, _ := ret[1].(error)
+        return ret0, ret1
+}</span>
+
+// GetPatientByID indicates an expected call of GetPatientByID.
+func (mr *MockClientInterfaceMockRecorder) GetPatientByID(id any) *gomock.Call <span class="cov0" title="0">{
+        mr.mock.ctrl.T.Helper()
+        return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPatientByID", reflect.TypeOf((*MockClientInterface)(nil).GetPatientByID), id)
+}</span>
+
+// SearchPatients mocks base method.
+func (m *MockClientInterface) SearchPatients(queryParams map[string]string) (*fhir.Bundle, error) <span class="cov0" title="0">{
+        m.ctrl.T.Helper()
+        ret := m.ctrl.Call(m, "SearchPatients", queryParams)
+        ret0, _ := ret[0].(*fhir.Bundle)
+        ret1, _ := ret[1].(error)
+        return ret0, ret1
+}</span>
+
+// SearchPatients indicates an expected call of SearchPatients.
+func (mr *MockClientInterfaceMockRecorder) SearchPatients(queryParams any) *gomock.Call <span class="cov0" title="0">{
+        mr.mock.ctrl.T.Helper()
+        return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SearchPatients", reflect.TypeOf((*MockClientInterface)(nil).SearchPatients), queryParams)
+}</span>
+</pre>
+		
+		<pre class="file" id="file22" style="display: none">package logger
 
 import (
         "io"
@@ -5303,11 +5378,11 @@ func Initialize(level, format, logFile string) error <span class="cov0" title="0
 }
 
 // GetLogger returns the configured logger instance
-func GetLogger() *logrus.Logger <span class="cov0" title="0">{
-        if Logger == nil </span><span class="cov0" title="0">{
+func GetLogger() *logrus.Logger <span class="cov10" title="27">{
+        if Logger == nil </span><span class="cov2" title="2">{
                 Logger = logrus.New()
         }</span>
-        <span class="cov0" title="0">return Logger</span>
+        <span class="cov10" title="27">return Logger</span>
 }
 
 // Info logs an info message
@@ -5316,7 +5391,7 @@ func Info(args ...interface{}) <span class="cov0" title="0">{
 }</span>
 
 // Infof logs a formatted info message
-func Infof(format string, args ...interface{}) <span class="cov0" title="0">{
+func Infof(format string, args ...interface{}) <span class="cov8" title="18">{
         GetLogger().Infof(format, args...)
 }</span>
 
@@ -5326,7 +5401,7 @@ func Error(args ...interface{}) <span class="cov0" title="0">{
 }</span>
 
 // Errorf logs a formatted error message
-func Errorf(format string, args ...interface{}) <span class="cov0" title="0">{
+func Errorf(format string, args ...interface{}) <span class="cov6" title="7">{
         GetLogger().Errorf(format, args...)
 }</span>
 
@@ -5336,7 +5411,7 @@ func Warn(args ...interface{}) <span class="cov0" title="0">{
 }</span>
 
 // Warnf logs a formatted warning message
-func Warnf(format string, args ...interface{}) <span class="cov0" title="0">{
+func Warnf(format string, args ...interface{}) <span class="cov2" title="2">{
         GetLogger().Warnf(format, args...)
 }</span>
 
@@ -5351,9 +5426,13 @@ func Debugf(format string, args ...interface{}) <span class="cov0" title="0">{
 }</span>
 </pre>
 		
-		<pre class="file" id="file22" style="display: none">package utils
+		<pre class="file" id="file23" style="display: none">package utils
 
-import "github.com/samply/golang-fhir-models/fhir-models/fhir"
+import (
+        "time"
+
+        "github.com/samply/golang-fhir-models/fhir-models/fhir"
+)
 
 // PtrBool returns a pointer to the given bool value.
 func PtrBool(b bool) *bool <span class="cov0" title="0">{
@@ -5361,18 +5440,18 @@ func PtrBool(b bool) *bool <span class="cov0" title="0">{
 }</span>
 
 // Helper function to create bool pointers
-func CreateBoolPtr(b bool) *bool <span class="cov7" title="4">{
+func CreateBoolPtr(b bool) *bool <span class="cov7" title="9">{
         return &amp;b
 }</span>
 
 // Helper function to create gender pointer using UnmarshalJSON
-func GenderPtr(g string) *fhir.AdministrativeGender <span class="cov4" title="2">{
+func GenderPtr(g string) *fhir.AdministrativeGender <span class="cov2" title="2">{
         var gender fhir.AdministrativeGender
         if err := gender.UnmarshalJSON([]byte(`"` + g + `"`)); err != nil </span><span class="cov0" title="0">{
                 // If unknown or error, default to AdministrativeGenderUnknown
                 gender = fhir.AdministrativeGenderUnknown
         }</span>
-        <span class="cov4" title="2">return &amp;gender</span>
+        <span class="cov2" title="2">return &amp;gender</span>
 }
 
 // Helper function to create system pointer
@@ -5397,7 +5476,7 @@ func UsePtr(u string) *fhir.ContactPointUse <span class="cov0" title="0">{
 }
 
 // Helper function to create string pointers
-func CreateStringPtr(s string) *string <span class="cov10" title="7">{
+func CreateStringPtr(s string) *string <span class="cov10" title="25">{
         return &amp;s
 }</span>
 
@@ -5406,6 +5485,15 @@ func NameUseOfficialPtr() *fhir.NameUse <span class="cov0" title="0">{
         nameUse := fhir.NameUseOfficial
         return &amp;nameUse
 }</span>
+
+// Helper function to create time pointer
+func CreateTimePtr(t string) *time.Time <span class="cov5" title="5">{
+        var ft time.Time
+        if err := ft.UnmarshalJSON([]byte(`"` + t + `"`)); err != nil </span><span class="cov5" title="5">{
+                return nil
+        }</span>
+        <span class="cov0" title="0">return &amp;ft</span>
+}
 </pre>
 		
 		</div>
