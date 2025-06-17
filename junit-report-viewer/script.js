@@ -1,16 +1,3 @@
-async function loadJUnitReport() {
-  try {
-    const response = await fetch("junit-report.xml");
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    const xmlText = await response.text();
-    parseXMLAndDisplay(xmlText);
-  } catch (error) {
-    console.log("Auto-load failed:", error.message);
-    showFileInput();
-  }
-}
 
 function showFileInput() {
   const loadingElem = document.getElementById("loading");
@@ -28,6 +15,7 @@ function setupFileInput() {
   const fileInput = document.getElementById("fileInput");
   const dropZone = document.getElementById("dropZone");
 
+  // Only add event listeners if the elements exist
   if (fileInput) {
     fileInput.addEventListener("change", handleFileSelect);
   }
@@ -765,5 +753,4 @@ function showError(message) {
 // Initialize theme on page load
 document.addEventListener("DOMContentLoaded", () => {
   initTheme();
-  loadJUnitReport();
 });
