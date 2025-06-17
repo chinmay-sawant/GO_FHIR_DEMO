@@ -1,4 +1,3 @@
-let analyticsData = {};
 
 async function loadJUnitReport() {
   try {
