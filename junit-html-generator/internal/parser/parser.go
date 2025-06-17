@@ -21,9 +21,9 @@ var forbiddenDirs = func() map[string]struct{} {
 		"domain":     {},
 		"middleware": {},
 		"database":   {},
-		"fhirclient": {},
-		"logger":     {},
-		"utils":      {},
+		// "fhirclient": {},
+		"logger": {},
+		"utils":  {},
 	}
 	if name, err := GetCurrentFolderName(); err == nil {
 		dirs[lower(name)] = struct{}{}
