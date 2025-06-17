@@ -66,3 +66,5 @@ func CreateTimePtr(t string) *time.Time {
 	}
 	return &ft
 }
+
+// Helper function to create date pointer

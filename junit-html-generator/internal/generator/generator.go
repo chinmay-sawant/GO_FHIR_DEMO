@@ -148,6 +148,30 @@ func (g *Generator) generateHTML(analytics *models.Analytics, outputDir string) 
 
     <script>
         const analyticsData = {{.AnalyticsJSON}};
+        // Chart.js Test Distribution Chart
+        document.addEventListener("DOMContentLoaded", function() {
+            if (window.Chart && analyticsData && analyticsData.TestedSuites && analyticsData.UntestedSuites) {
+                const ctx = document.getElementById('testDistributionChart').getContext('2d');
+                const tested = analyticsData.TestedSuites.length;
+                const untested = analyticsData.UntestedSuites.length;
+                new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Tested', 'Untested'],
+                        datasets: [{
+                            data: [tested, untested],
+                            backgroundColor: ['#4caf50', '#f44336'],
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: { position: 'bottom' }
+                        }
+                    }
+                });
+            }
+        });
         {{if not .Standalone}}
         {{.JS}}
         {{else}}

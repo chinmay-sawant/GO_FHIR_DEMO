@@ -4,10 +4,49 @@ import (
 	"encoding/xml"
 	"fmt"
 	"io/ioutil"
+	"os"
+	"path/filepath"
 	"sort"
 
 	"github.com/chinmay/junit-html-generator/internal/models"
 )
+
+// forbiddenDirs is a set of directory names to skip (lowercase)
+var forbiddenDirs = func() map[string]struct{} {
+	dirs := map[string]struct{}{
+		"config":     {},
+		"docs":       {},
+		"mocks":      {},
+		"routes":     {},
+		"domain":     {},
+		"middleware": {},
+		"database":   {},
+		"fhirclient": {},
+		"logger":     {},
+		"utils":      {},
+	}
+	if name, err := GetCurrentFolderName(); err == nil {
+		dirs[lower(name)] = struct{}{}
+	}
+	fmt.Println("Forbidden directories:")
+	for dir := range dirs {
+		fmt.Printf("  - %s\n", dir)
+	}
+	return dirs
+}()
+
+// GetCurrentFolderName returns the name of the current working directory
+func GetCurrentFolderName() (string, error) {
+	dir, err := os.Getwd()
+	if err != nil {
+		return "", err
+	}
+	foldername := filepath.Base(dir)
+	foldername = lower(foldername)
+	foldername = string([]rune(foldername))
+	foldername = replaceUnderscoreWithDash(foldername)
+	return foldername, nil
+}
 
 // ParseJUnitXML parses a JUnit XML file and returns the test suites
 func ParseJUnitXML(filePath string) (*models.TestSuites, error) {
@@ -27,10 +66,10 @@ func ParseJUnitXML(filePath string) (*models.TestSuites, error) {
 // CalculateAnalytics calculates analytics data from test suites
 func CalculateAnalytics(testSuites *models.TestSuites) *models.Analytics {
 	analytics := &models.Analytics{
-		TotalTests:    testSuites.Tests,
-		TotalFailures: testSuites.Failures,
-		TotalErrors:   testSuites.Errors,
-		TotalTime:     testSuites.Time,
+		TotalTests:    0,
+		TotalFailures: 0,
+		TotalErrors:   0,
+		TotalTime:     0,
 	}
 
 	var testedSuites, untestedSuites []models.TestSuite
@@ -38,6 +77,14 @@ func CalculateAnalytics(testSuites *models.TestSuites) *models.Analytics {
 	failurePatterns := make(map[string]int)
 
 	for _, suite := range testSuites.TestSuites {
+		if shouldSkipSuite(suite.Name) {
+			continue
+		}
+		analytics.TotalTests += suite.Tests
+		analytics.TotalFailures += suite.Failures
+		analytics.TotalErrors += suite.Errors
+		analytics.TotalTime += suite.Time
+
 		if suite.Tests > 0 {
 			testedSuites = append(testedSuites, suite)
 
@@ -84,7 +131,7 @@ func CalculateAnalytics(testSuites *models.TestSuites) *models.Analytics {
 	}
 
 	// Calculate coverage percentage
-	totalModules := len(testSuites.TestSuites)
+	totalModules := len(testedSuites) + len(untestedSuites)
 	testedModules := len(testedSuites)
 	if totalModules > 0 {
 		analytics.CoveragePercent = float64(testedModules) / float64(totalModules) * 100
@@ -192,4 +239,53 @@ func generateRecommendations(analytics *models.Analytics) []string {
 	}
 
 	return recommendations
+}
+
+// shouldSkipSuite returns true if the suite name contains any forbidden directory as a path segment
+func shouldSkipSuite(suiteName string) bool {
+
+	// Normalize path separators and lowercase
+	suiteName = lower(suiteName)
+	suiteName = replaceUnderscoreWithDash(suiteName)
+
+	// Extract the last path segment (directory or file name)
+	var last string
+	if idx := len(suiteName) - 1; idx >= 0 && (suiteName[idx] == '/' || suiteName[idx] == '\\') {
+		suiteName = suiteName[:idx]
+	}
+	fmt.Println("Normalized suite name:", suiteName)
+	last = filepath.Base(suiteName)
+	fmt.Println("Last part of suite name:", last)
+	if _, forbidden := forbiddenDirs[last]; forbidden {
+		return true
+	}
+
+	println("Last part of suite name:", last)
+	if _, forbidden := forbiddenDirs[last]; forbidden {
+		return true
+	}
+	return false
+}
+
+func lower(s string) string {
+	// Fast path for ASCII
+	b := []byte(s)
+	for i := range b {
+		if b[i] >= 'A' && b[i] <= 'Z' {
+			b[i] += 'a' - 'A'
+		}
+	}
+	return string(b)
+}
+
+func replaceUnderscoreWithDash(s string) string {
+	result := make([]rune, len(s))
+	for i, r := range s {
+		if r == '_' {
+			result[i] = '-'
+		} else {
+			result[i] = r
+		}
+	}
+	return string(result)
 }
