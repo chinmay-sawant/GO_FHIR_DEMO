@@ -1,4 +1,3 @@
-
 async function loadJUnitReport() {
   try {
     const response = await fetch("junit-report.xml");
@@ -14,8 +13,14 @@ async function loadJUnitReport() {
 }
 
 function showFileInput() {
-  document.getElementById("loading").style.display = "none";
-  document.getElementById("file-input-section").style.display = "block";
+  const loadingElem = document.getElementById("loading");
+  if (loadingElem) {
+    loadingElem.style.display = "none";
+  }
+  const fileInputSection = document.getElementById("file-input-section");
+  if (fileInputSection) {
+    fileInputSection.style.display = "block";
+  }
   setupFileInput();
 }
 
@@ -23,25 +28,28 @@ function setupFileInput() {
   const fileInput = document.getElementById("fileInput");
   const dropZone = document.getElementById("dropZone");
 
-  fileInput.addEventListener("change", handleFileSelect);
+  if (fileInput) {
+    fileInput.addEventListener("change", handleFileSelect);
+  }
+  if (dropZone) {
+    dropZone.addEventListener("dragover", (e) => {
+      e.preventDefault();
+      dropZone.classList.add("dragover");
+    });
 
-  dropZone.addEventListener("dragover", (e) => {
-    e.preventDefault();
-    dropZone.classList.add("dragover");
-  });
+    dropZone.addEventListener("dragleave", () => {
+      dropZone.classList.remove("dragover");
+    });
 
-  dropZone.addEventListener("dragleave", () => {
-    dropZone.classList.remove("dragover");
-  });
-
-  dropZone.addEventListener("drop", (e) => {
-    e.preventDefault();
-    dropZone.classList.remove("dragover");
-    const files = e.dataTransfer.files;
-    if (files.length > 0) {
-      handleFile(files[0]);
-    }
-  });
+    dropZone.addEventListener("drop", (e) => {
+      e.preventDefault();
+      dropZone.classList.remove("dragover");
+      const files = e.dataTransfer.files;
+      if (files.length > 0) {
+        handleFile(files[0]);
+      }
+    });
+  }
 }
 
 function handleFileSelect(event) {
