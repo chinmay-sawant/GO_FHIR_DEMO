@@ -36,14 +36,14 @@ func (g *Generator) Generate(testSuites *models.TestSuites, outputDir string) er
 	analytics := parser.CalculateAnalytics(testSuites)
 
 	// Generate HTML file
-	if err := g.generateHTML(testSuites, analytics, outputDir); err != nil {
+	if err := g.generateHTML(analytics, outputDir); err != nil {
 		return fmt.Errorf("failed to generate HTML: %w", err)
 	}
 
 	return nil
 }
 
-func (g *Generator) generateHTML(testSuites *models.TestSuites, analytics *models.Analytics, outputDir string) error {
+func (g *Generator) generateHTML(analytics *models.Analytics, outputDir string) error {
 	tmpl := `<!DOCTYPE html>
 <html lang="en">
 <head>

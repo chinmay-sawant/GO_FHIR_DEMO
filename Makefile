@@ -130,8 +130,7 @@ help:
 	@echo   help               - Display this help
 	@echo   mocks              - Generate all mocks
 	@echo   clean-mocks        - Clean all generated mocks
-	@echo   coverage           - Generate test coverage report
-	@echo   coverage-detailed  - Generate detailed test coverage report
+	@echo   coverage-with-junit- Generate test coverage report
 	@echo   clean-coverage     - Clean coverage files
 
 ## Generate test coverage with JUnit XML report
