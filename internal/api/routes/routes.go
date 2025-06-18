@@ -7,8 +7,27 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// RouteSetupInterface defines the contract for route setup
+type RouteSetupInterface interface {
+	SetupRoutes(patientHandler handlers.PatientHandlerInterface, externalPatientHandler handlers.ExternalPatientHandlerInterface) *gin.Engine
+}
+
+// RouteSetup implements RouteSetupInterface
+type RouteSetup struct{}
+
+// NewRouteSetup creates a new RouteSetup instance
+func NewRouteSetup() RouteSetupInterface {
+	return &RouteSetup{}
+}
+
+// Legacy function for backward compatibility
+func SetupRoutes(patientHandler handlers.PatientHandlerInterface, externalPatientHandler handlers.ExternalPatientHandlerInterface) *gin.Engine {
+	routeSetup := NewRouteSetup()
+	return routeSetup.SetupRoutes(patientHandler, externalPatientHandler)
+}
+
 // SetupRoutes configures all the routes for the application
-func SetupRoutes(patientHandler *handlers.PatientHandler, externalPatientHandler *handlers.ExternalPatientHandler) *gin.Engine {
+func (r *RouteSetup) SetupRoutes(patientHandler handlers.PatientHandlerInterface, externalPatientHandler handlers.ExternalPatientHandlerInterface) *gin.Engine {
 	router := gin.New()
 
 	// Global middleware

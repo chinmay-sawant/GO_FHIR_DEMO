@@ -12,12 +12,24 @@ import (
 	"github.com/samply/golang-fhir-models/fhir-models/fhir"
 )
 
+// PatientServiceInterface defines the contract for patient service
+type PatientServiceInterface interface {
+	CreatePatient(fhirPatient *fhir.Patient) (*domain.Patient, error)
+	GetPatient(id uint) (*domain.Patient, error)
+	GetPatients(limit, offset int) ([]*domain.Patient, int64, error)
+	UpdatePatient(id uint, fhirPatient *fhir.Patient) (*domain.Patient, error)
+	PatchPatient(id uint, updates map[string]interface{}) (*domain.Patient, error)
+	DeletePatient(id uint) error
+	ConvertToFHIR(patient *domain.Patient) (*fhir.Patient, error)
+	ConvertFromFHIR(fhirPatient *fhir.Patient) (*domain.Patient, error)
+}
+
 type patientService struct {
 	repo domain.PatientRepository
 }
 
 // NewPatientService creates a new patient service
-func NewPatientService(repo domain.PatientRepository) domain.PatientService {
+func NewPatientService(repo domain.PatientRepository) PatientServiceInterface {
 	return &patientService{
 		repo: repo,
 	}

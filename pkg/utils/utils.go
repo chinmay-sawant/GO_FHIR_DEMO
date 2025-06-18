@@ -1,6 +1,10 @@
 package utils
 
-import "github.com/samply/golang-fhir-models/fhir-models/fhir"
+import (
+	"time"
+
+	"github.com/samply/golang-fhir-models/fhir-models/fhir"
+)
 
 // PtrBool returns a pointer to the given bool value.
 func PtrBool(b bool) *bool {
@@ -53,3 +57,14 @@ func NameUseOfficialPtr() *fhir.NameUse {
 	nameUse := fhir.NameUseOfficial
 	return &nameUse
 }
+
+// Helper function to create time pointer
+func CreateTimePtr(t string) *time.Time {
+	var ft time.Time
+	if err := ft.UnmarshalJSON([]byte(`"` + t + `"`)); err != nil {
+		return nil
+	}
+	return &ft
+}
+
+// Helper function to create date pointer

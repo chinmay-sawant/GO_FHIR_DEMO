@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>JUnit Test Report</title>
+    <link rel="stylesheet" href="styles.css" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  </head>
+  <body data-theme="dark">
+    <div class="container">
+      <div class="header">
+        <button class="theme-toggle" onclick="toggleTheme()">
+          <span id="theme-icon">🌙</span>
+        </button>
+        <h1>JUnit Test Report</h1>
+        <p>Comprehensive test results and coverage analysis</p>
+      </div>
+
+      <div id="loading" class="loading">
+        <div class="spinner"></div>
+        <p>Loading test results...</p>
+      </div>
+
+      <div id="file-input-section" style="display: none">
+        <div class="cors-notice">
+          <strong>Note:</strong> Due to browser security restrictions, please
+          select your junit-report.xml file manually or serve this HTML through
+          a web server.
+        </div>
+        <div class="file-input-container" id="dropZone">
+          <input type="file" id="fileInput" class="file-input" accept=".xml" />
+          <label for="fileInput" class="file-input-label">
+            Choose XML File
+          </label>
+          <div class="file-info">
+            <p>Or drag and drop your junit-report.xml file here</p>
+          </div>
+        </div>
+      </div>
+
+      <div id="error-container" style="display: none">
+        <div class="error-message">
+          <strong>Error:</strong> <span id="error-message"></span>
+        </div>
+      </div>
+
+      <div id="content" style="display: none">
+        <div class="summary">
+          <div class="summary-card">
+            <div class="number tests" id="total-tests">0</div>
+            <div class="label">Total Tests</div>
+          </div>
+          <div class="summary-card">
+            <div class="number failures" id="total-failures">0</div>
+            <div class="label">Failures</div>
+          </div>
+          <div class="summary-card">
+            <div class="number errors" id="total-errors">0</div>
+            <div class="label">Errors</div>
+          </div>
+          <div class="summary-card">
+            <div class="number time" id="total-time">0s</div>
+            <div class="label">Total Time</div>
+          </div>
+          <div class="summary-card">
+            <div class="number coverage" id="coverage-percentage">0%</div>
+            <div class="label">Coverage</div>
+          </div>
+          <div class="summary-card">
+            <div class="number reliability" id="reliability-score">0%</div>
+            <div class="label">Reliability Score</div>
+          </div>
+          <div class="summary-card">
+            <div class="number performance" id="avg-test-time">0ms</div>
+            <div class="label">Avg Test Time</div>
+          </div>
+          <div class="summary-card">
+            <div class="number flaky" id="flaky-tests">0</div>
+            <div class="label">Slow Tests</div>
+          </div>
+        </div>
+
+        <div class="tabs">
+          <button class="tab active" onclick="showTab('all')">
+            All Modules
+          </button>
+          <button class="tab" onclick="showTab('tested')">
+            Tested Modules
+          </button>
+          <button class="tab" onclick="showTab('untested')">
+            Untested Modules
+          </button>
+          <button class="tab" onclick="showTab('analytics')">Analytics</button>
+        </div>
+
+        <div class="tab-content active" id="all">
+          <div id="all-suites"></div>
+        </div>
+
+        <div class="tab-content" id="tested">
+          <div id="tested-suites"></div>
+        </div>
+
+        <div class="tab-content" id="untested">
+          <div id="untested-suites"></div>
+        </div>
+
+        <div class="tab-content" id="analytics">
+          <div class="analytics-grid">
+            <div class="analytics-section">
+              <h3>Test Distribution</h3>
+              <canvas
+                id="testDistributionChart"
+                width="400"
+                height="200"
+              ></canvas>
+            </div>
+
+            <div class="analytics-section">
+              <h3>Performance Analysis</h3>
+              <canvas id="performanceChart" width="400" height="200"></canvas>
+            </div>
+
+            <div class="analytics-section">
+              <h3>Failure Analysis</h3>
+              <div id="failureAnalysis"></div>
+            </div>
+
+            <div class="analytics-section">
+              <h3>Test Health Metrics</h3>
+              <div id="healthMetrics"></div>
+            </div>
+
+            <div class="analytics-section">
+              <h3>Module Coverage Heatmap</h3>
+              <div id="coverageHeatmap"></div>
+            </div>
+
+            <div class="analytics-section">
+              <h3>Performance Insights</h3>
+              <div id="performanceInsights"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>

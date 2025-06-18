@@ -11,6 +11,12 @@ import (
 	"github.com/samply/golang-fhir-models/fhir-models/fhir"
 )
 
+// ClientInterface defines the contract for FHIR client
+type ClientInterface interface {
+	GetPatientByID(id string) (*fhir.Patient, error)
+	SearchPatients(queryParams map[string]string) (*fhir.Bundle, error)
+}
+
 // Client is a client for interacting with a FHIR server.
 type Client struct {
 	BaseURL    string
@@ -18,7 +24,7 @@ type Client struct {
 }
 
 // NewClient creates a new FHIR client.
-func NewClient(baseURL string) *Client {
+func NewClient(baseURL string) ClientInterface {
 	return &Client{
 		BaseURL: baseURL,
 		HTTPClient: &http.Client{

@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites tests="51" failures="0" errors="0" time="7.145953">
+	<testsuite tests="0" failures="0" time="0.087000" name="go-fhir-demo" timestamp="2025-06-17T20:36:43+05:30">
+		<properties>
+			<property name="go.version" value="go1.23.0 windows/amd64"></property>
+		</properties>
+	</testsuite>
+	<testsuite tests="0" failures="0" time="0.110000" name="go-fhir-demo/config" timestamp="2025-06-17T20:36:43+05:30">
+		<properties>
+			<property name="go.version" value="go1.23.0 windows/amd64"></property>
+		</properties>
+	</testsuite>
+	<testsuite tests="0" failures="0" time="0.085000" name="go-fhir-demo/docs" timestamp="2025-06-17T20:36:43+05:30">
+		<properties>
+			<property name="go.version" value="go1.23.0 windows/amd64"></property>
+		</properties>
+	</testsuite>
+	<testsuite tests="19" failures="0" time="0.630000" name="go-fhir-demo/internal/api/handlers" timestamp="2025-06-17T20:36:44+05:30">
+		<properties>
+			<property name="go.version" value="go1.23.0 windows/amd64"></property>
+		</properties>
+		<testcase classname="go-fhir-demo/internal/api/handlers" name="TestExternalPatientHandlerTestSuite/TestGetExternalPatientByID_BadRequest" time="0.000000"></testcase>
+		<testcase classname="go-fhir-demo/internal/api/handlers" name="TestExternalPatientHandlerTestSuite/TestGetExternalPatientByID_Error" time="0.000000"></testcase>
+		<testcase classname="go-fhir-demo/internal/api/handlers" name="TestExternalPatientHandlerTestSuite/TestGetExternalPatientByID_Success" time="0.000000"></testcase>
+		<testcase classname="go-fhir-demo/internal/api/handlers" name="TestExternalPatientHandlerTestSuite/TestSearchExternalPatients_Error" time="0.000000"></testcase>
+		<testcase classname="go-fhir-demo/internal/api/handlers" name="TestExternalPatientHandlerTestSuite/TestSearchExternalPatients_Success" time="0.000000"></testcase>
+		<testcase classname="go-fhir-demo/internal/api/handlers" name="TestExternalPatientHandlerTestSuite" time="0.000000"></testcase>
+		<testcase classname="go-fhir-demo/internal/api/handlers" name="TestPatientHandlerTestSuite/TestCreatePatient_BadRequest" time="0.000000"></testcase>
+		<testcase classname="go-fhir-demo/internal/api/handlers" name="TestPatientHandlerTestSuite/TestCreatePatient_Error" time="0.000000"></testcase>
+		<testcase classname="go-fhir-demo/internal/api/handlers" name="TestPatientHandlerTestSuite/TestCreatePatient_Success" time="0.000000"></testcase>
+		<testcase classname="go-fhir-demo/internal/api/handlers" name="TestPatientHandlerTestSuite/TestDeletePatient_BadRequest" time="0.000000"></testcase>
+		<testcase classname="go-fhir-demo/internal/api/handlers" name="TestPatientHandlerTestSuite/TestDeletePatient_Error" time="0.000000"></testcase>
+		<testcase classname="go-fhir-demo/internal/api/handlers" name="TestPatientHandlerTestSuite/TestDeletePatient_Success" time="0.000000"></testcase>
+		<testcase classname="go-fhir-demo/internal/api/handlers" name="TestPatientHandlerTestSuite/TestGetPatient_BadRequest" time="0.000000"></testcase>
+		<testcase classname="go-fhir-demo/internal/api/handlers" name="TestPatientHandlerTestSuite/TestGetPatient_NotFound" time="0.000000"></testcase>
+		<testcase classname="go-fhir-demo/internal/api/handlers" name="TestPatientHandlerTestSuite/TestGetPatient_Success" time="0.000000"></testcase>
+		<testcase classname="go-fhir-demo/internal/api/handlers" name="TestPatientHandlerTestSuite/TestGetPatients_Success" time="0.000000"></testcase>
+		<testcase classname="go-fhir-demo/internal/api/handlers" name="TestPatientHandlerTestSuite/TestPatchPatient_Success" time="0.000000"></testcase>
+		<testcase classname="go-fhir-demo/internal/api/handlers" name="TestPatientHandlerTestSuite/TestUpdatePatient_Success" time="0.000000"></testcase>
+		<testcase classname="go-fhir-demo/internal/api/handlers" name="TestPatientHandlerTestSuite" time="0.000000"></testcase>
+	</testsuite>
+	<testsuite tests="0" failures="0" time="0.092000" name="go-fhir-demo/internal/api/handlers/mocks" timestamp="2025-06-17T20:36:44+05:30">
+		<properties>
+			<property name="go.version" value="go1.23.0 windows/amd64"></property>
+		</properties>
+	</testsuite>
+	<testsuite tests="0" failures="0" time="0.091000" name="go-fhir-demo/internal/api/routes" timestamp="2025-06-17T20:36:44+05:30">
+		<properties>
+			<property name="go.version" value="go1.23.0 windows/amd64"></property>
+		</properties>
+	</testsuite>
+	<testsuite tests="0" failures="0" time="0.090000" name="go-fhir-demo/internal/api/routes/mocks" timestamp="2025-06-17T20:36:44+05:30">
+		<properties>
+			<property name="go.version" value="go1.23.0 windows/amd64"></property>
+		</properties>
+	</testsuite>
+	<testsuite tests="0" failures="0" time="0.091000" name="go-fhir-demo/internal/domain" timestamp="2025-06-17T20:36:44+05:30">
+		<properties>
+			<property name="go.version" value="go1.23.0 windows/amd64"></property>
+		</properties>
+	</testsuite>
+	<testsuite tests="0" failures="0" time="0.110000" name="go-fhir-demo/internal/domain/mocks" timestamp="2025-06-17T20:36:44+05:30">
+		<properties>
+			<property name="go.version" value="go1.23.0 windows/amd64"></property>
+		</properties>
+	</testsuite>
+	<testsuite tests="0" failures="0" time="0.095000" name="go-fhir-demo/internal/middleware" timestamp="2025-06-17T20:36:44+05:30">
+		<properties>
+			<property name="go.version" value="go1.23.0 windows/amd64"></property>
+		</properties>
+	</testsuite>
+	<testsuite tests="0" failures="0" time="0.000000" name="go-fhir-demo/internal/middleware/mocks" timestamp="2025-06-17T20:36:44+05:30">
+		<properties>
+			<property name="go.version" value="go1.23.0 windows/amd64"></property>
+		</properties>
+	</testsuite>
+	<testsuite tests="11" failures="0" time="6.417000" name="go-fhir-demo/internal/repository" timestamp="2025-06-17T20:36:44+05:30">
+		<properties>
+			<property name="go.version" value="go1.23.0 windows/amd64"></property>
+		</properties>
+		<testcase classname="go-fhir-demo/internal/repository" name="TestPatientRepositoryTestSuite/TestCount_EmptyTable" time="0.010000"></testcase>
+		<testcase classname="go-fhir-demo/internal/repository" name="TestPatientRepositoryTestSuite/TestCount_Success" time="0.010000"></testcase>
+		<testcase classname="go-fhir-demo/internal/repository" name="TestPatientRepositoryTestSuite/TestCreate_Error" time="0.010000"></testcase>
+		<testcase classname="go-fhir-demo/internal/repository" name="TestPatientRepositoryTestSuite/TestCreate_Success" time="0.010000"></testcase>
+		<testcase classname="go-fhir-demo/internal/repository" name="TestPatientRepositoryTestSuite/TestDelete_Success" time="0.010000"></testcase>
+		<testcase classname="go-fhir-demo/internal/repository" name="TestPatientRepositoryTestSuite/TestGetAll_Success" time="0.010000"></testcase>
+		<testcase classname="go-fhir-demo/internal/repository" name="TestPatientRepositoryTestSuite/TestGetAll_WithPagination" time="0.010000"></testcase>
+		<testcase classname="go-fhir-demo/internal/repository" name="TestPatientRepositoryTestSuite/TestGetByID_NotFound" time="0.010000"></testcase>
+		<testcase classname="go-fhir-demo/internal/repository" name="TestPatientRepositoryTestSuite/TestGetByID_Success" time="0.010000"></testcase>
+		<testcase classname="go-fhir-demo/internal/repository" name="TestPatientRepositoryTestSuite/TestUpdate_Success" time="0.010000"></testcase>
+		<testcase classname="go-fhir-demo/internal/repository" name="TestPatientRepositoryTestSuite" time="5.740000"></testcase>
+	</testsuite>
+	<testsuite tests="0" failures="0" time="0.091000" name="go-fhir-demo/internal/repository/mocks" timestamp="2025-06-17T20:36:44+05:30">
+		<properties>
+			<property name="go.version" value="go1.23.0 windows/amd64"></property>
+		</properties>
+	</testsuite>
+	<testsuite tests="21" failures="0" time="0.696000" name="go-fhir-demo/internal/service" timestamp="2025-06-17T20:36:44+05:30">
+		<properties>
+			<property name="go.version" value="go1.23.0 windows/amd64"></property>
+		</properties>
+		<testcase classname="go-fhir-demo/internal/service" name="TestExternalPatientServiceTestSuite/TestGetExternalPatientByID_Error" time="0.000000"></testcase>
+		<testcase classname="go-fhir-demo/internal/service" name="TestExternalPatientServiceTestSuite/TestGetExternalPatientByID_Success" time="0.000000"></testcase>
+		<testcase classname="go-fhir-demo/internal/service" name="TestExternalPatientServiceTestSuite/TestSearchExternalPatients_EmptyParams" time="0.000000"></testcase>
+		<testcase classname="go-fhir-demo/internal/service" name="TestExternalPatientServiceTestSuite/TestSearchExternalPatients_Error" time="0.000000"></testcase>
+		<testcase classname="go-fhir-demo/internal/service" name="TestExternalPatientServiceTestSuite/TestSearchExternalPatients_Success" time="0.000000"></testcase>
+		<testcase classname="go-fhir-demo/internal/service" name="TestExternalPatientServiceTestSuite" time="0.000000"></testcase>
+		<testcase classname="go-fhir-demo/internal/service" name="TestPatientServiceTestSuite/TestConvertFromFHIR_Success" time="0.000000"></testcase>
+		<testcase classname="go-fhir-demo/internal/service" name="TestPatientServiceTestSuite/TestConvertToFHIR_InvalidJSON" time="0.000000"></testcase>
+		<testcase classname="go-fhir-demo/internal/service" name="TestPatientServiceTestSuite/TestConvertToFHIR_Success" time="0.000000"></testcase>
+		<testcase classname="go-fhir-demo/internal/service" name="TestPatientServiceTestSuite/TestCreatePatient_Error" time="0.000000"></testcase>
+		<testcase classname="go-fhir-demo/internal/service" name="TestPatientServiceTestSuite/TestCreatePatient_Success" time="0.000000"></testcase>
+		<testcase classname="go-fhir-demo/internal/service" name="TestPatientServiceTestSuite/TestDeletePatient_Error" time="0.000000"></testcase>
+		<testcase classname="go-fhir-demo/internal/service" name="TestPatientServiceTestSuite/TestDeletePatient_Success" time="0.000000"></testcase>
+		<testcase classname="go-fhir-demo/internal/service" name="TestPatientServiceTestSuite/TestGetPatient_NotFound" time="0.000000"></testcase>
+		<testcase classname="go-fhir-demo/internal/service" name="TestPatientServiceTestSuite/TestGetPatient_Success" time="0.000000"></testcase>
+		<testcase classname="go-fhir-demo/internal/service" name="TestPatientServiceTestSuite/TestGetPatients_Error" time="0.000000"></testcase>
+		<testcase classname="go-fhir-demo/internal/service" name="TestPatientServiceTestSuite/TestGetPatients_Success" time="0.000000"></testcase>
+		<testcase classname="go-fhir-demo/internal/service" name="TestPatientServiceTestSuite/TestPatchPatient_Success" time="0.000000"></testcase>
+		<testcase classname="go-fhir-demo/internal/service" name="TestPatientServiceTestSuite/TestUpdatePatient_NotFound" time="0.000000"></testcase>
+		<testcase classname="go-fhir-demo/internal/service" name="TestPatientServiceTestSuite/TestUpdatePatient_Success" time="0.000000"></testcase>
+		<testcase classname="go-fhir-demo/internal/service" name="TestPatientServiceTestSuite" time="0.000000"></testcase>
+	</testsuite>
+	<testsuite tests="0" failures="0" time="0.090000" name="go-fhir-demo/internal/service/mocks" timestamp="2025-06-17T20:36:44+05:30">
+		<properties>
+			<property name="go.version" value="go1.23.0 windows/amd64"></property>
+		</properties>
+	</testsuite>
+	<testsuite tests="0" failures="0" time="0.111000" name="go-fhir-demo/pkg/database" timestamp="2025-06-17T20:36:44+05:30">
+		<properties>
+			<property name="go.version" value="go1.23.0 windows/amd64"></property>
+		</properties>
+	</testsuite>
+	<testsuite tests="0" failures="0" time="0.110000" name="go-fhir-demo/pkg/fhirclient" timestamp="2025-06-17T20:36:44+05:30">
+		<properties>
+			<property name="go.version" value="go1.23.0 windows/amd64"></property>
+		</properties>
+	</testsuite>
+	<testsuite tests="0" failures="0" time="0.085000" name="go-fhir-demo/pkg/fhirclient/mocks" timestamp="2025-06-17T20:36:44+05:30">
+		<properties>
+			<property name="go.version" value="go1.23.0 windows/amd64"></property>
+		</properties>
+	</testsuite>
+	<testsuite tests="0" failures="0" time="0.090000" name="go-fhir-demo/pkg/logger" timestamp="2025-06-17T20:36:44+05:30">
+		<properties>
+			<property name="go.version" value="go1.23.0 windows/amd64"></property>
+		</properties>
+	</testsuite>
+	<testsuite tests="0" failures="0" time="0.089000" name="go-fhir-demo/pkg/utils" timestamp="2025-06-17T20:36:44+05:30">
+		<properties>
+			<property name="go.version" value="go1.23.0 windows/amd64"></property>
+		</properties>
+	</testsuite>
+</testsuites>

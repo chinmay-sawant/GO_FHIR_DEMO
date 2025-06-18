@@ -18,6 +18,13 @@ A comprehensive Go Gin framework application with FHIR (Fast Healthcare Interope
 - **Request/Response Middleware** for performance monitoring
 - **Clean Architecture** with proper separation of concerns
 
+### Testing & Quality Assurance
+- **Comprehensive Test Suite** with unit and integration tests
+- **JUnit XML Reports** using [gotestsum](https://github.com/gotestyourself/gotestsum) for CI/CD integration
+- **Test Coverage Reports** with HTML and console output
+- **Mock Generation** using [uber-go/mock](https://github.com/uber-go/mock) for unit testing
+- **Automated Test Reporting** compatible with Jenkins, GitHub Actions, and other CI tools
+
 ### Technical Features
 - Docker support with docker-compose
 - Makefile for common development tasks
@@ -375,6 +382,15 @@ make test
 make setup
 ```
 
+### Mock Generation Commands
+```cmd
+# Generate all mocks
+make mocks
+
+# Clean all generated mocks
+make clean-mocks
+```
+
 ### Database Commands
 ```cmd
 # Run database migrations up
@@ -468,67 +484,102 @@ go test -v ./...
 go test -cover ./...
 ```
 
-## 🔧 Troubleshooting
+### Testing & Coverage Commands
+```cmd
+# Generate JUnit XML report with verbose output
+make test-with-junit
 
-### Common Issues
+# Generate test coverage report
+make coverage
 
-#### Database Connection Issues
-```
-Error: failed to connect to database
-```
-**Solution:**
-1. Verify PostgreSQL is running
-2. Check database credentials in `.env`
-3. Ensure database `fhir_demo` exists
-4. Verify user permissions
+# Generate detailed test coverage report
+make coverage-detailed
 
-#### Migration Errors
-```
-Error: migration failed
-```
-**Solution:**
-1. Check database connection
-2. Verify migration files exist in `migrations/`
-3. Ensure migration tool is installed
-4. Check migration version with `migrate version`
+# Clean coverage files
+make clean-coverage
 
-#### Port Already in Use
-```
-Error: bind: address already in use
-```
-**Solution:**
-1. Change `SERVER_PORT` in `.env`
-2. Kill existing process: `netstat -ano | findstr :8080`
-3. Use `taskkill /PID <process_id> /F`
+# Generate all mocks for testing
+make mocks
 
-#### Swagger Documentation Not Loading
-**Solution:**
-1. Regenerate docs: `swag init`
-2. Verify swagger imports in `main.go`
-3. Check swagger annotations in handlers
-
-#### Swagger Init Failing
-**Solution:**
-swag init --parseDependency --parseDepth 99
-
-### Debug Mode
-Enable debug logging by setting:
-```env
-LOG_LEVEL=debug
-GIN_MODE=debug
+# Clean generated mocks
+make clean-mocks
 ```
 
-## 📚 Additional Resources
+### Test Coverage
 
-### FHIR Resources
-- [FHIR R4 Specification](https://hl7.org/fhir/R4/)
-- [FHIR Patient Resource](https://hl7.org/fhir/R4/patient.html)
-- [FHIR RESTful API](https://hl7.org/fhir/R4/http.html)
+The application includes comprehensive test coverage generation through the Makefile:
 
-### Go Resources
-- [Gin Web Framework](https://gin-gonic.com/)
-- [GORM Documentation](https://gorm.io/)
-- [Swagger Go Documentation](https://github.com/swaggo/swag)
+#### JUnit XML Report Generation
+```cmd
+make test-with-junit
+```
+This command:
+- Uses gotestsum for enhanced test output formatting
+- Generates a JUnit XML report at `junit-report.xml`
+- Provides standard verbose output for detailed test information
+- Compatible with CI/CD systems for test result publishing
+
+#### Basic Coverage Report
+```cmd
+make coverage
+```
+This command:
+- Runs all tests with coverage profiling
+- Generates an HTML coverage report at `coverage.html`
+- Provides a quick overview of test coverage
+
+#### Detailed Coverage Report
+```cmd
+make coverage-detailed
+```
+This command:
+- Runs tests with verbose output and atomic coverage mode
+- Displays detailed coverage statistics in the console
+- Generates both console summary and HTML report
+- Shows function-level coverage information
+
+#### Coverage File Management
+```cmd
+make clean-coverage
+```
+This command removes generated coverage files (`coverage.out`, `coverage.html`, and `junit-report.xml`).
+
+#### Test Report Locations
+- **JUnit XML**: `junit-report.xml` - Test results in JUnit format for CI/CD systems
+- **Console Output**: Function-level coverage summary (with `make coverage-detailed`)
+- **HTML Report**: `coverage.html` - Interactive coverage visualization
+- **Raw Data**: `coverage.out` - Coverage profile data
+
+### CI/CD Integration
+The JUnit XML reports can be easily integrated into various CI/CD pipelines:
+
+#### GitHub Actions Example
+```yaml
+- name: Run Tests
+  run: make test-with-junit
+
+- name: Publish Test Results
+  uses: dorny/test-reporter@v1
+  if: success() || failure()
+  with:
+    name: Go Tests
+    path: junit-report.xml
+    reporter: java-junit
+```
+
+#### Jenkins Pipeline Example
+```groovy
+stage('Test') {
+    steps {
+        sh 'make test-with-junit'
+    }
+    post {
+        always {
+            junit 'junit-report.xml'
+        }
+    }
+}
+```
 
 ## 🤝 Contributing
 
@@ -540,10 +591,11 @@ GIN_MODE=debug
 
 ### Code Standards
 - Follow Go best practices and idioms
-- Add comprehensive tests for new features
+- Add comprehensive tests for new features with JUnit XML compatibility
 - Update documentation for API changes
 - Add Swagger annotations for new endpoints
 - Follow the existing code structure
+- Ensure all tests pass with `make test-with-junit`
 
 ## 📄 License
 
@@ -566,3 +618,31 @@ For questions, issues, or contributions:
 - **Documentation:** [Wiki](https://github.com/your-repo/go-fhir-demo/wiki)
 
 **Built with ❤️ for Healthcare Interoperability**
+
+## Mocking
+
+This application uses [github.com/uber-go/mock](https://github.com/uber-go/mock) for generating mocks in tests.
+
+### Installing mockgen
+
+To install the mock generator tool (`mockgen`), run:
+
+```
+go install github.com/uber/mockgen@latest
+```
+
+Make sure your `$GOPATH/bin` (or `$GOBIN`) is in your system's `PATH` to use `mockgen` from anywhere.
+
+### Installing gotestsum
+
+To install gotestsum for enhanced test reporting and JUnit XML generation, run:
+
+```
+go install gotest.tools/gotestsum@latest
+```
+
+gotestsum provides:
+- Enhanced test output formatting
+- JUnit XML report generation for CI/CD integration
+- Better test result visualization
+- Support for various output formats

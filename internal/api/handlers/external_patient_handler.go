@@ -7,8 +7,13 @@ import (
 	"go-fhir-demo/pkg/logger"
 
 	"github.com/gin-gonic/gin"
-	// Added import
 )
+
+// ExternalPatientHandlerInterface defines the contract for external patient handlers
+type ExternalPatientHandlerInterface interface {
+	GetExternalPatientByID(c *gin.Context)
+	SearchExternalPatients(c *gin.Context)
+}
 
 // ExternalPatientHandler handles requests for external patient data.
 type ExternalPatientHandler struct {
@@ -16,7 +21,7 @@ type ExternalPatientHandler struct {
 }
 
 // NewExternalPatientHandler creates a new ExternalPatientHandler.
-func NewExternalPatientHandler(service domain.ExternalPatientService) *ExternalPatientHandler {
+func NewExternalPatientHandler(service domain.ExternalPatientService) ExternalPatientHandlerInterface {
 	return &ExternalPatientHandler{
 		service: service,
 	}

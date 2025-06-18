@@ -7,12 +7,22 @@ import (
 	"gorm.io/gorm"
 )
 
+// PatientRepositoryInterface defines the contract for patient repository
+type PatientRepositoryInterface interface {
+	Create(patient *domain.Patient) error
+	GetByID(id uint) (*domain.Patient, error)
+	GetAll(limit, offset int) ([]*domain.Patient, error)
+	Update(patient *domain.Patient) error
+	Delete(id uint) error
+	Count() (int64, error)
+}
+
 type patientRepository struct {
 	db *gorm.DB
 }
 
 // NewPatientRepository creates a new patient repository
-func NewPatientRepository(db *gorm.DB) domain.PatientRepository {
+func NewPatientRepository(db *gorm.DB) PatientRepositoryInterface {
 	return &patientRepository{
 		db: db,
 	}
