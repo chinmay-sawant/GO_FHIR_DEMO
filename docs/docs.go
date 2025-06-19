@@ -74,12 +74,12 @@ const docTemplate = `{
                 "summary": "Create an external patient",
                 "parameters": [
                     {
-                        "description": "Patient resource to create",
+                        "description": "Patient resource to create (FHIR-compliant JSON)",
                         "name": "patient",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/fhir.Patient"
+                            "type": "object"
                         }
                     }
                 ],

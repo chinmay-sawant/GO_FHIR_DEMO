@@ -1500,12 +1500,12 @@ paths:
       - application/json
       description: Creates a new patient resource on an external FHIR server
       parameters:
-      - description: Patient resource to create
+      - description: Patient resource to create (FHIR-compliant JSON)
         in: body
         name: patient
         required: true
         schema:
-          $ref: '#/definitions/fhir.Patient'
+          type: object
       produces:
       - application/json
       responses:
