@@ -1,6 +1,7 @@
 package fhirclient
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -15,6 +16,7 @@ import (
 type ClientInterface interface {
 	GetPatientByID(id string) (*fhir.Patient, error)
 	SearchPatients(queryParams map[string]string) (*fhir.Bundle, error)
+	CreatePatient(patient *fhir.Patient) (*fhir.Patient, error)
 }
 
 // Client is a client for interacting with a FHIR server.
@@ -98,4 +100,37 @@ func (c *Client) SearchPatients(queryParams map[string]string) (*fhir.Bundle, er
 	}
 
 	return &bundle, nil
+}
+
+// CreatePatient creates a new Patient resource on the FHIR server.
+func (c *Client) CreatePatient(patient *fhir.Patient) (*fhir.Patient, error) {
+	reqURL := fmt.Sprintf("%s/Patient", c.BaseURL)
+	body, err := json.Marshal(patient)
+	if err != nil {
+		return nil, fmt.Errorf("failed to marshal patient: %w", err)
+	}
+	req, err := http.NewRequest("POST", reqURL, io.NopCloser(bytes.NewReader(body)))
+	if err != nil {
+		return nil, fmt.Errorf("failed to create POST request: %w", err)
+	}
+	req.Header.Set("Accept", "application/fhir+json")
+	req.Header.Set("Content-Type", "application/fhir+json")
+
+	resp, err := c.HTTPClient.Do(req)
+	if err != nil {
+		return nil, fmt.Errorf("failed to execute POST request: %w", err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusCreated && resp.StatusCode != http.StatusOK {
+		bodyBytes, _ := io.ReadAll(resp.Body)
+		return nil, fmt.Errorf("fhir server returned non-success status %d: %s", resp.StatusCode, string(bodyBytes))
+	}
+
+	var createdPatient fhir.Patient
+	if err := json.NewDecoder(resp.Body).Decode(&createdPatient); err != nil {
+		return nil, fmt.Errorf("failed to decode created patient response: %w", err)
+	}
+
+	return &createdPatient, nil
 }

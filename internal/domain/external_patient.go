@@ -8,4 +8,5 @@ import (
 type ExternalPatientService interface {
 	GetExternalPatientByID(id string) (*fhir.Patient, error)
 	SearchExternalPatients(params map[string]string) (*fhir.Bundle, error)
+	CreateExternalPatient(patient *fhir.Patient) (*fhir.Patient, error)
 }

@@ -7,12 +7,14 @@ import (
 	"go-fhir-demo/pkg/logger"
 
 	"github.com/gin-gonic/gin"
+	"github.com/samply/golang-fhir-models/fhir-models/fhir"
 )
 
 // ExternalPatientHandlerInterface defines the contract for external patient handlers
 type ExternalPatientHandlerInterface interface {
 	GetExternalPatientByID(c *gin.Context)
 	SearchExternalPatients(c *gin.Context)
+	CreateExternalPatient(c *gin.Context)
 }
 
 // ExternalPatientHandler handles requests for external patient data.
@@ -82,4 +84,32 @@ func (h *ExternalPatientHandler) SearchExternalPatients(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, bundle)
+}
+
+// CreateExternalPatient godoc
+// @Summary Create an external patient
+// @Description Creates a new patient resource on an external FHIR server
+// @Tags ExternalPatients
+// @Accept json
+// @Produce json
+// @Param patient body fhir.Patient true "Patient resource to create"
+// @Success 201 {object} fhir.Patient "Successfully created patient"
+// @Failure 400 {object} map[string]string "Invalid request"
+// @Failure 500 {object} map[string]string "Internal server error"
+// @Router /external-patients [post]
+func (h *ExternalPatientHandler) CreateExternalPatient(c *gin.Context) {
+	var patient fhir.Patient
+	if err := c.ShouldBindJSON(&patient); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid patient data", "details": err.Error()})
+		return
+	}
+
+	createdPatient, err := h.service.CreateExternalPatient(&patient)
+	if err != nil {
+		logger.Errorf("Failed to create external patient: %v", err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create patient on external server", "details": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusCreated, createdPatient)
 }

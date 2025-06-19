@@ -1,0 +1,306 @@
+{
+  "examples": [
+    {
+      "description": "Basic Adult Patient",
+      "payload": {
+        "resourceType": "Patient",
+        "active": true,
+        "name": [
+          {
+            "use": "official",
+            "family": "Smith",
+            "given": ["John", "Michael"]
+          }
+        ],
+        "telecom": [
+          {
+            "system": "phone",
+            "value": "+1-555-123-4567",
+            "use": "home"
+          },
+          {
+            "system": "email",
+            "value": "john.smith@example.com",
+            "use": "home"
+          }
+        ],
+        "gender": "male",
+        "birthDate": "1985-03-15",
+        "address": [
+          {
+            "use": "home",
+            "type": "both",
+            "text": "456 Oak Street, Springfield, IL 62701",
+            "line": ["456 Oak Street"],
+            "city": "Springfield",
+            "state": "IL",
+            "postalCode": "62701",
+            "country": "US"
+          }
+        ],
+        "maritalStatus": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/v3-MaritalStatus",
+              "code": "M",
+              "display": "Married"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "description": "Female Patient with Contact",
+      "payload": {
+        "resourceType": "Patient",
+        "active": true,
+        "name": [
+          {
+            "use": "official",
+            "family": "Johnson",
+            "given": ["Emily", "Rose"]
+          },
+          {
+            "use": "maiden",
+            "family": "Davis",
+            "given": ["Emily"]
+          }
+        ],
+        "telecom": [
+          {
+            "system": "phone",
+            "value": "+1-555-987-6543",
+            "use": "mobile"
+          },
+          {
+            "system": "email",
+            "value": "emily.johnson@workplace.com",
+            "use": "work"
+          }
+        ],
+        "gender": "female",
+        "birthDate": "1992-07-22",
+        "address": [
+          {
+            "use": "home",
+            "type": "both",
+            "line": ["789 Maple Avenue", "Apt 4B"],
+            "city": "Chicago",
+            "state": "IL",
+            "postalCode": "60601",
+            "country": "US"
+          }
+        ],
+        "maritalStatus": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/v3-MaritalStatus",
+              "code": "S",
+              "display": "Single"
+            }
+          ]
+        },
+        "contact": [
+          {
+            "relationship": [
+              {
+                "coding": [
+                  {
+                    "system": "http://terminology.hl7.org/CodeSystem/v2-0131",
+                    "code": "C",
+                    "display": "Emergency Contact"
+                  }
+                ]
+              }
+            ],
+            "name": {
+              "family": "Johnson",
+              "given": ["Robert"]
+            },
+            "telecom": [
+              {
+                "system": "phone",
+                "value": "+1-555-555-1234"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "description": "Pediatric Patient",
+      "payload": {
+        "resourceType": "Patient",
+        "active": true,
+        "name": [
+          {
+            "use": "official",
+            "family": "Williams",
+            "given": ["Alex", "Jordan"]
+          }
+        ],
+        "telecom": [
+          {
+            "system": "phone",
+            "value": "+1-555-246-8135",
+            "use": "home"
+          }
+        ],
+        "gender": "other",
+        "birthDate": "2015-12-10",
+        "address": [
+          {
+            "use": "home",
+            "type": "both",
+            "line": ["321 Pine Street"],
+            "city": "Boston",
+            "state": "MA",
+            "postalCode": "02101",
+            "country": "US"
+          }
+        ],
+        "contact": [
+          {
+            "relationship": [
+              {
+                "coding": [
+                  {
+                    "system": "http://terminology.hl7.org/CodeSystem/v3-RoleCode",
+                    "code": "MTH",
+                    "display": "Mother"
+                  }
+                ]
+              }
+            ],
+            "name": {
+              "family": "Williams",
+              "given": ["Sarah"]
+            },
+            "telecom": [
+              {
+                "system": "phone",
+                "value": "+1-555-246-8135"
+              }
+            ],
+            "address": {
+              "use": "home",
+              "line": ["321 Pine Street"],
+              "city": "Boston",
+              "state": "MA",
+              "postalCode": "02101",
+              "country": "US"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "description": "Patient with Multiple Identifiers",
+      "payload": {
+        "resourceType": "Patient",
+        "identifier": [
+          {
+            "use": "usual",
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
+                  "code": "MR",
+                  "display": "Medical Record Number"
+                }
+              ]
+            },
+            "system": "http://hospital.example.org",
+            "value": "MRN123456"
+          },
+          {
+            "use": "official",
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
+                  "code": "SS",
+                  "display": "Social Security Number"
+                }
+              ]
+            },
+            "system": "http://hl7.org/fhir/sid/us-ssn",
+            "value": "123-45-6789"
+          }
+        ],
+        "active": true,
+        "name": [
+          {
+            "use": "official",
+            "family": "Brown",
+            "given": ["Michael", "James"]
+          }
+        ],
+        "telecom": [
+          {
+            "system": "phone",
+            "value": "+1-555-789-0123",
+            "use": "home"
+          }
+        ],
+        "gender": "male",
+        "birthDate": "1978-11-05",
+        "address": [
+          {
+            "use": "home",
+            "type": "both",
+            "line": ["654 Elm Street"],
+            "city": "Denver",
+            "state": "CO",
+            "postalCode": "80201",
+            "country": "US"
+          }
+        ]
+      }
+    },
+    {
+      "description": "Inactive Patient (Deceased)",
+      "payload": {
+        "resourceType": "Patient",
+        "active": false,
+        "name": [
+          {
+            "use": "official",
+            "family": "Thompson",
+            "given": ["Robert", "William"]
+          }
+        ],
+        "telecom": [
+          {
+            "system": "phone",
+            "value": "+1-555-456-7890",
+            "use": "home"
+          }
+        ],
+        "gender": "male",
+        "birthDate": "1945-08-20",
+        "deceasedDateTime": "2023-12-15T14:30:00Z",
+        "address": [
+          {
+            "use": "home",
+            "type": "both",
+            "line": ["987 Cedar Lane"],
+            "city": "Phoenix",
+            "state": "AZ",
+            "postalCode": "85001",
+            "country": "US"
+          }
+        ]
+      }
+    }
+  ],
+  "usage_notes": {
+    "content_type": "application/fhir+json",
+    "endpoint_example": "POST http://your-hapi-fhir-server/fhir/Patient",
+    "headers": {
+      "Content-Type": "application/fhir+json",
+      "Accept": "application/fhir+json"
+    },
+    "curl_example": "curl -X POST 'http://localhost:8080/fhir/Patient' -H 'Content-Type: application/fhir+json' -d @patient.json"
+  }
+}

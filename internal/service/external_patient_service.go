@@ -10,6 +10,7 @@ import (
 type ExternalPatientServiceInterface interface {
 	GetExternalPatientByID(id string) (*fhir.Patient, error)
 	SearchExternalPatients(params map[string]string) (*fhir.Bundle, error)
+	CreateExternalPatient(patient *fhir.Patient) (*fhir.Patient, error)
 }
 
 type externalPatientService struct {
@@ -31,4 +32,9 @@ func (s *externalPatientService) GetExternalPatientByID(id string) (*fhir.Patien
 // SearchExternalPatients searches for patients on the external FHIR server.
 func (s *externalPatientService) SearchExternalPatients(params map[string]string) (*fhir.Bundle, error) {
 	return s.client.SearchPatients(params)
+}
+
+// CreateExternalPatient creates a patient on the external FHIR server.
+func (s *externalPatientService) CreateExternalPatient(patient *fhir.Patient) (*fhir.Patient, error) {
+	return s.client.CreatePatient(patient)
 }

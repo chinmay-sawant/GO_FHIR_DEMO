@@ -52,6 +52,56 @@
                         }
                     }
                 }
+            },
+            "post": {
+                "description": "Creates a new patient resource on an external FHIR server",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "ExternalPatients"
+                ],
+                "summary": "Create an external patient",
+                "parameters": [
+                    {
+                        "description": "Patient resource to create",
+                        "name": "patient",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/fhir.Patient"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Successfully created patient",
+                        "schema": {
+                            "$ref": "#/definitions/fhir.Patient"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
             }
         },
         "/external-patients/{id}": {

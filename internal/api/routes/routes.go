@@ -65,6 +65,7 @@ func (r *RouteSetup) SetupRoutes(patientHandler handlers.PatientHandlerInterface
 		{
 			externalPatients.GET("/:id", externalPatientHandler.GetExternalPatientByID)
 			externalPatients.GET("", externalPatientHandler.SearchExternalPatients)
+			externalPatients.POST("", externalPatientHandler.CreateExternalPatient)
 		}
 	}
 

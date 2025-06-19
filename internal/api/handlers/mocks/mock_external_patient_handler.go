@@ -40,6 +40,18 @@ func (m *MockExternalPatientHandlerInterface) EXPECT() *MockExternalPatientHandl
 	return m.recorder
 }
 
+// CreateExternalPatient mocks base method.
+func (m *MockExternalPatientHandlerInterface) CreateExternalPatient(c *gin.Context) {
+	m.ctrl.T.Helper()
+	m.ctrl.Call(m, "CreateExternalPatient", c)
+}
+
+// CreateExternalPatient indicates an expected call of CreateExternalPatient.
+func (mr *MockExternalPatientHandlerInterfaceMockRecorder) CreateExternalPatient(c any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateExternalPatient", reflect.TypeOf((*MockExternalPatientHandlerInterface)(nil).CreateExternalPatient), c)
+}
+
 // GetExternalPatientByID mocks base method.
 func (m *MockExternalPatientHandlerInterface) GetExternalPatientByID(c *gin.Context) {
 	m.ctrl.T.Helper()
