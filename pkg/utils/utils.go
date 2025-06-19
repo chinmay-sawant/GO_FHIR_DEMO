@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"encoding/json"
 	"time"
 
 	"github.com/samply/golang-fhir-models/fhir-models/fhir"
@@ -67,4 +68,15 @@ func CreateTimePtr(t string) *time.Time {
 	return &ft
 }
 
-// Helper function to create date pointer
+// ConvertJsonToFHIRPatient converts a generic JSON map to a FHIR Patient resource.
+func ConvertJsonToFHIRPatient(data map[string]interface{}) (*fhir.Patient, error) {
+	bytes, err := json.Marshal(data)
+	if err != nil {
+		return nil, err
+	}
+	var patient fhir.Patient
+	if err := json.Unmarshal(bytes, &patient); err != nil {
+		return nil, err
+	}
+	return &patient, nil
+}

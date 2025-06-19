@@ -628,7 +628,7 @@ This application uses [github.com/uber-go/mock](https://github.com/uber-go/mock)
 To install the mock generator tool (`mockgen`), run:
 
 ```
-go install github.com/uber/mockgen@latest
+go install go.uber.org/mock/mockgen@latest
 ```
 
 Make sure your `$GOPATH/bin` (or `$GOBIN`) is in your system's `PATH` to use `mockgen` from anywhere.

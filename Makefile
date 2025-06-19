@@ -76,7 +76,7 @@ setup: deps install-migrate install-gotestsum
 .PHONY: mocks
 mocks:
 	@echo Starting mock generation...
-	@for /f "tokens=*" %%f in ('dir /s /b "internal\*.go" 2^>nul ^| findstr /v /i "mock" ^| findstr /v /i "_test"') do ( \
+	@for /f "tokens=*" %%f in ('dir /s /b "internal\*.go" "pkg\fhirclient\*.go" 2^>nul ^| findstr /v /i "mock" ^| findstr /v /i "_test"') do ( \
 		echo Processing Go file: %%f && \
 		for %%d in ("%%~dpf") do ( \
 			set "file_dir=%%~d" && \

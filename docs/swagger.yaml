@@ -1495,6 +1495,39 @@ paths:
       summary: Search for external patients
       tags:
       - ExternalPatients
+    post:
+      consumes:
+      - application/json
+      description: Creates a new patient resource on an external FHIR server
+      parameters:
+      - description: Patient resource to create (FHIR-compliant JSON)
+        in: body
+        name: patient
+        required: true
+        schema:
+          type: object
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Successfully created patient
+          schema:
+            $ref: '#/definitions/fhir.Patient'
+        "400":
+          description: Invalid request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Create an external patient
+      tags:
+      - ExternalPatients
   /external-patients/{id}:
     get:
       description: Retrieves a patient resource from an external FHIR server by its
