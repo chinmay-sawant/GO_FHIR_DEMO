@@ -240,16 +240,17 @@ func main() {
 	// Register with Consul
 	appName := "go-fhir-demo"
 	appID := fmt.Sprintf("%s-%s", appName, cfg.Server.Port)
-	var appHost string
+	var appHost, checkHost string
 	if cfg.Server.DevMode {
 		appHost = "localhost"
-
+		checkHost = "host.docker.internal"
 	} else {
 		// Get the local IP address for production mode
 		appHost = getLocalIP()
+		checkHost = appHost
 	}
 	appPort := cfg.Server.Port
-	if err := consul.RegisterWithConsul(cfg.Consul.Address, appName, appID, appHost, appPort); err != nil {
+	if err := consul.RegisterWithConsul(cfg.Consul.Address, appName, appID, appHost, appPort, checkHost); err != nil {
 		logger.Warnf("Consul registration failed: %v", err)
 	} else {
 		logger.Infof("Registered service '%s' with Consul at %s", appName, cfg.Consul.Address)

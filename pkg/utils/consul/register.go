@@ -9,7 +9,7 @@ import (
 )
 
 // RegisterWithConsul registers this service with Consul agent
-func RegisterWithConsul(consulAddr, serviceName, serviceID, serviceHost, servicePort string) error {
+func RegisterWithConsul(consulAddr, serviceName, serviceID, serviceHost, servicePort, checkHost string) error {
 	portInt, err := strconv.Atoi(servicePort)
 	if err != nil {
 		return fmt.Errorf("invalid service port: %w", err)
@@ -20,7 +20,7 @@ func RegisterWithConsul(consulAddr, serviceName, serviceID, serviceHost, service
 		"Address": serviceHost,
 		"Port":    portInt,
 		"Check": map[string]interface{}{
-			"HTTP":     fmt.Sprintf("http://%s:%d/health", serviceHost, portInt),
+			"HTTP":     fmt.Sprintf("http://%s:%d/health", checkHost, portInt),
 			"Interval": "10s",
 			"Timeout":  "5s",
 		},
