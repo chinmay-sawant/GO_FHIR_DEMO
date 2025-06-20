@@ -9,7 +9,7 @@ import (
 
 // RouteSetupInterface defines the contract for route setup
 type RouteSetupInterface interface {
-	SetupRoutes(patientHandler handlers.PatientHandlerInterface, externalPatientHandler handlers.ExternalPatientHandlerInterface) *gin.Engine
+	SetupRoutes(patientHandler handlers.PatientHandlerInterface, externalPatientHandler handlers.ExternalPatientHandlerInterface, consulHandler ...handlers.ConsulHandlerInterface) *gin.Engine
 }
 
 // RouteSetup implements RouteSetupInterface
@@ -21,13 +21,18 @@ func NewRouteSetup() RouteSetupInterface {
 }
 
 // Legacy function for backward compatibility
-func SetupRoutes(patientHandler handlers.PatientHandlerInterface, externalPatientHandler handlers.ExternalPatientHandlerInterface) *gin.Engine {
+func SetupRoutes(patientHandler handlers.PatientHandlerInterface, externalPatientHandler handlers.ExternalPatientHandlerInterface, consulHandler ...handlers.ConsulHandlerInterface) *gin.Engine {
 	routeSetup := NewRouteSetup()
-	return routeSetup.SetupRoutes(patientHandler, externalPatientHandler)
+	return routeSetup.SetupRoutes(patientHandler, externalPatientHandler, consulHandler...)
 }
 
 // SetupRoutes configures all the routes for the application
-func (r *RouteSetup) SetupRoutes(patientHandler handlers.PatientHandlerInterface, externalPatientHandler handlers.ExternalPatientHandlerInterface) *gin.Engine {
+func (r *RouteSetup) SetupRoutes(
+	patientHandler handlers.PatientHandlerInterface,
+	externalPatientHandler handlers.ExternalPatientHandlerInterface,
+	// Add consulHandler as optional argument
+	consulHandler ...handlers.ConsulHandlerInterface,
+) *gin.Engine {
 	router := gin.New()
 
 	// Global middleware
@@ -67,6 +72,11 @@ func (r *RouteSetup) SetupRoutes(patientHandler handlers.PatientHandlerInterface
 			externalPatients.GET("", externalPatientHandler.SearchExternalPatients)
 			externalPatients.POST("", externalPatientHandler.CreateExternalPatient)
 		}
+	}
+
+	// Consul secret endpoint
+	if len(consulHandler) > 0 && consulHandler[0] != nil {
+		router.GET("/consul/secret", consulHandler[0].GetConsulSecret)
 	}
 
 	// FHIR metadata endpoint

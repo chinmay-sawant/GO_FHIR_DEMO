@@ -17,6 +17,7 @@ A comprehensive Go Gin framework application with FHIR (Fast Healthcare Interope
 - **Configuration Management** with Viper and environment variables
 - **Request/Response Middleware** for performance monitoring
 - **Clean Architecture** with proper separation of concerns
+- **Consul Key Vault Integration** - Fetch secrets from Consul KV store via API endpoint
 
 ### Testing & Quality Assurance
 - **Comprehensive Test Suite** with unit and integration tests
@@ -110,6 +111,9 @@ A comprehensive Go Gin framework application with FHIR (Fast Healthcare Interope
 - **Makefile** - Build automation
 - **Air** (optional) - Live reloading for development
 
+### Service Discovery & Secret Management
+- **Consul** - Service discovery and key-value store integration
+
 ## 📋 Prerequisites
 
 Before you begin, ensure you have the following installed on your Windows system:
@@ -118,6 +122,7 @@ Before you begin, ensure you have the following installed on your Windows system
 - **PostgreSQL 12+** - [Download from postgresql.org](https://www.postgresql.org/downloads/)
 - **Git** - [Download from git-scm.com](https://git-scm.com/)
 - **Make** (optional) - [Install via Chocolatey](https://chocolatey.org/) or use the provided batch scripts
+- **Consul** (optional, for secret management) - [Download from consul.io](https://www.consul.io/downloads)
 
 ## 🚀 Quick Start
 
@@ -134,7 +139,7 @@ Copy the example environment file and configure your settings:
 copy .env.example .env
 ```
 
-Edit the `.env` file with your database credentials and external FHIR server URL:
+Edit the `.env` file with your database credentials, external FHIR server URL, and Consul settings:
 ```env
 # Database Configuration
 DB_HOST=localhost
@@ -153,6 +158,10 @@ EXTERNAL_FHIR_SERVER_BASE_URL=http://hapi.fhir.org/baseR4
 
 # Logging Configuration
 LOG_LEVEL=info
+
+# Consul Configuration
+CONSUL_ADDRESS=http://localhost:8500
+CONSUL_KEY=myapp/secret
 ```
 
 ### 3. Database Setup
@@ -240,6 +249,12 @@ swag init --parseDependency --parseDepth 99
 | `GET` | `/api/v1/external-patients/{id}` | Get patient from external FHIR server by ID | - |
 | `GET` | `/api/v1/external-patients` | Search patients on external FHIR server | `name`, `family`, `given`, `birthdate`, `gender` |
 
+### Consul Key Vault Endpoint
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/consul/secret` | Get secret from Consul KV as JSON |
+
 ### Health Check Endpoints
 
 | Method | Endpoint | Description |
@@ -276,6 +291,11 @@ curl -X GET http://localhost:8080/api/v1/patients
 curl -X GET http://localhost:8080/api/v1/patients/1
 ```
 
+#### Get Secret from Consul
+```bash
+curl -X GET http://localhost:8080/consul/secret
+```
+
 ## ⚙️ Configuration
 
 ### Environment Variables
@@ -292,6 +312,8 @@ curl -X GET http://localhost:8080/api/v1/patients/1
 | `GIN_MODE` | Gin framework mode (`debug`/`release`) | `debug` | No |
 | `LOG_LEVEL` | Logging level (`trace`/`debug`/`info`/`warn`/`error`) | `info` | No |
 | `EXTERNAL_FHIR_SERVER_BASE_URL` | Base URL for external FHIR server | - | Yes |
+| `CONSUL_ADDRESS` | Consul server address | `http://localhost:8500` | No |
+| `CONSUL_KEY` | Consul KV key to fetch | `myapp/secret` | No |
 
 ### Configuration File
 The application also supports JSON configuration via `config/config.json` for default values. Environment variables take precedence over configuration file settings.
@@ -300,6 +322,20 @@ The application also supports JSON configuration via `config/config.json` for de
 Configure the base URL for the external FHIR server in your environment:
 ```env
 EXTERNAL_FHIR_SERVER_BASE_URL=http://hapi.fhir.org/baseR4
+```
+
+#### Consul Configuration
+Configure Consul integration in your environment:
+```env
+CONSUL_ADDRESS=http://localhost:8500
+CONSUL_KEY=myapp/secret
+```
+Or in `config/config.json`:
+```json
+"consul": {
+  "address": "http://localhost:8500",
+  "key": "myapp/secret"
+}
 ```
 
 Popular public FHIR servers for testing:
@@ -420,7 +456,7 @@ make help
 
 ### Using Docker Compose (Recommended)
 ```cmd
-# Start all services (PostgreSQL + Application)
+# Start all services (PostgreSQL + Consul + Application)
 docker-compose up -d
 
 # View logs
@@ -442,6 +478,7 @@ docker run -p 8080:8080 --env-file .env go-fhir-demo
 ### Docker Environment
 The `docker-compose.yml` includes:
 - PostgreSQL database with persistent volume
+- Consul service for key-value store and service discovery
 - Application service with environment variables
 - Network configuration for service communication
 
@@ -470,7 +507,8 @@ The `docker-compose.yml` includes:
 4. **Handler** - Add HTTP endpoints in `internal/api/handlers/`
 5. **Routes** - Register routes in `internal/api/routes/`
 6. **Migration** - Create database changes in `migrations/`
-7. **Documentation** - Add Swagger annotations
+7. **Consul Integration** - Add handler in `internal/api/handlers/consul_handler.go`, utility in `pkg/utils/consul.go`, and register route in `internal/api/routes/`.
+8. **Documentation** - Update Swagger annotations and regenerate docs
 
 ### Testing
 ```cmd

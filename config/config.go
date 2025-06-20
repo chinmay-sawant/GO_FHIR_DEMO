@@ -9,11 +9,17 @@ import (
 	"github.com/spf13/viper"
 )
 
+type ConsulConfig struct {
+	Address string `json:"address"`
+	Key     string `json:"key"`
+}
+
 type Config struct {
 	Server   ServerConfig   `json:"server"`
 	Database DatabaseConfig `json:"database"`
 	Logging  LoggingConfig  `json:"logging"`
 	FHIR     FHIRConfig     `json:"fhir"`
+	Consul   ConsulConfig   `json:"consul"`
 }
 
 type ServerConfig struct {
@@ -71,6 +77,8 @@ func Load() (*Config, error) {
 	viper.SetDefault("logging.file", "logs/app.log")
 	viper.SetDefault("fhir.base_url", "/api/v1")
 	viper.SetDefault("fhir.version", "R4")
+	viper.SetDefault("consul.address", "http://localhost:8500")
+	viper.SetDefault("consul.key", "myapp/secret")
 
 	// Bind environment variables
 	viper.BindEnv("server.port", "SERVER_PORT")
@@ -82,6 +90,8 @@ func Load() (*Config, error) {
 	viper.BindEnv("database.name", "DB_NAME")
 	viper.BindEnv("database.sslmode", "DB_SSLMODE")
 	viper.BindEnv("logging.level", "LOG_LEVEL")
+	viper.BindEnv("consul.address", "CONSUL_ADDRESS")
+	viper.BindEnv("consul.key", "CONSUL_KEY")
 
 	if err := viper.ReadInConfig(); err != nil {
 		if _, ok := err.(viper.ConfigFileNotFoundError); !ok {
@@ -109,6 +119,13 @@ func Load() (*Config, error) {
 	}
 	if name := os.Getenv("DB_NAME"); name != "" {
 		config.Database.Name = name
+	}
+	// Override with environment variables for Consul
+	if addr := os.Getenv("CONSUL_ADDRESS"); addr != "" {
+		config.Consul.Address = addr
+	}
+	if key := os.Getenv("CONSUL_KEY"); key != "" {
+		config.Consul.Key = key
 	}
 
 	return &config, nil

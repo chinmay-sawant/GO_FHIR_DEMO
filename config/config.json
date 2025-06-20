@@ -19,5 +19,9 @@
   "fhir": {
     "base_url": "/api/v1",
     "version": "R4"
+  },
+  "consul": {
+    "address": "http://localhost:8500",
+    "key": "dev"
   }
 }

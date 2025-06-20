@@ -197,12 +197,13 @@ func main() {
 	// Initialize handlers
 	patientHandler := handlers.NewPatientHandler(patientService)
 	externalPatientHandler := handlers.NewExternalPatientHandler(externalPatientService)
+	consulHandler := handlers.NewConsulHandler(&cfg.Consul)
 
 	// Set Gin mode
 	gin.SetMode(cfg.Server.Mode)
 
-	// Setup routes
-	router := routes.SetupRoutes(patientHandler, externalPatientHandler) // Pass new handler to SetupRoutes
+	// Setup routes (pass consulHandler)
+	router := routes.SetupRoutes(patientHandler, externalPatientHandler, consulHandler)
 
 	// Swagger endpoint
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
