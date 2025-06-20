@@ -28,6 +28,7 @@ type ServerConfig struct {
 	ReadTimeout               time.Duration `json:"read_timeout"`
 	WriteTimeout              time.Duration `json:"write_timeout"`
 	ExternalFHIRServerBaseURL string        `json:"external_fhir_server_base_url"`
+	DevMode                   bool          `json:"dev_mode"`
 }
 
 type DatabaseConfig struct {
@@ -79,6 +80,7 @@ func Load() (*Config, error) {
 	viper.SetDefault("fhir.version", "R4")
 	viper.SetDefault("consul.address", "http://localhost:8500")
 	viper.SetDefault("consul.key", "myapp/secret")
+	viper.SetDefault("server.dev_mode", false)
 
 	// Bind environment variables
 	viper.BindEnv("server.port", "SERVER_PORT")
@@ -92,6 +94,7 @@ func Load() (*Config, error) {
 	viper.BindEnv("logging.level", "LOG_LEVEL")
 	viper.BindEnv("consul.address", "CONSUL_ADDRESS")
 	viper.BindEnv("consul.key", "CONSUL_KEY")
+	viper.BindEnv("server.dev_mode", "DEV_MODE")
 
 	if err := viper.ReadInConfig(); err != nil {
 		if _, ok := err.(viper.ConfigFileNotFoundError); !ok {
@@ -127,7 +130,11 @@ func Load() (*Config, error) {
 	if key := os.Getenv("CONSUL_KEY"); key != "" {
 		config.Consul.Key = key
 	}
-
+	if key := os.Getenv("DEV_MODE"); key != "" {
+		if key == "true" {
+			config.Server.DevMode = true
+		}
+	}
 	return &config, nil
 }
 

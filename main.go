@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"net"
 	"net/http"
 	"os"
 	"os/signal"
@@ -19,6 +20,7 @@ import (
 	"go-fhir-demo/pkg/fhirclient" // Import the new fhirclient package
 	"go-fhir-demo/pkg/logger"
 	"go-fhir-demo/pkg/utils"
+	"go-fhir-demo/pkg/utils/consul"
 
 	"github.com/gin-gonic/gin"
 	"github.com/samply/golang-fhir-models/fhir-models/fhir"
@@ -35,6 +37,25 @@ import (
 // @version 1.0
 // @description This is a sample FHIR Patient API server in Go using Gin.
 // @BasePath /api/v1
+
+// getLocalIP tries to get the non-loopback local IP of the host
+func getLocalIP() string {
+	addrs, err := net.InterfaceAddrs()
+	if err != nil {
+		return "localhost"
+	}
+	for _, addr := range addrs {
+		if ipnet, ok := addr.(*net.IPNet); ok && !ipnet.IP.IsLoopback() && ipnet.IP.To4() != nil {
+			ipnet.IP = ipnet.IP.To4() // Ensure we get the IPv4 address
+			if ipnet.IP[0] == 127 && ipnet.IP[1] == 0 && ipnet.IP[2] == 0 && ipnet.IP[3] == 1 {
+				return "localhost"
+			}
+			fmt.Println("Detected local IP:", ipnet.IP.String())
+			return ipnet.IP.String()
+		}
+	}
+	return "localhost"
+}
 
 func main() {
 	// Load configuration
@@ -214,6 +235,24 @@ func main() {
 		Handler:      router,
 		ReadTimeout:  cfg.Server.ReadTimeout,
 		WriteTimeout: cfg.Server.WriteTimeout,
+	}
+
+	// Register with Consul
+	appName := "go-fhir-demo"
+	appID := fmt.Sprintf("%s-%s", appName, cfg.Server.Port)
+	var appHost string
+	if cfg.Server.DevMode {
+		appHost = "localhost"
+
+	} else {
+		// Get the local IP address for production mode
+		appHost = getLocalIP()
+	}
+	appPort := cfg.Server.Port
+	if err := consul.RegisterWithConsul(cfg.Consul.Address, appName, appID, appHost, appPort); err != nil {
+		logger.Warnf("Consul registration failed: %v", err)
+	} else {
+		logger.Infof("Registered service '%s' with Consul at %s", appName, cfg.Consul.Address)
 	}
 
 	// Start server in a goroutine
