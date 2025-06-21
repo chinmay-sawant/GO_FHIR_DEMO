@@ -23,5 +23,10 @@
   "consul": {
     "address": "http://localhost:8500",
     "key": "dev"
+  },
+  "vault": {
+    "address": "http://localhost:8200",
+    "token": "root",
+    "secret_path": "secret/data/myapp"
   }
 }

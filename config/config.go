@@ -14,12 +14,19 @@ type ConsulConfig struct {
 	Key     string `json:"key"`
 }
 
+type VaultConfig struct {
+	Address    string `json:"address"`
+	Token      string `json:"token"`
+	SecretPath string `json:"secret_path"`
+}
+
 type Config struct {
 	Server   ServerConfig   `json:"server"`
 	Database DatabaseConfig `json:"database"`
 	Logging  LoggingConfig  `json:"logging"`
 	FHIR     FHIRConfig     `json:"fhir"`
 	Consul   ConsulConfig   `json:"consul"`
+	Vault    VaultConfig    `json:"vault"`
 }
 
 type ServerConfig struct {
@@ -81,6 +88,9 @@ func Load() (*Config, error) {
 	viper.SetDefault("consul.address", "http://localhost:8500")
 	viper.SetDefault("consul.key", "myapp/secret")
 	viper.SetDefault("server.dev_mode", false)
+	viper.SetDefault("vault.address", "http://localhost:8200")
+	viper.SetDefault("vault.token", "root")
+	viper.SetDefault("vault.secret_path", "secret/data/myapp")
 
 	// Bind environment variables
 	viper.BindEnv("server.port", "SERVER_PORT")
@@ -95,6 +105,9 @@ func Load() (*Config, error) {
 	viper.BindEnv("consul.address", "CONSUL_ADDRESS")
 	viper.BindEnv("consul.key", "CONSUL_KEY")
 	viper.BindEnv("server.dev_mode", "DEV_MODE")
+	viper.BindEnv("vault.address", "VAULT_ADDRESS")
+	viper.BindEnv("vault.token", "VAULT_TOKEN")
+	viper.BindEnv("vault.secret_path", "VAULT_SECRET_PATH")
 
 	if err := viper.ReadInConfig(); err != nil {
 		if _, ok := err.(viper.ConfigFileNotFoundError); !ok {
@@ -129,6 +142,16 @@ func Load() (*Config, error) {
 	}
 	if key := os.Getenv("CONSUL_KEY"); key != "" {
 		config.Consul.Key = key
+	}
+	// Override with environment variables for Vault
+	if addr := os.Getenv("VAULT_ADDRESS"); addr != "" {
+		config.Vault.Address = addr
+	}
+	if token := os.Getenv("VAULT_TOKEN"); token != "" {
+		config.Vault.Token = token
+	}
+	if path := os.Getenv("VAULT_SECRET_PATH"); path != "" {
+		config.Vault.SecretPath = path
 	}
 	if key := os.Getenv("DEV_MODE"); key != "" {
 		if key == "true" {

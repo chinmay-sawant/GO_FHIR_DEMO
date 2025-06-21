@@ -36,6 +36,28 @@ services:
       timeout: 5s
       retries: 5
 
+  vault:
+    image: hashicorp/vault:latest
+    container_name: fhir_vault
+    ports:
+      - "8200:8200"
+    environment:
+      VAULT_ADDR: http://localhost:8200
+    cap_add:
+      - IPC_LOCK
+    command: "server"
+    healthcheck:
+      test: ["CMD", "vault", "status"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - vault_data:/vault/file
+      - ./vault/config:/vault/config
+      - ./vault/policies:/vault/policies
+      - ./vault/data:/vault/data
+      
+
   fhir-api:
     build: .
     container_name: fhir_api
@@ -51,6 +73,9 @@ services:
       LOG_LEVEL: info
       CONSUL_ADDRESS: http://consul:8500
       CONSUL_KEY: myapp/secret
+      VAULT_ADDRESS: http://vault:8200
+      VAULT_TOKEN: root
+      VAULT_SECRET_PATH: secret/data/myapp
     ports:
       - "8080:8080"
     depends_on:
@@ -58,9 +83,12 @@ services:
         condition: service_healthy
       consul:
         condition: service_started
+      vault:
+        condition: service_started
     volumes:
       - ./logs:/root/logs
 
 volumes:
   postgres_data:
   consul_data:
+  vault_data:
