@@ -1,22 +1,28 @@
 # Go FHIR Demo Application
 
-A comprehensive Go Gin framework application with FHIR (Fast Healthcare Interoperability Resources) R4 support, featuring a PostgreSQL database, automatic API documentation with Swagger, **external FHIR server integration**, and production-ready architecture.
+A comprehensive Go Gin framework application with FHIR (Fast Healthcare Interoperability Resources) R4 support, featuring PostgreSQL database, automatic API documentation with Swagger, external FHIR server integration, service discovery with Consul, secret management with Vault, and production-ready architecture.
 
 ## 🚀 Features
 
 ### Core Features
-- **RESTful API** for Patient resources (GET, POST, PUT, DELETE, PATCH)
-- **FHIR R4 Compliance** with custom FHIR data structures using standard JSON
+- **RESTful API** for Patient resources with full CRUD operations (GET, POST, PUT, PATCH, DELETE)
+- **FHIR R4 Compliance** with standard FHIR data structures and validation
 - **External FHIR Server Integration** - Connect to and query external FHIR servers (like HAPI FHIR)
-- **FHIR Client Package** - Reusable client for external FHIR server communication
-- **PostgreSQL Database** with GORM ORM for robust data persistence
+- **FHIR Client Package** - Reusable HTTP client for external FHIR server communication
+- **PostgreSQL Database** with GORM ORM and JSONB support for efficient FHIR data storage
 - **Database Migrations** using [golang-migrate](https://github.com/golang-migrate/migrate)
-- **Swagger/OpenAPI Documentation** with interactive UI
-- **Automatic Data Seeding** with sample FHIR patient records
-- **Structured Logging** with Logrus
-- **Configuration Management** with Viper and environment variables
-- **Request/Response Middleware** for performance monitoring
-- **Clean Architecture** with proper separation of concerns
+- **Swagger/OpenAPI Documentation** with interactive UI and auto-generation
+- **Automatic Data Seeding** with sample FHIR patient records on startup
+- **Structured Logging** with configurable levels and formats
+- **Configuration Management** with Viper supporting JSON files and environment variables
+- **Request/Response Middleware** for performance monitoring, CORS, and error handling
+- **Clean Architecture** with proper separation of concerns (handlers, services, repositories)
+
+### Service Discovery & Secret Management
+- **Consul Integration** - Service discovery, service registration, and key-value store
+- **HashiCorp Vault Integration** - Secure secret management and storage
+- **Consul Handler** - API endpoint to fetch secrets from Consul KV store
+- **Service Registration** - Automatic registration with Consul on startup
 
 ### Testing & Quality Assurance
 - **Comprehensive Test Suite** with unit and integration tests
@@ -34,49 +40,56 @@ A comprehensive Go Gin framework application with FHIR (Fast Healthcare Interope
 - Comprehensive error handling and validation
 - Production-ready logging and monitoring
 
-## 🏗️ Architecture & Project Structure
+## 📊 Project Structure
 
 ```
-├── config/                    # Configuration management
-│   ├── config.go             # Configuration loader with Viper
-│   └── config.json           # Default configuration
-├── docs/                     # Auto-generated Swagger documentation
+├── config/                   # Configuration management
+│   ├── config.go            # Configuration loader with Viper
+│   └── config.json          # Default configuration
+├── docs/                    # Auto-generated Swagger documentation
 │   ├── docs.go
 │   ├── swagger.json
 │   └── swagger.yaml
-├── examples/                 # Sample FHIR data
-│   └── sample_patient.json   # Example patient resource
-├── internal/                 # Private application code
+├── examples/                # Sample FHIR data
+│   └── sample_patient.json  # Example patient resource
+├── internal/                # Private application code
 │   ├── api/
-│   │   ├── handlers/         # HTTP request handlers
-│   │   │   ├── patient_handler.go
-│   │   │   └── external_patient_handler.go  # External FHIR server handlers
-│   │   └── routes/           # Route definitions
+│   │   ├── handlers/        # HTTP request handlers
+│   │   │   ├── patient_handler.go           # Local patient CRUD operations
+│   │   │   ├── external_patient_handler.go  # External FHIR server integration
+│   │   │   └── consul_handler.go            # Consul KV secret management
+│   │   └── routes/          # Route definitions and middleware setup
 │   │       └── routes.go
-│   ├── domain/               # Domain models and business entities
-│   │   ├── patient.go        # FHIR Patient domain model
+│   ├── domain/              # Domain models and business entities
+│   │   ├── patient.go       # FHIR Patient domain model
 │   │   └── external_patient.go  # External patient service interface
-│   ├── middleware/           # HTTP middleware
-│   │   └── middleware.go     # Logging and timing middleware
-│   ├── repository/           # Data access layer
-│   │   └── patient_repository.go
-│   └── service/              # Business logic layer
-│       ├── patient_service.go
+│   ├── middleware/          # HTTP middleware
+│   │   └── middleware.go    # CORS, logging, timing, error handling
+│   ├── repository/          # Data access layer
+│   │   └── patient_repository.go  # PostgreSQL data operations
+│   └── service/             # Business logic layer
+│       ├── patient_service.go           # Local patient business logic
 │       └── external_patient_service.go  # External FHIR server service
-├── logs/                     # Application logs
-├── migrations/               # Database schema migrations
+├── logs/                    # Application logs
+├── migrations/              # Database schema migrations
 │   ├── 000001_create_patients_table.up.sql
 │   └── 000001_create_patients_table.down.sql
-├── pkg/                      # Shared/reusable packages
-│   ├── database/             # Database connection utilities
-│   ├── fhirclient/           # FHIR client for external servers
-│   │   └── client.go         # HTTP client for FHIR R4 servers
-│   ├── logger/               # Logging utilities
-│   └── utils/                # Common utility functions
-├── docker-compose.yml        # Docker services definition
-├── Dockerfile               # Container build instructions
-├── Makefile                 # Development automation
-└── main.go                  # Application entry point
+├── pkg/                     # Shared/reusable packages
+│   ├── database/            # Database connection utilities
+│   ├── fhirclient/          # HTTP client for external FHIR servers
+│   ├── logger/              # Structured logging utilities
+│   └── utils/               # Common utility functions
+│       ├── consul.go        # Consul KV utilities
+│       └── consul/          # Consul service registration
+│           └── register.go
+├── vault/                   # Vault configuration
+│   └── config/
+│       └── vault.hcl        # Vault server configuration
+├── docker-compose.yml       # Multi-service Docker setup
+├── Dockerfile              # Application container definition
+├── Makefile                # Development automation scripts
+├── INSTALLATION.md         # Detailed installation guide
+└── main.go                 # Application entry point with service registration
 ```
 
 ## 🛠️ Technologies Used
@@ -110,99 +123,38 @@ A comprehensive Go Gin framework application with FHIR (Fast Healthcare Interope
 - **Makefile** - Build automation
 - **Air** (optional) - Live reloading for development
 
+### Service Discovery & Secret Management
+- **Consul** - Service discovery and key-value store integration
+- **HashiCorp Vault** - Secure secret management and storage
+
 ## 📋 Prerequisites
 
-Before you begin, ensure you have the following installed on your Windows system:
+For detailed installation instructions, see [INSTALLATION.md](INSTALLATION.md).
 
-- **Go 1.21+** - [Download from golang.org](https://golang.org/downloads/)
-- **PostgreSQL 12+** - [Download from postgresql.org](https://www.postgresql.org/downloads/)
-- **Git** - [Download from git-scm.com](https://git-scm.com/)
-- **Make** (optional) - [Install via Chocolatey](https://chocolatey.org/) or use the provided batch scripts
+- **Go 1.23+** - Programming language runtime
+- **PostgreSQL 15+** - Database server
+- **Docker & Docker Compose** - Containerization platform
+- **Git** - Version control system
 
 ## 🚀 Quick Start
 
-### 1. Clone the Repository
-```cmd
+For complete installation and setup instructions, please refer to [INSTALLATION.md](INSTALLATION.md).
+
+### Quick Docker Setup
+```bash
+# Clone the repository
 git clone <repository-url>
 cd Go_FHIR_Demo
+
+# Start all services with Docker Compose
+docker-compose up -d
+
+# Access the application
+# API: http://localhost:8080
+# Swagger UI: http://localhost:8080/swagger/index.html
+# Consul UI: http://localhost:8500
+# Vault UI: http://localhost:8200 (requires initialization)
 ```
-
-### 2. Environment Setup
-
-Copy the example environment file and configure your settings:
-```cmd
-copy .env.example .env
-```
-
-Edit the `.env` file with your database credentials and external FHIR server URL:
-```env
-# Database Configuration
-DB_HOST=localhost
-DB_PORT=5432
-DB_USER=fhir_user
-DB_PASSWORD=fhir_password
-DB_NAME=fhir_demo
-DB_SSLMODE=disable
-
-# Server Configuration
-SERVER_PORT=8080
-GIN_MODE=debug
-
-# External FHIR Server Configuration
-EXTERNAL_FHIR_SERVER_BASE_URL=http://hapi.fhir.org/baseR4
-
-# Logging Configuration
-LOG_LEVEL=info
-```
-
-### 3. Database Setup
-
-#### Option A: Using Docker (Recommended)
-```cmd
-docker-compose up -d postgres
-```
-
-#### Option B: Manual PostgreSQL Setup
-1. Create a PostgreSQL database named `fhir_demo`
-2. Create a user with appropriate permissions
-```sql
-CREATE DATABASE fhir_demo;
-CREATE USER fhir_user WITH PASSWORD 'fhir_password';
-GRANT ALL PRIVILEGES ON DATABASE fhir_demo TO fhir_user;
-```
-
-### 4. Install Dependencies
-```cmd
-go mod tidy
-```
-
-### 5. Install Migration Tool
-
-**Option A: Using Go Install (Recommended)**
-```cmd
-go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@latest
-```
-
-**Option B: Download Binary (Windows)**
-1. Download the latest Windows release from: https://github.com/golang-migrate/migrate/releases
-2. Extract `migrate.exe` and place it in a folder (e.g., `C:\tools\migrate.exe`)
-3. Add that folder to your system PATH
-4. Verify installation:
-```cmd
-migrate --version
-```
-
-### 6. Run Database Migrations
-```cmd
-migrate -path migrations -database "postgres://fhir_user:fhir_password@localhost:5432/fhir_demo?sslmode=disable" up
-```
-
-### 7. Run the Application
-```cmd
-go run main.go
-```
-
-The application will start on `http://localhost:8080` and automatically seed sample patient data.
 
 ## 📖 API Documentation
 
@@ -222,30 +174,39 @@ swag init --parseDependency --parseDepth 99
 
 ## 🔗 API Endpoints
 
-### Local Patient Resource Endpoints
+### Core Application Endpoints
 
-| Method | Endpoint | Description | Request Body |
-|--------|----------|-------------|--------------|
-| `GET` | `/api/v1/patients` | Get all patients with pagination | - |
-| `GET` | `/api/v1/patients/{id}` | Get patient by ID | - |
-| `POST` | `/api/v1/patients` | Create new patient | FHIR Patient JSON |
-| `PUT` | `/api/v1/patients/{id}` | Update entire patient resource | FHIR Patient JSON |
-| `PATCH` | `/api/v1/patients/{id}` | Partially update patient | Partial FHIR Patient JSON |
-| `DELETE` | `/api/v1/patients/{id}` | Delete patient (soft delete) | - |
+| Method | Endpoint | Description | Response |
+|--------|----------|-------------|----------|
+| `GET` | `/health` | Application health check | Service status and version |
+| `GET` | `/metadata` | FHIR capability statement | Server capabilities and supported operations |
+| `GET` | `/swagger/index.html` | Interactive API documentation | Swagger UI interface |
+
+### Local Patient Resource Endpoints (FHIR R4 Compliant)
+
+| Method | Endpoint | Description | Request Body | Query Parameters |
+|--------|----------|-------------|--------------|------------------|
+| `GET` | `/api/v1/patients` | Get all patients with pagination | - | `limit` (default: 10), `offset` (default: 0) |
+| `GET` | `/api/v1/patients/{id}` | Get patient by ID | - | - |
+| `POST` | `/api/v1/patients` | Create new patient | FHIR Patient JSON | - |
+| `PUT` | `/api/v1/patients/{id}` | Update entire patient resource | FHIR Patient JSON | - |
+| `PATCH` | `/api/v1/patients/{id}` | Partially update patient | Partial updates map | - |
+| `DELETE` | `/api/v1/patients/{id}` | Delete patient (soft delete) | - | - |
 
 ### External FHIR Server Endpoints
 
-| Method | Endpoint | Description | Query Parameters |
-|--------|----------|-------------|------------------|
-| `GET` | `/api/v1/external-patients/{id}` | Get patient from external FHIR server by ID | - |
-| `GET` | `/api/v1/external-patients` | Search patients on external FHIR server | `name`, `family`, `given`, `birthdate`, `gender` |
+| Method | Endpoint | Description | Request Body | Query Parameters |
+|--------|----------|-------------|--------------|------------------|
+| `GET` | `/api/v1/external-patients/{id}` | Get patient from external FHIR server by ID | - | - |
+| `GET` | `/api/v1/external-patients` | Search patients on external FHIR server | - | FHIR search params (`name`, `family`, `given`, `birthdate`, `gender`, etc.) |
+| `POST` | `/api/v1/external-patients` | Create patient on external FHIR server | FHIR-compliant Patient JSON | - |
 
-### Health Check Endpoints
+### Service Discovery & Secret Management Endpoints
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `GET` | `/health` | Application health status |
-| `GET` | `/swagger/index.html` | Interactive API documentation |
+| Method | Endpoint | Description | Response |
+|--------|----------|-------------|----------|
+| `GET` | `/consul/secret` | Get secret from Consul KV store | JSON secret data |
+| `GET` | `/vault/secret` | Get secret from Vault KV store | JSON secret data |
 
 ### Example Usage
 
@@ -266,14 +227,43 @@ curl -X GET "http://localhost:8080/api/v1/external-patients/123"
 curl -X GET "http://localhost:8080/api/v1/external-patients?family=Smith&gender=female"
 ```
 
-#### Get All Local Patients
+#### Get All Local Patients with Pagination
 ```bash
-curl -X GET http://localhost:8080/api/v1/patients
+curl -X GET "http://localhost:8080/api/v1/patients?limit=20&offset=0"
 ```
 
 #### Get Patient by ID
 ```bash
 curl -X GET http://localhost:8080/api/v1/patients/1
+```
+
+#### Update Patient
+```bash
+curl -X PUT http://localhost:8080/api/v1/patients/1 \
+  -H "Content-Type: application/json" \
+  -d @examples/sample_patient.json
+```
+
+#### Partially Update Patient
+```bash
+curl -X PATCH http://localhost:8080/api/v1/patients/1 \
+  -H "Content-Type: application/json" \
+  -d '{"family": "UpdatedLastName"}'
+```
+
+#### Delete Patient
+```bash
+curl -X DELETE http://localhost:8080/api/v1/patients/1
+```
+
+#### Get Secret from Consul
+```bash
+curl -X GET http://localhost:8080/consul/secret
+```
+
+#### Get Secret from Vault
+```bash
+curl -X GET http://localhost:8080/vault/secret
 ```
 
 ## ⚙️ Configuration
@@ -292,6 +282,11 @@ curl -X GET http://localhost:8080/api/v1/patients/1
 | `GIN_MODE` | Gin framework mode (`debug`/`release`) | `debug` | No |
 | `LOG_LEVEL` | Logging level (`trace`/`debug`/`info`/`warn`/`error`) | `info` | No |
 | `EXTERNAL_FHIR_SERVER_BASE_URL` | Base URL for external FHIR server | - | Yes |
+| `CONSUL_ADDRESS` | Consul server address | `http://localhost:8500` | No |
+| `CONSUL_KEY` | Consul KV key to fetch | `myapp/secret` | No |
+| `VAULT_ADDRESS` | Vault server address | `http://localhost:8200` | No |
+| `VAULT_TOKEN` | Vault authentication token | `root` | No |
+| `VAULT_SECRET_PATH` | Vault secret path | `secret/data/myapp` | No |
 
 ### Configuration File
 The application also supports JSON configuration via `config/config.json` for default values. Environment variables take precedence over configuration file settings.
@@ -300,6 +295,36 @@ The application also supports JSON configuration via `config/config.json` for de
 Configure the base URL for the external FHIR server in your environment:
 ```env
 EXTERNAL_FHIR_SERVER_BASE_URL=http://hapi.fhir.org/baseR4
+```
+
+#### Consul Configuration
+Configure Consul integration in your environment:
+```env
+CONSUL_ADDRESS=http://localhost:8500
+CONSUL_KEY=myapp/secret
+```
+Or in `config/config.json`:
+```json
+"consul": {
+  "address": "http://localhost:8500",
+  "key": "myapp/secret"
+}
+```
+
+#### Vault Configuration
+Configure Vault integration in your environment:
+```env
+VAULT_ADDRESS=http://localhost:8200
+VAULT_TOKEN=root
+VAULT_SECRET_PATH=secret/data/myapp
+```
+Or in `config/config.json`:
+```json
+"vault": {
+  "address": "http://localhost:8200",
+  "token": "root",
+  "secret_path": "secret/data/myapp"
+}
 ```
 
 Popular public FHIR servers for testing:
@@ -420,7 +445,7 @@ make help
 
 ### Using Docker Compose (Recommended)
 ```cmd
-# Start all services (PostgreSQL + Application)
+# Start all services (PostgreSQL + Consul + Application)
 docker-compose up -d
 
 # View logs
@@ -442,6 +467,7 @@ docker run -p 8080:8080 --env-file .env go-fhir-demo
 ### Docker Environment
 The `docker-compose.yml` includes:
 - PostgreSQL database with persistent volume
+- Consul service for key-value store and service discovery
 - Application service with environment variables
 - Network configuration for service communication
 
@@ -470,7 +496,8 @@ The `docker-compose.yml` includes:
 4. **Handler** - Add HTTP endpoints in `internal/api/handlers/`
 5. **Routes** - Register routes in `internal/api/routes/`
 6. **Migration** - Create database changes in `migrations/`
-7. **Documentation** - Add Swagger annotations
+7. **Consul Integration** - Add handler in `internal/api/handlers/consul_handler.go`, utility in `pkg/utils/consul.go`, and register route in `internal/api/routes/`.
+8. **Documentation** - Update Swagger annotations and regenerate docs
 
 ### Testing
 ```cmd

@@ -9,11 +9,24 @@ import (
 	"github.com/spf13/viper"
 )
 
+type ConsulConfig struct {
+	Address string `json:"address"`
+	Key     string `json:"key"`
+}
+
+type VaultConfig struct {
+	Address    string `json:"address"`
+	Token      string `json:"token"`
+	SecretPath string `json:"secret_path"`
+}
+
 type Config struct {
 	Server   ServerConfig   `json:"server"`
 	Database DatabaseConfig `json:"database"`
 	Logging  LoggingConfig  `json:"logging"`
 	FHIR     FHIRConfig     `json:"fhir"`
+	Consul   ConsulConfig   `json:"consul"`
+	Vault    VaultConfig    `json:"vault"`
 }
 
 type ServerConfig struct {
@@ -22,6 +35,7 @@ type ServerConfig struct {
 	ReadTimeout               time.Duration `json:"read_timeout"`
 	WriteTimeout              time.Duration `json:"write_timeout"`
 	ExternalFHIRServerBaseURL string        `json:"external_fhir_server_base_url"`
+	DevMode                   bool          `json:"dev_mode"`
 }
 
 type DatabaseConfig struct {
@@ -71,6 +85,12 @@ func Load() (*Config, error) {
 	viper.SetDefault("logging.file", "logs/app.log")
 	viper.SetDefault("fhir.base_url", "/api/v1")
 	viper.SetDefault("fhir.version", "R4")
+	viper.SetDefault("consul.address", "http://localhost:8500")
+	viper.SetDefault("consul.key", "myapp/secret")
+	viper.SetDefault("server.dev_mode", false)
+	viper.SetDefault("vault.address", "http://localhost:8200")
+	viper.SetDefault("vault.token", "root")
+	viper.SetDefault("vault.secret_path", "secret/data/myapp")
 
 	// Bind environment variables
 	viper.BindEnv("server.port", "SERVER_PORT")
@@ -82,6 +102,12 @@ func Load() (*Config, error) {
 	viper.BindEnv("database.name", "DB_NAME")
 	viper.BindEnv("database.sslmode", "DB_SSLMODE")
 	viper.BindEnv("logging.level", "LOG_LEVEL")
+	viper.BindEnv("consul.address", "CONSUL_ADDRESS")
+	viper.BindEnv("consul.key", "CONSUL_KEY")
+	viper.BindEnv("server.dev_mode", "DEV_MODE")
+	viper.BindEnv("vault.address", "VAULT_ADDRESS")
+	viper.BindEnv("vault.token", "VAULT_TOKEN")
+	viper.BindEnv("vault.secret_path", "VAULT_SECRET_PATH")
 
 	if err := viper.ReadInConfig(); err != nil {
 		if _, ok := err.(viper.ConfigFileNotFoundError); !ok {
@@ -110,7 +136,28 @@ func Load() (*Config, error) {
 	if name := os.Getenv("DB_NAME"); name != "" {
 		config.Database.Name = name
 	}
-
+	// Override with environment variables for Consul
+	if addr := os.Getenv("CONSUL_ADDRESS"); addr != "" {
+		config.Consul.Address = addr
+	}
+	if key := os.Getenv("CONSUL_KEY"); key != "" {
+		config.Consul.Key = key
+	}
+	// Override with environment variables for Vault
+	if addr := os.Getenv("VAULT_ADDRESS"); addr != "" {
+		config.Vault.Address = addr
+	}
+	if token := os.Getenv("VAULT_TOKEN"); token != "" {
+		config.Vault.Token = token
+	}
+	if path := os.Getenv("VAULT_SECRET_PATH"); path != "" {
+		config.Vault.SecretPath = path
+	}
+	if key := os.Getenv("DEV_MODE"); key != "" {
+		if key == "true" {
+			config.Server.DevMode = true
+		}
+	}
 	return &config, nil
 }
 
