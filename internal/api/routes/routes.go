@@ -30,7 +30,7 @@ func SetupRoutes(patientHandler handlers.PatientHandlerInterface, externalPatien
 func (r *RouteSetup) SetupRoutes(
 	patientHandler handlers.PatientHandlerInterface,
 	externalPatientHandler handlers.ExternalPatientHandlerInterface,
-	// Add consulHandler as optional argument
+	// Add optional handlers
 	consulHandler ...handlers.ConsulHandlerInterface,
 ) *gin.Engine {
 	router := gin.New()

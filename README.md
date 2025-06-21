@@ -1,28 +1,28 @@
 # Go FHIR Demo Application
 
-A comprehensive Go Gin framework application with FHIR (Fast Healthcare Interoperability Resources) R4 support, featuring a PostgreSQL database, automatic API documentation with Swagger, **external FHIR server integration**, service discovery with Consul, secret management with Vault, and production-ready architecture.
+A comprehensive Go Gin framework application with FHIR (Fast Healthcare Interoperability Resources) R4 support, featuring PostgreSQL database, automatic API documentation with Swagger, external FHIR server integration, service discovery with Consul, secret management with Vault, and production-ready architecture.
 
 ## 🚀 Features
 
 ### Core Features
-- **RESTful API** for Patient resources (GET, POST, PUT, DELETE, PATCH)
-- **FHIR R4 Compliance** with custom FHIR data structures using standard JSON
+- **RESTful API** for Patient resources with full CRUD operations (GET, POST, PUT, PATCH, DELETE)
+- **FHIR R4 Compliance** with standard FHIR data structures and validation
 - **External FHIR Server Integration** - Connect to and query external FHIR servers (like HAPI FHIR)
-- **FHIR Client Package** - Reusable client for external FHIR server communication
-- **PostgreSQL Database** with GORM ORM for robust data persistence
+- **FHIR Client Package** - Reusable HTTP client for external FHIR server communication
+- **PostgreSQL Database** with GORM ORM and JSONB support for efficient FHIR data storage
 - **Database Migrations** using [golang-migrate](https://github.com/golang-migrate/migrate)
-- **Swagger/OpenAPI Documentation** with interactive UI
-- **Automatic Data Seeding** with sample FHIR patient records
-- **Structured Logging** with Logrus
-- **Configuration Management** with Viper and environment variables
-- **Request/Response Middleware** for performance monitoring
-- **Clean Architecture** with proper separation of concerns
+- **Swagger/OpenAPI Documentation** with interactive UI and auto-generation
+- **Automatic Data Seeding** with sample FHIR patient records on startup
+- **Structured Logging** with configurable levels and formats
+- **Configuration Management** with Viper supporting JSON files and environment variables
+- **Request/Response Middleware** for performance monitoring, CORS, and error handling
+- **Clean Architecture** with proper separation of concerns (handlers, services, repositories)
 
 ### Service Discovery & Secret Management
-- **Consul Integration** - Service discovery and key-value store for configuration
+- **Consul Integration** - Service discovery, service registration, and key-value store
 - **HashiCorp Vault Integration** - Secure secret management and storage
 - **Consul Handler** - API endpoint to fetch secrets from Consul KV store
-- **Vault Handler** - API endpoint to fetch secrets from Vault (planned)
+- **Service Registration** - Automatic registration with Consul on startup
 
 ### Testing & Quality Assurance
 - **Comprehensive Test Suite** with unit and integration tests
@@ -40,7 +40,7 @@ A comprehensive Go Gin framework application with FHIR (Fast Healthcare Interope
 - Comprehensive error handling and validation
 - Production-ready logging and monitoring
 
-## 🏗️ Architecture & Project Structure
+## 📊 Project Structure
 
 ```
 ├── config/                   # Configuration management
@@ -55,20 +55,20 @@ A comprehensive Go Gin framework application with FHIR (Fast Healthcare Interope
 ├── internal/                # Private application code
 │   ├── api/
 │   │   ├── handlers/        # HTTP request handlers
-│   │   │   ├── patient_handler.go
-│   │   │   ├── external_patient_handler.go  # External FHIR server handlers
-│   │   │   └── consul_handler.go            # Consul KV integration
-│   │   └── routes/          # Route definitions
+│   │   │   ├── patient_handler.go           # Local patient CRUD operations
+│   │   │   ├── external_patient_handler.go  # External FHIR server integration
+│   │   │   └── consul_handler.go            # Consul KV secret management
+│   │   └── routes/          # Route definitions and middleware setup
 │   │       └── routes.go
 │   ├── domain/              # Domain models and business entities
 │   │   ├── patient.go       # FHIR Patient domain model
 │   │   └── external_patient.go  # External patient service interface
 │   ├── middleware/          # HTTP middleware
-│   │   └── middleware.go    # Logging, timing, CORS, error handling
+│   │   └── middleware.go    # CORS, logging, timing, error handling
 │   ├── repository/          # Data access layer
-│   │   └── patient_repository.go
+│   │   └── patient_repository.go  # PostgreSQL data operations
 │   └── service/             # Business logic layer
-│       ├── patient_service.go
+│       ├── patient_service.go           # Local patient business logic
 │       └── external_patient_service.go  # External FHIR server service
 ├── logs/                    # Application logs
 ├── migrations/              # Database schema migrations
@@ -76,9 +76,8 @@ A comprehensive Go Gin framework application with FHIR (Fast Healthcare Interope
 │   └── 000001_create_patients_table.down.sql
 ├── pkg/                     # Shared/reusable packages
 │   ├── database/            # Database connection utilities
-│   ├── fhirclient/          # FHIR client for external servers
-│   │   └── client.go        # HTTP client for FHIR R4 servers
-│   ├── logger/              # Logging utilities
+│   ├── fhirclient/          # HTTP client for external FHIR servers
+│   ├── logger/              # Structured logging utilities
 │   └── utils/               # Common utility functions
 │       ├── consul.go        # Consul KV utilities
 │       └── consul/          # Consul service registration
@@ -86,10 +85,11 @@ A comprehensive Go Gin framework application with FHIR (Fast Healthcare Interope
 ├── vault/                   # Vault configuration
 │   └── config/
 │       └── vault.hcl        # Vault server configuration
-├── docker-compose.yml       # Docker services definition (PostgreSQL, Consul, Vault)
-├── Dockerfile              # Container build instructions
-├── Makefile                # Development automation
-└── main.go                 # Application entry point
+├── docker-compose.yml       # Multi-service Docker setup
+├── Dockerfile              # Application container definition
+├── Makefile                # Development automation scripts
+├── INSTALLATION.md         # Detailed installation guide
+└── main.go                 # Application entry point with service registration
 ```
 
 ## 🛠️ Technologies Used
@@ -174,42 +174,39 @@ swag init --parseDependency --parseDepth 99
 
 ## 🔗 API Endpoints
 
-### Local Patient Resource Endpoints
+### Core Application Endpoints
 
-| Method | Endpoint | Description | Request Body |
-|--------|----------|-------------|--------------|
-| `GET` | `/api/v1/patients` | Get all patients with pagination | - |
-| `GET` | `/api/v1/patients/{id}` | Get patient by ID | - |
-| `POST` | `/api/v1/patients` | Create new patient | FHIR Patient JSON |
-| `PUT` | `/api/v1/patients/{id}` | Update entire patient resource | FHIR Patient JSON |
-| `PATCH` | `/api/v1/patients/{id}` | Partially update patient | Partial FHIR Patient JSON |
-| `DELETE` | `/api/v1/patients/{id}` | Delete patient (soft delete) | - |
+| Method | Endpoint | Description | Response |
+|--------|----------|-------------|----------|
+| `GET` | `/health` | Application health check | Service status and version |
+| `GET` | `/metadata` | FHIR capability statement | Server capabilities and supported operations |
+| `GET` | `/swagger/index.html` | Interactive API documentation | Swagger UI interface |
+
+### Local Patient Resource Endpoints (FHIR R4 Compliant)
+
+| Method | Endpoint | Description | Request Body | Query Parameters |
+|--------|----------|-------------|--------------|------------------|
+| `GET` | `/api/v1/patients` | Get all patients with pagination | - | `limit` (default: 10), `offset` (default: 0) |
+| `GET` | `/api/v1/patients/{id}` | Get patient by ID | - | - |
+| `POST` | `/api/v1/patients` | Create new patient | FHIR Patient JSON | - |
+| `PUT` | `/api/v1/patients/{id}` | Update entire patient resource | FHIR Patient JSON | - |
+| `PATCH` | `/api/v1/patients/{id}` | Partially update patient | Partial updates map | - |
+| `DELETE` | `/api/v1/patients/{id}` | Delete patient (soft delete) | - | - |
 
 ### External FHIR Server Endpoints
 
-| Method | Endpoint | Description | Query Parameters |
-|--------|----------|-------------|------------------|
-| `GET` | `/api/v1/external-patients/{id}` | Get patient from external FHIR server by ID | - |
-| `GET` | `/api/v1/external-patients` | Search patients on external FHIR server | `name`, `family`, `given`, `birthdate`, `gender` |
+| Method | Endpoint | Description | Request Body | Query Parameters |
+|--------|----------|-------------|--------------|------------------|
+| `GET` | `/api/v1/external-patients/{id}` | Get patient from external FHIR server by ID | - | - |
+| `GET` | `/api/v1/external-patients` | Search patients on external FHIR server | - | FHIR search params (`name`, `family`, `given`, `birthdate`, `gender`, etc.) |
+| `POST` | `/api/v1/external-patients` | Create patient on external FHIR server | FHIR-compliant Patient JSON | - |
 
-### Consul Key Vault Endpoint
+### Service Discovery & Secret Management Endpoints
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `GET` | `/consul/secret` | Get secret from Consul KV as JSON |
-
-### Vault Key Vault Endpoint (Planned)
-
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `GET` | `/vault/secret` | Get secret from Vault KV as JSON |
-
-### Health Check Endpoints
-
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `GET` | `/health` | Application health status |
-| `GET` | `/swagger/index.html` | Interactive API documentation |
+| Method | Endpoint | Description | Response |
+|--------|----------|-------------|----------|
+| `GET` | `/consul/secret` | Get secret from Consul KV store | JSON secret data |
+| `GET` | `/vault/secret` | Get secret from Vault KV store | JSON secret data |
 
 ### Example Usage
 
@@ -230,9 +227,9 @@ curl -X GET "http://localhost:8080/api/v1/external-patients/123"
 curl -X GET "http://localhost:8080/api/v1/external-patients?family=Smith&gender=female"
 ```
 
-#### Get All Local Patients
+#### Get All Local Patients with Pagination
 ```bash
-curl -X GET http://localhost:8080/api/v1/patients
+curl -X GET "http://localhost:8080/api/v1/patients?limit=20&offset=0"
 ```
 
 #### Get Patient by ID
@@ -240,9 +237,33 @@ curl -X GET http://localhost:8080/api/v1/patients
 curl -X GET http://localhost:8080/api/v1/patients/1
 ```
 
+#### Update Patient
+```bash
+curl -X PUT http://localhost:8080/api/v1/patients/1 \
+  -H "Content-Type: application/json" \
+  -d @examples/sample_patient.json
+```
+
+#### Partially Update Patient
+```bash
+curl -X PATCH http://localhost:8080/api/v1/patients/1 \
+  -H "Content-Type: application/json" \
+  -d '{"family": "UpdatedLastName"}'
+```
+
+#### Delete Patient
+```bash
+curl -X DELETE http://localhost:8080/api/v1/patients/1
+```
+
 #### Get Secret from Consul
 ```bash
 curl -X GET http://localhost:8080/consul/secret
+```
+
+#### Get Secret from Vault
+```bash
+curl -X GET http://localhost:8080/vault/secret
 ```
 
 ## ⚙️ Configuration
