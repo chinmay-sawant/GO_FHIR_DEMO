@@ -3,7 +3,7 @@ package handlers
 import (
 	"encoding/json"
 	"errors"
-	"go-fhir-demo/internal/domain/mocks"
+	"go-fhir-demo/internal/service/mocks"
 	"go-fhir-demo/pkg/utils"
 	"net/http"
 	"net/http/httptest"
@@ -19,7 +19,7 @@ import (
 type ExternalPatientHandlerTestSuite struct {
 	suite.Suite
 	mockCtrl    *gomock.Controller
-	mockService *mocks.MockExternalPatientService
+	mockService *mocks.MockExternalPatientServiceInterface
 	handler     ExternalPatientHandlerInterface
 	router      *gin.Engine
 }
@@ -27,7 +27,7 @@ type ExternalPatientHandlerTestSuite struct {
 func (suite *ExternalPatientHandlerTestSuite) SetupTest() {
 	gin.SetMode(gin.TestMode)
 	suite.mockCtrl = gomock.NewController(suite.T())
-	suite.mockService = mocks.NewMockExternalPatientService(suite.mockCtrl)
+	suite.mockService = mocks.NewMockExternalPatientServiceInterface(suite.mockCtrl)
 	suite.handler = NewExternalPatientHandler(suite.mockService)
 	router := gin.New()
 	router.RedirectTrailingSlash = false

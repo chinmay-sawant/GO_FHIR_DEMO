@@ -10,7 +10,9 @@
 package mocks
 
 import (
+	context "context"
 	reflect "reflect"
+	time "time"
 
 	fhir "github.com/samply/golang-fhir-models/fhir-models/fhir"
 	gomock "go.uber.org/mock/gomock"
@@ -68,6 +70,21 @@ func (m *MockExternalPatientService) GetExternalPatientByID(id string) (*fhir.Pa
 func (mr *MockExternalPatientServiceMockRecorder) GetExternalPatientByID(id any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetExternalPatientByID", reflect.TypeOf((*MockExternalPatientService)(nil).GetExternalPatientByID), id)
+}
+
+// GetExternalPatientByIDDelayed mocks base method.
+func (m *MockExternalPatientService) GetExternalPatientByIDDelayed(ctx context.Context, id string, timeout time.Duration) (*fhir.Patient, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetExternalPatientByIDDelayed", ctx, id, timeout)
+	ret0, _ := ret[0].(*fhir.Patient)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetExternalPatientByIDDelayed indicates an expected call of GetExternalPatientByIDDelayed.
+func (mr *MockExternalPatientServiceMockRecorder) GetExternalPatientByIDDelayed(ctx, id, timeout any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetExternalPatientByIDDelayed", reflect.TypeOf((*MockExternalPatientService)(nil).GetExternalPatientByIDDelayed), ctx, id, timeout)
 }
 
 // SearchExternalPatients mocks base method.

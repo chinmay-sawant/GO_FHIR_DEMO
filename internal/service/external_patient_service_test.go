@@ -2,6 +2,7 @@ package service
 
 import (
 	"errors"
+	redisclientmock "go-fhir-demo/pkg/cache/mocks"
 	fhirclientmocks "go-fhir-demo/pkg/fhirclient/mocks"
 	"testing"
 
@@ -14,15 +15,18 @@ import (
 // ExternalPatientServiceTestSuite defines the test suite
 type ExternalPatientServiceTestSuite struct {
 	suite.Suite
-	mockClient *fhirclientmocks.MockClientInterface
-	service    ExternalPatientServiceInterface
+	mockClient      *fhirclientmocks.MockClientInterface
+	mockRedisClient *redisclientmock.MockCacheInterface
+	service         ExternalPatientServiceInterface
 }
 
 // SetupTest initializes the test suite before each test
 func (suite *ExternalPatientServiceTestSuite) SetupTest() {
 	ctrl := gomock.NewController(suite.T())
 	suite.mockClient = fhirclientmocks.NewMockClientInterface(ctrl)
-	suite.service = NewExternalPatientService(suite.mockClient)
+	suite.mockRedisClient = redisclientmock.NewMockCacheInterface(ctrl)
+
+	suite.service = NewExternalPatientService(suite.mockClient, suite.mockRedisClient)
 }
 
 // TestExternalPatientServiceTestSuite runs the test suite

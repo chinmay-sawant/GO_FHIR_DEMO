@@ -1464,6 +1464,25 @@ info:
   title: Go FHIR Demo API
   version: "1.0"
 paths:
+  /consul/secret:
+    get:
+      description: Fetches a secret from Consul Key Vault and returns it as JSON
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Get secret from Consul KV
+      tags:
+      - Consul
   /external-patients:
     get:
       description: Searches for patient resources on an external FHIR server based
@@ -1564,6 +1583,92 @@ paths:
               type: string
             type: object
       summary: Get an external patient by ID
+      tags:
+      - ExternalPatients
+  /external-patients/{id}/cached:
+    get:
+      description: Retrieves a patient resource from an external FHIR server by its
+        ID with Redis caching
+      parameters:
+      - description: Patient ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully retrieved patient
+          schema:
+            $ref: '#/definitions/fhir.Patient'
+        "400":
+          description: Invalid request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Patient not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get an external patient by ID with caching
+      tags:
+      - ExternalPatients
+  /external-patients/{id}/delayed:
+    get:
+      description: Retrieves a patient resource from an external FHIR server by its
+        ID with configurable timeout
+      parameters:
+      - description: Patient ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: 'Timeout in seconds (default: 10)'
+        in: query
+        name: timeout
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully retrieved patient
+          schema:
+            $ref: '#/definitions/fhir.Patient'
+        "400":
+          description: Invalid request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Patient not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "408":
+          description: Request timeout
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get an external patient by ID with timeout
       tags:
       - ExternalPatients
   /patients:
@@ -1770,4 +1875,23 @@ paths:
       summary: Update a Patient
       tags:
       - Patient
+  /vault/secret:
+    get:
+      description: Fetches a secret from Vault Key Vault and returns it as JSON
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Get secret from Vault KV
+      tags:
+      - Vault
 swagger: "2.0"

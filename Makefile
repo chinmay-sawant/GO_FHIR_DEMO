@@ -76,7 +76,7 @@ setup: deps install-migrate install-gotestsum
 .PHONY: mocks
 mocks:
 	@echo Starting mock generation...
-	@for /f "tokens=*" %%f in ('dir /s /b "internal\*.go" "pkg\fhirclient\*.go" 2^>nul ^| findstr /v /i "mock" ^| findstr /v /i "_test"') do ( \
+	@for /f "tokens=*" %%f in ('dir /s /b "internal\*.go" "pkg\fhirclient\*.go" "pkg\cache\*.go" 2^>nul ^| findstr /v /i "mock" ^| findstr /v /i "_test"') do ( \
 		echo Processing Go file: %%f && \
 		for %%d in ("%%~dpf") do ( \
 			set "file_dir=%%~d" && \
@@ -132,6 +132,7 @@ help:
 	@echo   clean-mocks        - Clean all generated mocks
 	@echo   coverage-with-junit- Generate test coverage report
 	@echo   clean-coverage     - Clean coverage files
+	@echo   docs               - Generate Swagger/OpenAPI documentation
 
 ## Generate test coverage with JUnit XML report
 coverage-with-junit:
@@ -158,3 +159,8 @@ clean-coverage:
 	@if exist coverage.html del coverage.html
 	@if exist junit-report.xml del junit-report.xml
 	@echo "Coverage and JUnit report files cleaned"
+
+## Generate Swagger/OpenAPI documentation
+.PHONY: docs
+docs:
+	swag init --parseDependency --parseDepth 99
