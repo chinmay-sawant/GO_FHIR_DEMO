@@ -383,6 +383,18 @@ mockgen -source=internal/domain/patient.go -destination=internal/domain/mocks/mo
 swag init --parseDependency --parseDepth 99
 ```
 
+## 📦 Additional Test Reporting Tools
+
+To enable advanced test reporting and viewing:
+
+1. **Clone the following repositories:**
+  - [junit-reports-go](https://github.com/chinmay-sawant/junit-reports-go)  
+    - This repository contains both the `junit-html-generator` and `junit-report-viewer` folders.
+
+2. **Place both folders** (`junit-html-generator` and `junit-report-viewer`) inside your project directory, i.e., within the `Go_FHIR_Demo` folder.
+
+This setup allows you to generate and view HTML reports from your JUnit XML test outputs.
+
 ## 🔍 Troubleshooting
 
 ### Common Issues
