@@ -20,14 +20,16 @@ A comprehensive Go Gin framework application with FHIR (Fast Healthcare Interope
 
 ### Cron Job Handler
 
-This project includes a custom cron job handler for simulating background jobs (such as data sync and cleanup) via API endpoints.
+This project includes a custom **cron job handler** for simulating background jobs (such as data sync and cleanup) via API endpoints.
 
 - **Endpoints:**
   - `POST /api/v1/cron/sync` - Triggers 5 background jobs with random delays (each job runs in a goroutine).
   - `POST /api/v1/cron/cleanup` - Cleans up jobs that are still in the "queued" state.
 
-- **Plugin/Library Used:**  
-  No external cron plugin is used. The implementation leverages Go's built-in `time`, `sync`, and goroutines for concurrency and job management.
+- **Implementation Details:**
+  - **No external cron plugin is used.** The handler is implemented using Go's built-in `time`, `sync`, and goroutines for concurrency and job management.
+  - Each job is tracked in a map with its state: `"queued"`, `"started"`, or `"completed"`.
+  - A mutex (`sync.Mutex`) is used to ensure thread-safe access to the job map.
 
 #### Why is it not a good idea to close existing running jobs?
 
@@ -39,14 +41,15 @@ Closing (cancelling) already running jobs in Go is not straightforward, especial
 
 #### Cleanup Behavior in This Project
 
-- Job with ID `99` is always in the "queued" state and can be closed/removed by the cleanup endpoint.
-- Jobs with IDs `1-5` are started immediately in goroutines and move to the "started" state; these cannot be stopped once running and will complete naturally.
+- **Job with ID `99`** is always in the `"queued"` state and can be closed/removed by the cleanup endpoint.
+- **Jobs with IDs `1-5`** are started immediately in goroutines and move to the `"started"` state; these cannot be stopped once running and will complete naturally.
+- When `/cron/cleanup` is called, only jobs in the `"queued"` state (like `99`) are removed. Running jobs (in goroutines) are not stopped.
 
 #### Mutexes in Cron Job Handler
 - This section uses a mutex within the cron job to ensure safe concurrent access to the shared object (h.jobs).
 - The mutex is locked twice to prevent race conditions, as multiple goroutines may attempt to access or modify
 - h.jobs at the same time. This approach guarantees thread safety when working with goroutines in the cron context.
-
+---
 ### Service Discovery & Secret Management
 - **Consul Integration** - Service discovery, service registration, and key-value store
 - **HashiCorp Vault Integration** - Secure secret management and storage
@@ -79,9 +82,11 @@ Closing (cancelling) already running jobs in Go is not straightforward, especial
 ├── internal/                # Private application code
 │   ├── api/
 │   │   ├── handlers/        # HTTP request handlers
-│   │   │   ├── patient_handler.go           # Local patient CRUD operations
-│   │   │   ├── external_patient_handler.go  # External FHIR server integration
-│   │   │   └── consul_handler.go            # Consul KV secret management
+│   │   │   ├── patient_handler.go              # Local patient CRUD operations
+│   │   │   ├── external_patient_handler.go     # External FHIR server integration
+│   │   │   ├── consul_handler.go               # Consul KV secret management
+│   │   │   └── cron/                           # Cron job handlers
+│   │   │        └── cronjob_handler.go         # Cron job API logic (sync/cleanup)
 │   │   └── routes/          # Route definitions and middleware setup
 │   │       └── routes.go
 │   ├── domain/              # Domain models and business entities
@@ -720,5 +725,7 @@ go install gotest.tools/gotestsum@latest
 gotestsum provides:
 - Enhanced test output formatting
 - JUnit XML report generation for CI/CD integration
+- Better test result visualization
+- Support for various output formats
 - Better test result visualization
 - Support for various output formats
