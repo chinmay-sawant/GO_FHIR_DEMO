@@ -68,6 +68,7 @@ func (h *CronJobHandler) TriggerCleanupJob(c *gin.Context) {
 func (h *CronJobHandler) TriggerDataSyncJob(c *gin.Context) {
 	logger.Infof("Data sync job triggered via API")
 	// Trigger jobs with delays 1,2,3,4,5 seconds
+	h.jobs[99] = "queued" // Initialize a dummy job to show that jobs are being queued
 	for i := 1; i <= 5; i++ {
 		h.mu.Lock()
 		sec := 6 + rand.Intn(5) // random seconds between 6 and 10
