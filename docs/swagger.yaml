@@ -1483,6 +1483,34 @@ paths:
       summary: Get secret from Consul KV
       tags:
       - Consul
+  /cron/cleanup:
+    post:
+      description: Triggers a background cleanup job.
+      produces:
+      - application/json
+      responses:
+        "202":
+          description: Accepted
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Trigger a cleanup job
+      tags:
+      - Cron
+  /cron/sync:
+    post:
+      description: Triggers a background data synchronization job.
+      produces:
+      - application/json
+      responses:
+        "202":
+          description: Accepted
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Trigger a data sync job
+      tags:
+      - Cron
   /external-patients:
     get:
       description: Searches for patient resources on an external FHIR server based

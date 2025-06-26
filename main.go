@@ -12,6 +12,7 @@ import (
 
 	"go-fhir-demo/config"
 	"go-fhir-demo/internal/api/handlers"
+	"go-fhir-demo/internal/api/handlers/cron"
 	"go-fhir-demo/internal/api/routes"
 	"go-fhir-demo/internal/domain"
 	"go-fhir-demo/internal/repository"
@@ -233,13 +234,14 @@ func main() {
 	// Initialize handlers
 	patientHandler := handlers.NewPatientHandler(patientService)
 	externalPatientHandler := handlers.NewExternalPatientHandler(externalPatientService)
+	cronJobHandler := cron.NewCronJobHandler() // or nil if not used
 	consulHandler := handlers.NewConsulHandler(&cfg.Consul)
 
 	// Set Gin mode
 	gin.SetMode(cfg.Server.Mode)
 
 	// Setup routes (pass consulHandler)
-	router := routes.SetupRoutes(patientHandler, externalPatientHandler, consulHandler)
+	router := routes.SetupRoutes(patientHandler, externalPatientHandler, cronJobHandler, consulHandler)
 
 	// Swagger endpoint
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
