@@ -210,6 +210,8 @@ swag init --parseDependency --parseDepth 99
 | `GET` | `/health` | Application health check | Service status and version |
 | `GET` | `/metadata` | FHIR capability statement | Server capabilities and supported operations |
 | `GET` | `/swagger/index.html` | Interactive API documentation | Swagger UI interface |
+| `POST` | `/api/v1/cron/sync` | Trigger 5 background data sync jobs (each with random delay) | Job trigger status |
+| `POST` | `/api/v1/cron/cleanup` | Cleanup jobs in "queued" state (e.g., job 99) | Cleanup status and cleaned job IDs |
 
 ### Local Patient Resource Endpoints (FHIR R4 Compliant)
 
