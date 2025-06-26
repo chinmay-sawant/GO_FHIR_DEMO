@@ -28,5 +28,11 @@
     "address": "http://localhost:8200",
     "token": "root",
     "secret_path": "secret/data/myapp"
+  },
+  "jaeger": {
+    "endpoint": "http://localhost:14268/api/traces",
+    "service_name": "go-fhir-demo",
+    "environment": "development",
+    "enabled": true
   }
 }

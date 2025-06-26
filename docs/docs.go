@@ -15,7 +15,7 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/consul/secret": {
+        "/api/v1/consul/secret": {
             "get": {
                 "description": "Fetches a secret from Consul Key Vault and returns it as JSON",
                 "produces": [
@@ -25,6 +25,34 @@ const docTemplate = `{
                     "Consul"
                 ],
                 "summary": "Get secret from Consul KV",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/vault/secret": {
+            "get": {
+                "description": "Fetches a secret from Vault Key Vault and returns it as JSON",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Vault"
+                ],
+                "summary": "Get secret from Vault KV",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -648,34 +676,6 @@ const docTemplate = `{
                     },
                     "404": {
                         "description": "Not Found",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    }
-                }
-            }
-        },
-        "/vault/secret": {
-            "get": {
-                "description": "Fetches a secret from Vault Key Vault and returns it as JSON",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Vault"
-                ],
-                "summary": "Get secret from Vault KV",
-                "responses": {
-                    "200": {
-                        "description": "OK",
                         "schema": {
                             "type": "object",
                             "additionalProperties": true

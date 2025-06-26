@@ -1464,7 +1464,7 @@ info:
   title: Go FHIR Demo API
   version: "1.0"
 paths:
-  /consul/secret:
+  /api/v1/consul/secret:
     get:
       description: Fetches a secret from Consul Key Vault and returns it as JSON
       produces:
@@ -1483,6 +1483,25 @@ paths:
       summary: Get secret from Consul KV
       tags:
       - Consul
+  /api/v1/vault/secret:
+    get:
+      description: Fetches a secret from Vault Key Vault and returns it as JSON
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Get secret from Vault KV
+      tags:
+      - Vault
   /cron/cleanup:
     post:
       description: Triggers a background cleanup job.
@@ -1903,23 +1922,4 @@ paths:
       summary: Update a Patient
       tags:
       - Patient
-  /vault/secret:
-    get:
-      description: Fetches a secret from Vault Key Vault and returns it as JSON
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            additionalProperties: true
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties: true
-            type: object
-      summary: Get secret from Vault KV
-      tags:
-      - Vault
 swagger: "2.0"

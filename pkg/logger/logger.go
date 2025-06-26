@@ -1,11 +1,13 @@
 package logger
 
 import (
+	"context"
 	"io"
 	"os"
 	"path/filepath"
 
 	"github.com/sirupsen/logrus"
+	"go.opentelemetry.io/otel/trace"
 )
 
 var Logger *logrus.Logger
@@ -100,4 +102,33 @@ func Debug(args ...interface{}) {
 // Debugf logs a formatted debug message
 func Debugf(format string, args ...interface{}) {
 	GetLogger().Debugf(format, args...)
+}
+
+// WithContext returns a log entry with context fields for tracing (Jaeger/OpenTelemetry)
+func WithContext(ctx context.Context) *logrus.Entry {
+	fields := logrus.Fields{}
+
+	span := trace.SpanFromContext(ctx)
+	if span != nil {
+		sc := span.SpanContext()
+		if sc.HasTraceID() {
+			fields["trace_id"] = sc.TraceID().String()
+		}
+		if sc.HasSpanID() {
+			fields["span_id"] = sc.SpanID().String()
+		}
+	}
+
+	return GetLogger().WithFields(fields)
+}
+
+type SpanContext interface {
+	TraceID() TraceID
+	SpanID() SpanID
+}
+type TraceID interface {
+	String() string
+}
+type SpanID interface {
+	String() string
 }

@@ -10,6 +10,7 @@
 package mocks
 
 import (
+	context "context"
 	reflect "reflect"
 
 	fhir "github.com/samply/golang-fhir-models/fhir-models/fhir"
@@ -41,46 +42,46 @@ func (m *MockClientInterface) EXPECT() *MockClientInterfaceMockRecorder {
 }
 
 // CreatePatient mocks base method.
-func (m *MockClientInterface) CreatePatient(patient *fhir.Patient) (*fhir.Patient, error) {
+func (m *MockClientInterface) CreatePatient(ctx context.Context, patient *fhir.Patient) (*fhir.Patient, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "CreatePatient", patient)
+	ret := m.ctrl.Call(m, "CreatePatient", ctx, patient)
 	ret0, _ := ret[0].(*fhir.Patient)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // CreatePatient indicates an expected call of CreatePatient.
-func (mr *MockClientInterfaceMockRecorder) CreatePatient(patient any) *gomock.Call {
+func (mr *MockClientInterfaceMockRecorder) CreatePatient(ctx, patient any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreatePatient", reflect.TypeOf((*MockClientInterface)(nil).CreatePatient), patient)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreatePatient", reflect.TypeOf((*MockClientInterface)(nil).CreatePatient), ctx, patient)
 }
 
 // GetPatientByID mocks base method.
-func (m *MockClientInterface) GetPatientByID(id string) (*fhir.Patient, error) {
+func (m *MockClientInterface) GetPatientByID(ctx context.Context, id string) (*fhir.Patient, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetPatientByID", id)
+	ret := m.ctrl.Call(m, "GetPatientByID", ctx, id)
 	ret0, _ := ret[0].(*fhir.Patient)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // GetPatientByID indicates an expected call of GetPatientByID.
-func (mr *MockClientInterfaceMockRecorder) GetPatientByID(id any) *gomock.Call {
+func (mr *MockClientInterfaceMockRecorder) GetPatientByID(ctx, id any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPatientByID", reflect.TypeOf((*MockClientInterface)(nil).GetPatientByID), id)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPatientByID", reflect.TypeOf((*MockClientInterface)(nil).GetPatientByID), ctx, id)
 }
 
 // SearchPatients mocks base method.
-func (m *MockClientInterface) SearchPatients(queryParams map[string]string) (*fhir.Bundle, error) {
+func (m *MockClientInterface) SearchPatients(ctx context.Context, queryParams map[string]string) (*fhir.Bundle, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "SearchPatients", queryParams)
+	ret := m.ctrl.Call(m, "SearchPatients", ctx, queryParams)
 	ret0, _ := ret[0].(*fhir.Bundle)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // SearchPatients indicates an expected call of SearchPatients.
-func (mr *MockClientInterfaceMockRecorder) SearchPatients(queryParams any) *gomock.Call {
+func (mr *MockClientInterfaceMockRecorder) SearchPatients(ctx, queryParams any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SearchPatients", reflect.TypeOf((*MockClientInterface)(nil).SearchPatients), queryParams)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SearchPatients", reflect.TypeOf((*MockClientInterface)(nil).SearchPatients), ctx, queryParams)
 }

@@ -85,11 +85,10 @@ func (r *RouteSetup) SetupRoutes(
 				cronJobs.POST("/sync", cronJobHandler.TriggerDataSyncJob)
 			}
 		}
-	}
-
-	// Consul secret endpoint
-	if len(consulHandler) > 0 && consulHandler[0] != nil {
-		v1.GET("/consul/secret", consulHandler[0].GetConsulSecret)
+		// Consul secret endpoint
+		if len(consulHandler) > 0 && consulHandler[0] != nil {
+			v1.GET("/consul/secret", consulHandler[0].GetConsulSecret)
+		}
 	}
 
 	// FHIR metadata endpoint

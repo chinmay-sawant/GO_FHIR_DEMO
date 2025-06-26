@@ -49,7 +49,7 @@ func (suite *ExternalPatientHandlerTestSuite) TestGetExternalPatientByID_Success
 	testID := "test-id-123"
 	mockPatient := &fhir.Patient{Id: utils.CreateStringPtr(testID)}
 	suite.mockService.EXPECT().
-		GetExternalPatientByID(testID).
+		GetExternalPatientByID(gomock.Any(), testID).
 		Return(mockPatient, nil)
 
 	req, _ := http.NewRequest("GET", "/external-patients/"+testID, nil)
@@ -66,7 +66,7 @@ func (suite *ExternalPatientHandlerTestSuite) TestGetExternalPatientByID_Success
 func (suite *ExternalPatientHandlerTestSuite) TestGetExternalPatientByID_Error() {
 	testID := "notfound"
 	suite.mockService.EXPECT().
-		GetExternalPatientByID(testID).
+		GetExternalPatientByID(gomock.Any(), testID).
 		Return(nil, errors.New("not found"))
 
 	req, _ := http.NewRequest("GET", "/external-patients/"+testID, nil)
@@ -87,7 +87,7 @@ func (suite *ExternalPatientHandlerTestSuite) TestGetExternalPatientByID_BadRequ
 func (suite *ExternalPatientHandlerTestSuite) TestSearchExternalPatients_Success() {
 	mockBundle := &fhir.Bundle{Type: fhir.BundleTypeSearchset}
 	suite.mockService.EXPECT().
-		SearchExternalPatients(gomock.Any()).
+		SearchExternalPatients(gomock.Any(), gomock.Any()).
 		Return(mockBundle, nil)
 
 	req, _ := http.NewRequest("GET", "/external-patients?name=John&gender=male", nil)
@@ -103,7 +103,7 @@ func (suite *ExternalPatientHandlerTestSuite) TestSearchExternalPatients_Success
 
 func (suite *ExternalPatientHandlerTestSuite) TestSearchExternalPatients_Error() {
 	suite.mockService.EXPECT().
-		SearchExternalPatients(gomock.Any()).
+		SearchExternalPatients(gomock.Any(), gomock.Any()).
 		Return(nil, errors.New("search failed"))
 
 	req, _ := http.NewRequest("GET", "/external-patients?name=Jane", nil)
@@ -112,6 +112,7 @@ func (suite *ExternalPatientHandlerTestSuite) TestSearchExternalPatients_Error()
 
 	assert.Equal(suite.T(), http.StatusInternalServerError, w.Code)
 }
+
 func (suite *ExternalPatientHandlerTestSuite) TestGetExternalPatientByIDCached_Success() {
 	testID := "cached-id-456"
 	mockPatient := &fhir.Patient{Id: utils.CreateStringPtr(testID)}

@@ -1,6 +1,7 @@
 package domain
 
 import (
+	"context"
 	"time"
 
 	"github.com/samply/golang-fhir-models/fhir-models/fhir"
@@ -23,24 +24,24 @@ type Patient struct {
 
 // PatientRepository defines the interface for patient data operations
 type PatientRepository interface {
-	Create(patient *Patient) error
-	GetByID(id uint) (*Patient, error)
-	GetAll(limit, offset int) ([]*Patient, error)
-	Update(patient *Patient) error
-	Delete(id uint) error
-	Count() (int64, error)
+	Create(ctx context.Context, patient *Patient) error
+	GetByID(ctx context.Context, id uint) (*Patient, error)
+	GetAll(ctx context.Context, limit, offset int) ([]*Patient, error)
+	Update(ctx context.Context, patient *Patient) error
+	Delete(ctx context.Context, id uint) error
+	Count(ctx context.Context) (int64, error)
 }
 
 // PatientService defines the interface for patient business logic
 type PatientService interface {
-	CreatePatient(fhirPatient *fhir.Patient) (*Patient, error)
-	GetPatient(id uint) (*Patient, error)
-	GetPatients(limit, offset int) ([]*Patient, int64, error)
-	UpdatePatient(id uint, fhirPatient *fhir.Patient) (*Patient, error)
-	PatchPatient(id uint, updates map[string]interface{}) (*Patient, error)
-	DeletePatient(id uint) error
-	ConvertToFHIR(patient *Patient) (*fhir.Patient, error)
-	ConvertFromFHIR(fhirPatient *fhir.Patient) (*Patient, error)
+	CreatePatient(ctx context.Context, fhirPatient *fhir.Patient) (*Patient, error)
+	GetPatient(ctx context.Context, id uint) (*Patient, error)
+	GetPatients(ctx context.Context, limit, offset int) ([]*Patient, int64, error)
+	UpdatePatient(ctx context.Context, id uint, fhirPatient *fhir.Patient) (*Patient, error)
+	PatchPatient(ctx context.Context, id uint, updates map[string]interface{}) (*Patient, error)
+	DeletePatient(ctx context.Context, id uint) error
+	ConvertToFHIR(ctx context.Context, patient *Patient) (*fhir.Patient, error)
+	ConvertFromFHIR(ctx context.Context, fhirPatient *fhir.Patient) (*Patient, error)
 }
 
 // TableName specifies the table name for Patient model

@@ -13,11 +13,11 @@ import (
 
 // ExternalPatientServiceInterface defines the contract for external patient service
 type ExternalPatientServiceInterface interface {
-	GetExternalPatientByID(id string) (*fhir.Patient, error)
+	GetExternalPatientByID(ctx context.Context, id string) (*fhir.Patient, error)
 	GetExternalPatientByIDCached(ctx context.Context, id string) (*fhir.Patient, error)
 	GetExternalPatientByIDDelayed(ctx context.Context, id string, timeout time.Duration) (*fhir.Patient, error)
-	SearchExternalPatients(params map[string]string) (*fhir.Bundle, error)
-	CreateExternalPatient(patient *fhir.Patient) (*fhir.Patient, error)
+	SearchExternalPatients(ctx context.Context, params map[string]string) (*fhir.Bundle, error)
+	CreateExternalPatient(ctx context.Context, patient *fhir.Patient) (*fhir.Patient, error)
 }
 
 type externalPatientService struct {
@@ -34,18 +34,18 @@ func NewExternalPatientService(client fhirclient.ClientInterface, cache cache.Ca
 }
 
 // GetExternalPatientByID retrieves a patient from the external FHIR server by ID.
-func (s *externalPatientService) GetExternalPatientByID(id string) (*fhir.Patient, error) {
-	return s.client.GetPatientByID(id)
+func (s *externalPatientService) GetExternalPatientByID(ctx context.Context, id string) (*fhir.Patient, error) {
+	return s.client.GetPatientByID(ctx, id)
 }
 
 // SearchExternalPatients searches for patients on the external FHIR server.
-func (s *externalPatientService) SearchExternalPatients(params map[string]string) (*fhir.Bundle, error) {
-	return s.client.SearchPatients(params)
+func (s *externalPatientService) SearchExternalPatients(ctx context.Context, params map[string]string) (*fhir.Bundle, error) {
+	return s.client.SearchPatients(ctx, params)
 }
 
 // CreateExternalPatient creates a patient on the external FHIR server.
-func (s *externalPatientService) CreateExternalPatient(patient *fhir.Patient) (*fhir.Patient, error) {
-	return s.client.CreatePatient(patient)
+func (s *externalPatientService) CreateExternalPatient(ctx context.Context, patient *fhir.Patient) (*fhir.Patient, error) {
+	return s.client.CreatePatient(ctx, patient)
 }
 
 // GetExternalPatientByIDCached retrieves a patient with Redis caching
@@ -54,16 +54,16 @@ func (s *externalPatientService) GetExternalPatientByIDCached(ctx context.Contex
 	if s.cache != nil {
 		cachedPatient, err := s.cache.GetPatient(ctx, id)
 		if err != nil {
-			logger.Warnf("Failed to get patient from cache: %v", err)
+			logger.WithContext(ctx).Warnf("Failed to get patient from cache: %v", err)
 		} else if cachedPatient != nil {
-			logger.Infof("Patient %s retrieved from cache", id)
+			logger.WithContext(ctx).Infof("Patient %s retrieved from cache", id)
 			return cachedPatient, nil
 		}
 	}
 
 	// Cache miss or error, fetch from external FHIR server
-	logger.Infof("Cache miss for patient %s, fetching from external server", id)
-	patient, err := s.client.GetPatientByID(id)
+	logger.WithContext(ctx).Infof("Cache miss for patient %s, fetching from external server", id)
+	patient, err := s.client.GetPatientByID(ctx, id)
 	if err != nil {
 		return nil, err
 	}
@@ -71,9 +71,9 @@ func (s *externalPatientService) GetExternalPatientByIDCached(ctx context.Contex
 	// Store in cache for future requests (expire after 1 hour)
 	if s.cache != nil {
 		if err := s.cache.SetPatient(ctx, id, patient, time.Hour); err != nil {
-			logger.Warnf("Failed to cache patient %s: %v", id, err)
+			logger.WithContext(ctx).Warnf("Failed to cache patient %s: %v", id, err)
 		} else {
-			logger.Infof("Patient %s cached successfully", id)
+			logger.WithContext(ctx).Infof("Patient %s cached successfully", id)
 		}
 	}
 
@@ -94,7 +94,7 @@ func (s *externalPatientService) GetExternalPatientByIDDelayed(ctx context.Conte
 
 	// Start the API call in a goroutine
 	go func() {
-		patient, err := s.client.GetPatientByID(id)
+		patient, err := s.client.GetPatientByID(ctx, id)
 		resultChan <- struct {
 			patient *fhir.Patient
 			err     error
@@ -105,13 +105,13 @@ func (s *externalPatientService) GetExternalPatientByIDDelayed(ctx context.Conte
 	select {
 	case result := <-resultChan:
 		if result.err != nil {
-			logger.Errorf("Failed to get patient %s from external server: %v", id, result.err)
+			logger.WithContext(ctx).Errorf("Failed to get patient %s from external server: %v", id, result.err)
 			return nil, result.err
 		}
-		logger.Infof("Patient %s retrieved from external server within timeout", id)
+		logger.WithContext(ctx).Infof("Patient %s retrieved from external server within timeout", id)
 		return result.patient, nil
 	case <-timeoutCtx.Done():
-		logger.Errorf("Timeout occurred while fetching patient %s from external server", id)
+		logger.WithContext(ctx).Errorf("Timeout occurred while fetching patient %s from external server", id)
 		return nil, timeoutCtx.Err()
 	}
 }

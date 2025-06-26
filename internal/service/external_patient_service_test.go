@@ -43,10 +43,10 @@ func (suite *ExternalPatientServiceTestSuite) TestGetExternalPatientByID_Success
 	mockPatient := &fhir.Patient{
 		Id: &testID,
 	}
-	suite.mockClient.EXPECT().GetPatientByID(testID).Return(mockPatient, nil)
+	suite.mockClient.EXPECT().GetPatientByID(gomock.Any(), testID).Return(mockPatient, nil)
 
 	// Act
-	patient, err := suite.service.GetExternalPatientByID(testID)
+	patient, err := suite.service.GetExternalPatientByID(context.Background(), testID)
 
 	// Assert
 	assert.NoError(suite.T(), err)
@@ -58,10 +58,10 @@ func (suite *ExternalPatientServiceTestSuite) TestGetExternalPatientByID_Success
 func (suite *ExternalPatientServiceTestSuite) TestGetExternalPatientByID_Error() {
 	// Arrange
 	testID := "notfound"
-	suite.mockClient.EXPECT().GetPatientByID(testID).Return(nil, errors.New("patient not found"))
+	suite.mockClient.EXPECT().GetPatientByID(gomock.Any(), testID).Return(nil, errors.New("patient not found"))
 
 	// Act
-	patient, err := suite.service.GetExternalPatientByID(testID)
+	patient, err := suite.service.GetExternalPatientByID(context.Background(), testID)
 
 	// Assert
 	assert.Error(suite.T(), err)
@@ -76,10 +76,10 @@ func (suite *ExternalPatientServiceTestSuite) TestSearchExternalPatients_Success
 	mockBundle := &fhir.Bundle{
 		Type: fhir.BundleTypeSearchset,
 	}
-	suite.mockClient.EXPECT().SearchPatients(searchParams).Return(mockBundle, nil)
+	suite.mockClient.EXPECT().SearchPatients(gomock.Any(), searchParams).Return(mockBundle, nil)
 
 	// Act
-	bundle, err := suite.service.SearchExternalPatients(searchParams)
+	bundle, err := suite.service.SearchExternalPatients(context.Background(), searchParams)
 
 	// Assert
 	assert.NoError(suite.T(), err)
@@ -91,10 +91,10 @@ func (suite *ExternalPatientServiceTestSuite) TestSearchExternalPatients_Success
 func (suite *ExternalPatientServiceTestSuite) TestSearchExternalPatients_Error() {
 	// Arrange
 	searchParams := map[string]string{"name": "Jane"}
-	suite.mockClient.EXPECT().SearchPatients(searchParams).Return(nil, errors.New("search failed"))
+	suite.mockClient.EXPECT().SearchPatients(gomock.Any(), searchParams).Return(nil, errors.New("search failed"))
 
 	// Act
-	bundle, err := suite.service.SearchExternalPatients(searchParams)
+	bundle, err := suite.service.SearchExternalPatients(context.Background(), searchParams)
 
 	// Assert
 	assert.Error(suite.T(), err)
@@ -109,10 +109,10 @@ func (suite *ExternalPatientServiceTestSuite) TestSearchExternalPatients_EmptyPa
 	mockBundle := &fhir.Bundle{
 		Type: fhir.BundleTypeSearchset,
 	}
-	suite.mockClient.EXPECT().SearchPatients(emptyParams).Return(mockBundle, nil)
+	suite.mockClient.EXPECT().SearchPatients(gomock.Any(), emptyParams).Return(mockBundle, nil)
 
 	// Act
-	bundle, err := suite.service.SearchExternalPatients(emptyParams)
+	bundle, err := suite.service.SearchExternalPatients(context.Background(), emptyParams)
 
 	// Assert
 	assert.NoError(suite.T(), err)
@@ -123,10 +123,10 @@ func (suite *ExternalPatientServiceTestSuite) TestSearchExternalPatients_EmptyPa
 func (suite *ExternalPatientServiceTestSuite) TestCreateExternalPatient_Success() {
 	// Arrange
 	mockPatient := &fhir.Patient{Id: func() *string { s := "new-id"; return &s }()}
-	suite.mockClient.EXPECT().CreatePatient(mockPatient).Return(mockPatient, nil)
+	suite.mockClient.EXPECT().CreatePatient(gomock.Any(), mockPatient).Return(mockPatient, nil)
 
 	// Act
-	created, err := suite.service.CreateExternalPatient(mockPatient)
+	created, err := suite.service.CreateExternalPatient(context.Background(), mockPatient)
 
 	// Assert
 	assert.NoError(suite.T(), err)
@@ -138,10 +138,10 @@ func (suite *ExternalPatientServiceTestSuite) TestCreateExternalPatient_Success(
 func (suite *ExternalPatientServiceTestSuite) TestCreateExternalPatient_Error() {
 	// Arrange
 	mockPatient := &fhir.Patient{Id: func() *string { s := "fail-id"; return &s }()}
-	suite.mockClient.EXPECT().CreatePatient(mockPatient).Return(nil, errors.New("create failed"))
+	suite.mockClient.EXPECT().CreatePatient(gomock.Any(), mockPatient).Return(nil, errors.New("create failed"))
 
 	// Act
-	created, err := suite.service.CreateExternalPatient(mockPatient)
+	created, err := suite.service.CreateExternalPatient(context.Background(), mockPatient)
 
 	// Assert
 	assert.Error(suite.T(), err)
@@ -171,7 +171,7 @@ func (suite *ExternalPatientServiceTestSuite) TestGetExternalPatientByIDCached_C
 	mockPatient := &fhir.Patient{Id: &testID}
 
 	suite.mockRedisClient.EXPECT().GetPatient(ctx, testID).Return(nil, nil)
-	suite.mockClient.EXPECT().GetPatientByID(testID).Return(mockPatient, nil)
+	suite.mockClient.EXPECT().GetPatientByID(ctx, testID).Return(mockPatient, nil)
 	suite.mockRedisClient.EXPECT().SetPatient(ctx, testID, mockPatient, gomock.Any()).Return(nil)
 
 	patient, err := suite.service.GetExternalPatientByIDCached(ctx, testID)
@@ -187,7 +187,7 @@ func (suite *ExternalPatientServiceTestSuite) TestGetExternalPatientByIDCached_C
 	testID := "error-id"
 
 	suite.mockRedisClient.EXPECT().GetPatient(ctx, testID).Return(nil, nil)
-	suite.mockClient.EXPECT().GetPatientByID(testID).Return(nil, errors.New("not found"))
+	suite.mockClient.EXPECT().GetPatientByID(ctx, testID).Return(nil, errors.New("not found"))
 
 	patient, err := suite.service.GetExternalPatientByIDCached(ctx, testID)
 
@@ -203,7 +203,7 @@ func (suite *ExternalPatientServiceTestSuite) TestGetExternalPatientByIDCached_C
 	mockPatient := &fhir.Patient{Id: &testID}
 
 	suite.mockRedisClient.EXPECT().GetPatient(ctx, testID).Return(nil, errors.New("redis down"))
-	suite.mockClient.EXPECT().GetPatientByID(testID).Return(mockPatient, nil)
+	suite.mockClient.EXPECT().GetPatientByID(ctx, testID).Return(mockPatient, nil)
 	suite.mockRedisClient.EXPECT().SetPatient(ctx, testID, mockPatient, gomock.Any()).Return(nil)
 
 	patient, err := suite.service.GetExternalPatientByIDCached(ctx, testID)
@@ -220,7 +220,7 @@ func (suite *ExternalPatientServiceTestSuite) TestGetExternalPatientByIDCached_C
 	mockPatient := &fhir.Patient{Id: &testID}
 
 	suite.mockRedisClient.EXPECT().GetPatient(ctx, testID).Return(nil, nil)
-	suite.mockClient.EXPECT().GetPatientByID(testID).Return(mockPatient, nil)
+	suite.mockClient.EXPECT().GetPatientByID(ctx, testID).Return(mockPatient, nil)
 	suite.mockRedisClient.EXPECT().SetPatient(ctx, testID, mockPatient, gomock.Any()).Return(errors.New("set failed"))
 
 	patient, err := suite.service.GetExternalPatientByIDCached(ctx, testID)
@@ -236,7 +236,7 @@ func (suite *ExternalPatientServiceTestSuite) TestGetExternalPatientByIDDelayed_
 	testID := "delayed-id"
 	mockPatient := &fhir.Patient{Id: &testID}
 
-	suite.mockClient.EXPECT().GetPatientByID(testID).Return(mockPatient, nil)
+	suite.mockClient.EXPECT().GetPatientByID(ctx, testID).Return(mockPatient, nil)
 
 	patient, err := suite.service.GetExternalPatientByIDDelayed(ctx, testID, 2*time.Second)
 
@@ -250,7 +250,7 @@ func (suite *ExternalPatientServiceTestSuite) TestGetExternalPatientByIDDelayed_
 	ctx := context.Background()
 	testID := "delayed-error"
 
-	suite.mockClient.EXPECT().GetPatientByID(testID).Return(nil, errors.New("delayed error"))
+	suite.mockClient.EXPECT().GetPatientByID(ctx, testID).Return(nil, errors.New("delayed error"))
 
 	patient, err := suite.service.GetExternalPatientByIDDelayed(ctx, testID, 2*time.Second)
 
@@ -265,7 +265,7 @@ func (suite *ExternalPatientServiceTestSuite) TestGetExternalPatientByIDDelayed_
 	testID := "timeout-id"
 
 	// Simulate a long-running GetPatientByID by blocking until context is done
-	suite.mockClient.EXPECT().GetPatientByID(testID).DoAndReturn(func(string) (*fhir.Patient, error) {
+	suite.mockClient.EXPECT().GetPatientByID(ctx, testID).DoAndReturn(func(_ context.Context, _ string) (*fhir.Patient, error) {
 		<-ctx.Done()
 		return nil, ctx.Err()
 	})

@@ -29,7 +29,7 @@ func NewVaultHandler(cfg *config.VaultConfig) VaultHandlerInterface {
 // @Produce json
 // @Success 200 {object} map[string]interface{}
 // @Failure 500 {object} map[string]interface{}
-// @Router /vault/secret [get]
+// @Router /api/v1/vault/secret [get]
 func (h *VaultHandler) GetVaultSecret(c *gin.Context) {
 	data, err := utils.GetVaultKV(h.cfg.Address, h.cfg.Token, h.cfg.SecretPath)
 	if err != nil {

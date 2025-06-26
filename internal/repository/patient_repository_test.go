@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"testing"
@@ -87,7 +88,7 @@ func (suite *PatientRepositoryTestSuite) TestCreate_Success() {
 		Gender:    "male",
 		BirthDate: &birthDate,
 	}
-	err := suite.repository.Create(patient)
+	err := suite.repository.Create(context.Background(), patient)
 	assert.NoError(suite.T(), err)
 	assert.NotZero(suite.T(), patient.ID)
 }
@@ -100,7 +101,7 @@ func (suite *PatientRepositoryTestSuite) TestCreate_Error() {
 	}
 
 	// Act
-	err := suite.repository.Create(patient)
+	err := suite.repository.Create(context.Background(), patient)
 
 	// Assert
 	// The database should return an error due to NOT NULL constraint violation
@@ -119,8 +120,8 @@ func (suite *PatientRepositoryTestSuite) TestGetByID_Success() {
 		Gender:    "female",
 		BirthDate: &birthDate,
 	}
-	suite.repository.Create(patient)
-	got, err := suite.repository.GetByID(patient.ID)
+	suite.repository.Create(context.Background(), patient)
+	got, err := suite.repository.GetByID(context.Background(), patient.ID)
 	assert.NoError(suite.T(), err)
 	assert.NotNil(suite.T(), got)
 	assert.Equal(suite.T(), patient.Family, got.Family)
@@ -130,7 +131,7 @@ func (suite *PatientRepositoryTestSuite) TestGetByID_Success() {
 
 // TestGetByID_NotFound tests retrieval of non-existent patient
 func (suite *PatientRepositoryTestSuite) TestGetByID_NotFound() {
-	got, err := suite.repository.GetByID(9999)
+	got, err := suite.repository.GetByID(context.Background(), 9999)
 	assert.Error(suite.T(), err)
 	assert.Nil(suite.T(), got)
 }
@@ -156,9 +157,9 @@ func (suite *PatientRepositoryTestSuite) TestGetAll_Success() {
 		Gender:    "female",
 		BirthDate: &birthDate2,
 	}
-	suite.repository.Create(p1)
-	suite.repository.Create(p2)
-	list, err := suite.repository.GetAll(10, 0)
+	suite.repository.Create(context.Background(), p1)
+	suite.repository.Create(context.Background(), p2)
+	list, err := suite.repository.GetAll(context.Background(), 10, 0)
 	assert.NoError(suite.T(), err)
 	assert.Len(suite.T(), list, 2)
 }
@@ -175,12 +176,12 @@ func (suite *PatientRepositoryTestSuite) TestGetAll_WithPagination() {
 			Gender:    "male",
 			BirthDate: utils.CreateTimePtr(time.Now().AddDate(-20-i, 0, 0).String()),
 		}
-		suite.repository.Create(patient)
+		suite.repository.Create(context.Background(), patient)
 	}
 
 	// Act
-	firstPage, err := suite.repository.GetAll(2, 0)
-	secondPage, err2 := suite.repository.GetAll(2, 2)
+	firstPage, err := suite.repository.GetAll(context.Background(), 2, 0)
+	secondPage, err2 := suite.repository.GetAll(context.Background(), 2, 2)
 
 	// Assert
 	assert.NoError(suite.T(), err)
@@ -201,11 +202,11 @@ func (suite *PatientRepositoryTestSuite) TestUpdate_Success() {
 		Gender:    "male",
 		BirthDate: &birthDate,
 	}
-	suite.repository.Create(patient)
+	suite.repository.Create(context.Background(), patient)
 	patient.Family = "Delta"
-	err := suite.repository.Update(patient)
+	err := suite.repository.Update(context.Background(), patient)
 	assert.NoError(suite.T(), err)
-	got, _ := suite.repository.GetByID(patient.ID)
+	got, _ := suite.repository.GetByID(context.Background(), patient.ID)
 	assert.Equal(suite.T(), "Delta", got.Family)
 }
 
@@ -221,10 +222,10 @@ func (suite *PatientRepositoryTestSuite) TestDelete_Success() {
 		Gender:    "female",
 		BirthDate: &birthDate,
 	}
-	suite.repository.Create(patient)
-	err := suite.repository.Delete(patient.ID)
+	suite.repository.Create(context.Background(), patient)
+	err := suite.repository.Delete(context.Background(), patient.ID)
 	assert.NoError(suite.T(), err)
-	got, err := suite.repository.GetByID(patient.ID)
+	got, err := suite.repository.GetByID(context.Background(), patient.ID)
 	assert.Error(suite.T(), err)
 	assert.Nil(suite.T(), got)
 }
@@ -249,9 +250,9 @@ func (suite *PatientRepositoryTestSuite) TestCount_Success() {
 		Gender:    "female",
 		BirthDate: &birthDate,
 	}
-	suite.repository.Create(p1)
-	suite.repository.Create(p2)
-	count, err := suite.repository.Count()
+	suite.repository.Create(context.Background(), p1)
+	suite.repository.Create(context.Background(), p2)
+	count, err := suite.repository.Count(context.Background())
 	assert.NoError(suite.T(), err)
 	assert.Equal(suite.T(), int64(2), count)
 }
@@ -259,7 +260,7 @@ func (suite *PatientRepositoryTestSuite) TestCount_Success() {
 // TestCount_EmptyTable tests count on empty table
 func (suite *PatientRepositoryTestSuite) TestCount_EmptyTable() {
 	// Act
-	count, err := suite.repository.Count()
+	count, err := suite.repository.Count(context.Background())
 
 	// Assert
 	assert.NoError(suite.T(), err)
