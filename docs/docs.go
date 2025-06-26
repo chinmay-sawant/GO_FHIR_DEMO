@@ -43,6 +43,48 @@ const docTemplate = `{
                 }
             }
         },
+        "/cron/cleanup": {
+            "post": {
+                "description": "Triggers a background cleanup job.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Cron"
+                ],
+                "summary": "Trigger a cleanup job",
+                "responses": {
+                    "202": {
+                        "description": "Accepted",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/cron/sync": {
+            "post": {
+                "description": "Triggers a background data synchronization job.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Cron"
+                ],
+                "summary": "Trigger a data sync job",
+                "responses": {
+                    "202": {
+                        "description": "Accepted",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
         "/external-patients": {
             "get": {
                 "description": "Searches for patient resources on an external FHIR server based on query parameters",

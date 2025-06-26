@@ -18,6 +18,35 @@ A comprehensive Go Gin framework application with FHIR (Fast Healthcare Interope
 - **Request/Response Middleware** for performance monitoring, CORS, and error handling
 - **Clean Architecture** with proper separation of concerns (handlers, services, repositories)
 
+### Cron Job Handler
+
+This project includes a custom cron job handler for simulating background jobs (such as data sync and cleanup) via API endpoints.
+
+- **Endpoints:**
+  - `POST /api/v1/cron/sync` - Triggers 5 background jobs with random delays (each job runs in a goroutine).
+  - `POST /api/v1/cron/cleanup` - Cleans up jobs that are still in the "queued" state.
+
+- **Plugin/Library Used:**  
+  No external cron plugin is used. The implementation leverages Go's built-in `time`, `sync`, and goroutines for concurrency and job management.
+
+#### Why is it not a good idea to close existing running jobs?
+
+Closing (cancelling) already running jobs in Go is not straightforward, especially if they are running in goroutines without explicit cancellation support (such as context cancellation). Forcefully terminating goroutines is not supported by the Go runtime and can lead to resource leaks or inconsistent state.
+
+**Best Practice:**  
+- Design jobs to be cancellable using `context.Context` so they can gracefully exit when requested.
+- Only jobs that are still in the "queued" state (not yet started) can be safely cancelled/removed.
+
+#### Cleanup Behavior in This Project
+
+- Job with ID `99` is always in the "queued" state and can be closed/removed by the cleanup endpoint.
+- Jobs with IDs `1-5` are started immediately in goroutines and move to the "started" state; these cannot be stopped once running and will complete naturally.
+
+#### Mutexes in Cron Job Handler
+- This section uses a mutex within the cron job to ensure safe concurrent access to the shared object (h.jobs).
+- The mutex is locked twice to prevent race conditions, as multiple goroutines may attempt to access or modify
+- h.jobs at the same time. This approach guarantees thread safety when working with goroutines in the cron context.
+
 ### Service Discovery & Secret Management
 - **Consul Integration** - Service discovery, service registration, and key-value store
 - **HashiCorp Vault Integration** - Secure secret management and storage

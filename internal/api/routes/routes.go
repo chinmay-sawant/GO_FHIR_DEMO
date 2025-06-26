@@ -2,6 +2,7 @@ package routes
 
 import (
 	"go-fhir-demo/internal/api/handlers"
+	"go-fhir-demo/internal/api/handlers/cron"
 	"go-fhir-demo/internal/middleware"
 
 	"github.com/gin-gonic/gin"
@@ -9,7 +10,7 @@ import (
 
 // RouteSetupInterface defines the contract for route setup
 type RouteSetupInterface interface {
-	SetupRoutes(patientHandler handlers.PatientHandlerInterface, externalPatientHandler handlers.ExternalPatientHandlerInterface, consulHandler ...handlers.ConsulHandlerInterface) *gin.Engine
+	SetupRoutes(patientHandler handlers.PatientHandlerInterface, externalPatientHandler handlers.ExternalPatientHandlerInterface, cronJobHandler cron.CronJobHandlerInterface, consulHandler ...handlers.ConsulHandlerInterface) *gin.Engine
 }
 
 // RouteSetup implements RouteSetupInterface
@@ -21,15 +22,16 @@ func NewRouteSetup() RouteSetupInterface {
 }
 
 // Legacy function for backward compatibility
-func SetupRoutes(patientHandler handlers.PatientHandlerInterface, externalPatientHandler handlers.ExternalPatientHandlerInterface, consulHandler ...handlers.ConsulHandlerInterface) *gin.Engine {
+func SetupRoutes(patientHandler handlers.PatientHandlerInterface, externalPatientHandler handlers.ExternalPatientHandlerInterface, cronJobHandler cron.CronJobHandlerInterface, consulHandler ...handlers.ConsulHandlerInterface) *gin.Engine {
 	routeSetup := NewRouteSetup()
-	return routeSetup.SetupRoutes(patientHandler, externalPatientHandler, consulHandler...)
+	return routeSetup.SetupRoutes(patientHandler, externalPatientHandler, cronJobHandler, consulHandler...)
 }
 
 // SetupRoutes configures all the routes for the application
 func (r *RouteSetup) SetupRoutes(
 	patientHandler handlers.PatientHandlerInterface,
 	externalPatientHandler handlers.ExternalPatientHandlerInterface,
+	cronJobHandler cron.CronJobHandlerInterface,
 	// Add optional handlers
 	consulHandler ...handlers.ConsulHandlerInterface,
 ) *gin.Engine {
@@ -73,6 +75,15 @@ func (r *RouteSetup) SetupRoutes(
 			externalPatients.GET("/:id/delayed", externalPatientHandler.GetExternalPatientByIDDelayed)
 			externalPatients.GET("", externalPatientHandler.SearchExternalPatients)
 			externalPatients.POST("", externalPatientHandler.CreateExternalPatient)
+		}
+
+		// Cron job routes
+		if cronJobHandler != nil {
+			cronJobs := v1.Group("/cron")
+			{
+				cronJobs.POST("/cleanup", cronJobHandler.TriggerCleanupJob)
+				cronJobs.POST("/sync", cronJobHandler.TriggerDataSyncJob)
+			}
 		}
 	}
 
