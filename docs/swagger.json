@@ -8,6 +8,34 @@
     },
     "basePath": "/api/v1",
     "paths": {
+        "/consul/secret": {
+            "get": {
+                "description": "Fetches a secret from Consul Key Vault and returns it as JSON",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Consul"
+                ],
+                "summary": "Get secret from Consul KV",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
         "/external-patients": {
             "get": {
                 "description": "Searches for patient resources on an external FHIR server based on query parameters",
@@ -141,6 +169,133 @@
                     },
                     "404": {
                         "description": "Patient not found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/external-patients/{id}/cached": {
+            "get": {
+                "description": "Retrieves a patient resource from an external FHIR server by its ID with Redis caching",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "ExternalPatients"
+                ],
+                "summary": "Get an external patient by ID with caching",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Patient ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successfully retrieved patient",
+                        "schema": {
+                            "$ref": "#/definitions/fhir.Patient"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Patient not found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/external-patients/{id}/delayed": {
+            "get": {
+                "description": "Retrieves a patient resource from an external FHIR server by its ID with configurable timeout",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "ExternalPatients"
+                ],
+                "summary": "Get an external patient by ID with timeout",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Patient ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Timeout in seconds (default: 10)",
+                        "name": "timeout",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successfully retrieved patient",
+                        "schema": {
+                            "$ref": "#/definitions/fhir.Patient"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Patient not found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "408": {
+                        "description": "Request timeout",
                         "schema": {
                             "type": "object",
                             "additionalProperties": {
@@ -444,6 +599,34 @@
                     },
                     "404": {
                         "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/vault/secret": {
+            "get": {
+                "description": "Fetches a secret from Vault Key Vault and returns it as JSON",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Vault"
+                ],
+                "summary": "Get secret from Vault KV",
+                "responses": {
+                    "200": {
+                        "description": "OK",
                         "schema": {
                             "type": "object",
                             "additionalProperties": true

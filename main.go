@@ -16,6 +16,7 @@ import (
 	"go-fhir-demo/internal/domain"
 	"go-fhir-demo/internal/repository"
 	"go-fhir-demo/internal/service"
+	"go-fhir-demo/pkg/cache"
 	"go-fhir-demo/pkg/database"
 	"go-fhir-demo/pkg/fhirclient" // Import the new fhirclient package
 	"go-fhir-demo/pkg/logger"
@@ -96,8 +97,22 @@ func main() {
 	// Initialize FHIR client
 	fhirClient := fhirclient.NewClient(cfg.Server.ExternalFHIRServerBaseURL)
 
-	// Initialize external patient service
-	externalPatientService := service.NewExternalPatientService(fhirClient)
+	// Initialize Redis cache
+	var cacheService cache.CacheInterface
+	if cfg.Redis.Host != "" {
+		cacheService = cache.NewRedisCache(cache.Config{
+			Host:     cfg.Redis.Host,
+			Port:     cfg.Redis.Port,
+			Password: cfg.Redis.Password,
+			DB:       cfg.Redis.DB,
+		})
+		logger.Info("Redis cache initialized successfully")
+	} else {
+		logger.Warn("Redis cache not configured, caching features will be disabled")
+	}
+
+	// Initialize external patient service with cache
+	externalPatientService := service.NewExternalPatientService(fhirClient, cacheService)
 
 	// --- Seed dummy patients if not present ---
 	dummyPatients := []fhir.Patient{

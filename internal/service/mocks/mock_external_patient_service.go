@@ -10,7 +10,9 @@
 package mocks
 
 import (
+	context "context"
 	reflect "reflect"
+	time "time"
 
 	fhir "github.com/samply/golang-fhir-models/fhir-models/fhir"
 	gomock "go.uber.org/mock/gomock"
@@ -68,6 +70,36 @@ func (m *MockExternalPatientServiceInterface) GetExternalPatientByID(id string) 
 func (mr *MockExternalPatientServiceInterfaceMockRecorder) GetExternalPatientByID(id any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetExternalPatientByID", reflect.TypeOf((*MockExternalPatientServiceInterface)(nil).GetExternalPatientByID), id)
+}
+
+// GetExternalPatientByIDCached mocks base method.
+func (m *MockExternalPatientServiceInterface) GetExternalPatientByIDCached(ctx context.Context, id string) (*fhir.Patient, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetExternalPatientByIDCached", ctx, id)
+	ret0, _ := ret[0].(*fhir.Patient)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetExternalPatientByIDCached indicates an expected call of GetExternalPatientByIDCached.
+func (mr *MockExternalPatientServiceInterfaceMockRecorder) GetExternalPatientByIDCached(ctx, id any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetExternalPatientByIDCached", reflect.TypeOf((*MockExternalPatientServiceInterface)(nil).GetExternalPatientByIDCached), ctx, id)
+}
+
+// GetExternalPatientByIDDelayed mocks base method.
+func (m *MockExternalPatientServiceInterface) GetExternalPatientByIDDelayed(ctx context.Context, id string, timeout time.Duration) (*fhir.Patient, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetExternalPatientByIDDelayed", ctx, id, timeout)
+	ret0, _ := ret[0].(*fhir.Patient)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetExternalPatientByIDDelayed indicates an expected call of GetExternalPatientByIDDelayed.
+func (mr *MockExternalPatientServiceInterfaceMockRecorder) GetExternalPatientByIDDelayed(ctx, id, timeout any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetExternalPatientByIDDelayed", reflect.TypeOf((*MockExternalPatientServiceInterface)(nil).GetExternalPatientByIDDelayed), ctx, id, timeout)
 }
 
 // SearchExternalPatients mocks base method.

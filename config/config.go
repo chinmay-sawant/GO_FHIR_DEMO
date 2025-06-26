@@ -9,22 +9,12 @@ import (
 	"github.com/spf13/viper"
 )
 
-type ConsulConfig struct {
-	Address string `json:"address"`
-	Key     string `json:"key"`
-}
-
-type VaultConfig struct {
-	Address    string `json:"address"`
-	Token      string `json:"token"`
-	SecretPath string `json:"secret_path"`
-}
-
 type Config struct {
 	Server   ServerConfig   `json:"server"`
 	Database DatabaseConfig `json:"database"`
 	Logging  LoggingConfig  `json:"logging"`
 	FHIR     FHIRConfig     `json:"fhir"`
+	Redis    RedisConfig    `json:"redis"`
 	Consul   ConsulConfig   `json:"consul"`
 	Vault    VaultConfig    `json:"vault"`
 }
@@ -61,6 +51,24 @@ type FHIRConfig struct {
 	Version string `json:"version"`
 }
 
+type RedisConfig struct {
+	Host     string `json:"host"`
+	Port     string `json:"port"`
+	Password string `json:"password"`
+	DB       int    `json:"db"`
+}
+
+type ConsulConfig struct {
+	Address string `json:"address"`
+	Key     string `json:"key"`
+}
+
+type VaultConfig struct {
+	Address    string `json:"address"`
+	Token      string `json:"token"`
+	SecretPath string `json:"secret_path"`
+}
+
 func Load() (*Config, error) {
 	// Load .env file from the root directory if it exists
 	_ = godotenv.Load()
@@ -85,9 +93,12 @@ func Load() (*Config, error) {
 	viper.SetDefault("logging.file", "logs/app.log")
 	viper.SetDefault("fhir.base_url", "/api/v1")
 	viper.SetDefault("fhir.version", "R4")
+	viper.SetDefault("redis.host", "localhost")
+	viper.SetDefault("redis.port", "6379")
+	viper.SetDefault("redis.password", "")
+	viper.SetDefault("redis.db", 0)
 	viper.SetDefault("consul.address", "http://localhost:8500")
 	viper.SetDefault("consul.key", "myapp/secret")
-	viper.SetDefault("server.dev_mode", false)
 	viper.SetDefault("vault.address", "http://localhost:8200")
 	viper.SetDefault("vault.token", "root")
 	viper.SetDefault("vault.secret_path", "secret/data/myapp")
@@ -102,9 +113,12 @@ func Load() (*Config, error) {
 	viper.BindEnv("database.name", "DB_NAME")
 	viper.BindEnv("database.sslmode", "DB_SSLMODE")
 	viper.BindEnv("logging.level", "LOG_LEVEL")
+	viper.BindEnv("redis.host", "REDIS_HOST")
+	viper.BindEnv("redis.port", "REDIS_PORT")
+	viper.BindEnv("redis.password", "REDIS_PASSWORD")
+	viper.BindEnv("redis.db", "REDIS_DB")
 	viper.BindEnv("consul.address", "CONSUL_ADDRESS")
 	viper.BindEnv("consul.key", "CONSUL_KEY")
-	viper.BindEnv("server.dev_mode", "DEV_MODE")
 	viper.BindEnv("vault.address", "VAULT_ADDRESS")
 	viper.BindEnv("vault.token", "VAULT_TOKEN")
 	viper.BindEnv("vault.secret_path", "VAULT_SECRET_PATH")
@@ -135,6 +149,16 @@ func Load() (*Config, error) {
 	}
 	if name := os.Getenv("DB_NAME"); name != "" {
 		config.Database.Name = name
+	}
+	// Override with environment variables for Redis
+	if host := os.Getenv("REDIS_HOST"); host != "" {
+		config.Redis.Host = host
+	}
+	if port := os.Getenv("REDIS_PORT"); port != "" {
+		config.Redis.Port = port
+	}
+	if password := os.Getenv("REDIS_PASSWORD"); password != "" {
+		config.Redis.Password = password
 	}
 	// Override with environment variables for Consul
 	if addr := os.Getenv("CONSUL_ADDRESS"); addr != "" {

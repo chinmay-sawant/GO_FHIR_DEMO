@@ -56,7 +56,23 @@ services:
       - ./vault/config:/vault/config
       - ./vault/policies:/vault/policies
       - ./vault/data:/vault/data
-      
+
+  redis:
+    image: redis:7-alpine
+    container_name: go-fhir-redis
+    ports:
+      - "6379:6379"
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
+    networks:
+      - fhir-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+         
 
   fhir-api:
     build: .
@@ -76,6 +92,10 @@ services:
       VAULT_ADDRESS: http://vault:8200
       VAULT_TOKEN: root
       VAULT_SECRET_PATH: secret/data/myapp
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: ""
+      REDIS_DB: 0
     ports:
       - "8080:8080"
     depends_on:
@@ -88,7 +108,13 @@ services:
     volumes:
       - ./logs:/root/logs
 
+
 volumes:
   postgres_data:
   consul_data:
   vault_data:
+  redis_data:
+
+networks:
+  fhir-network:
+    driver: bridge

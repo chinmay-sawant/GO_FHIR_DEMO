@@ -69,6 +69,8 @@ func (r *RouteSetup) SetupRoutes(
 		externalPatients := v1.Group("/external-patients")
 		{
 			externalPatients.GET("/:id", externalPatientHandler.GetExternalPatientByID)
+			externalPatients.GET("/:id/cached", externalPatientHandler.GetExternalPatientByIDCached)
+			externalPatients.GET("/:id/delayed", externalPatientHandler.GetExternalPatientByIDDelayed)
 			externalPatients.GET("", externalPatientHandler.SearchExternalPatients)
 			externalPatients.POST("", externalPatientHandler.CreateExternalPatient)
 		}
@@ -76,7 +78,7 @@ func (r *RouteSetup) SetupRoutes(
 
 	// Consul secret endpoint
 	if len(consulHandler) > 0 && consulHandler[0] != nil {
-		router.GET("/consul/secret", consulHandler[0].GetConsulSecret)
+		v1.GET("/consul/secret", consulHandler[0].GetConsulSecret)
 	}
 
 	// FHIR metadata endpoint

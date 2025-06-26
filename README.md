@@ -21,19 +21,14 @@ A comprehensive Go Gin framework application with FHIR (Fast Healthcare Interope
 ### Service Discovery & Secret Management
 - **Consul Integration** - Service discovery, service registration, and key-value store
 - **HashiCorp Vault Integration** - Secure secret management and storage
+- **Redis Cache** - High-performance caching for external FHIR API calls
 - **Consul Handler** - API endpoint to fetch secrets from Consul KV store
 - **Service Registration** - Automatic registration with Consul on startup
 
-### Testing & Quality Assurance
-- **Comprehensive Test Suite** with unit and integration tests
-- **JUnit XML Reports** using [gotestsum](https://github.com/gotestyourself/gotestsum) for CI/CD integration
-- **Test Coverage Reports** with HTML and console output
-- **Mock Generation** using [uber-go/mock](https://github.com/uber-go/mock) for unit testing
-- **Automated Test Reporting** compatible with Jenkins, GitHub Actions, and other CI tools
-
 ### Technical Features
 - Docker support with docker-compose
-- Makefile for common development tasks
+- Redis caching for improved performance
+- Timeout handling for external API calls
 - Environment-based configuration with `.env` file support
 - JSONB storage for efficient FHIR data querying
 - HTTP client with timeout and error handling for external FHIR servers
@@ -198,6 +193,8 @@ swag init --parseDependency --parseDepth 99
 | Method | Endpoint | Description | Request Body | Query Parameters |
 |--------|----------|-------------|--------------|------------------|
 | `GET` | `/api/v1/external-patients/{id}` | Get patient from external FHIR server by ID | - | - |
+| `GET` | `/api/v1/external-patients/{id}/cached` | Get patient with Redis caching | - | - |
+| `GET` | `/api/v1/external-patients/{id}/delayed` | Get patient with timeout control | - | `timeout` (seconds, default: 10) |
 | `GET` | `/api/v1/external-patients` | Search patients on external FHIR server | - | FHIR search params (`name`, `family`, `given`, `birthdate`, `gender`, etc.) |
 | `POST` | `/api/v1/external-patients` | Create patient on external FHIR server | FHIR-compliant Patient JSON | - |
 
@@ -220,6 +217,16 @@ curl -X POST http://localhost:8080/api/v1/patients \
 #### Get Patient from External FHIR Server
 ```bash
 curl -X GET "http://localhost:8080/api/v1/external-patients/123"
+```
+
+#### Get Patient with Redis Cache
+```bash
+curl -X GET "http://localhost:8080/api/v1/external-patients/123/cached"
+```
+
+#### Get Patient with Custom Timeout
+```bash
+curl -X GET "http://localhost:8080/api/v1/external-patients/123/delayed?timeout=30"
 ```
 
 #### Search External FHIR Server
@@ -287,6 +294,10 @@ curl -X GET http://localhost:8080/vault/secret
 | `VAULT_ADDRESS` | Vault server address | `http://localhost:8200` | No |
 | `VAULT_TOKEN` | Vault authentication token | `root` | No |
 | `VAULT_SECRET_PATH` | Vault secret path | `secret/data/myapp` | No |
+| `REDIS_HOST` | Redis server host | `localhost` | No |
+| `REDIS_PORT` | Redis server port | `6379` | No |
+| `REDIS_PASSWORD` | Redis password | `` | No |
+| `REDIS_DB` | Redis database number | `0` | No |
 
 ### Configuration File
 The application also supports JSON configuration via `config/config.json` for default values. Environment variables take precedence over configuration file settings.
@@ -325,6 +336,15 @@ Or in `config/config.json`:
   "token": "root",
   "secret_path": "secret/data/myapp"
 }
+```
+
+#### Redis Configuration
+Configure Redis for caching in your environment:
+```env
+REDIS_HOST=localhost
+REDIS_PORT=6379
+REDIS_PASSWORD=
+REDIS_DB=0
 ```
 
 Popular public FHIR servers for testing:

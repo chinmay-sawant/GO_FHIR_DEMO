@@ -64,6 +64,30 @@ func (mr *MockExternalPatientHandlerInterfaceMockRecorder) GetExternalPatientByI
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetExternalPatientByID", reflect.TypeOf((*MockExternalPatientHandlerInterface)(nil).GetExternalPatientByID), c)
 }
 
+// GetExternalPatientByIDCached mocks base method.
+func (m *MockExternalPatientHandlerInterface) GetExternalPatientByIDCached(c *gin.Context) {
+	m.ctrl.T.Helper()
+	m.ctrl.Call(m, "GetExternalPatientByIDCached", c)
+}
+
+// GetExternalPatientByIDCached indicates an expected call of GetExternalPatientByIDCached.
+func (mr *MockExternalPatientHandlerInterfaceMockRecorder) GetExternalPatientByIDCached(c any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetExternalPatientByIDCached", reflect.TypeOf((*MockExternalPatientHandlerInterface)(nil).GetExternalPatientByIDCached), c)
+}
+
+// GetExternalPatientByIDDelayed mocks base method.
+func (m *MockExternalPatientHandlerInterface) GetExternalPatientByIDDelayed(c *gin.Context) {
+	m.ctrl.T.Helper()
+	m.ctrl.Call(m, "GetExternalPatientByIDDelayed", c)
+}
+
+// GetExternalPatientByIDDelayed indicates an expected call of GetExternalPatientByIDDelayed.
+func (mr *MockExternalPatientHandlerInterfaceMockRecorder) GetExternalPatientByIDDelayed(c any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetExternalPatientByIDDelayed", reflect.TypeOf((*MockExternalPatientHandlerInterface)(nil).GetExternalPatientByIDDelayed), c)
+}
+
 // SearchExternalPatients mocks base method.
 func (m *MockExternalPatientHandlerInterface) SearchExternalPatients(c *gin.Context) {
 	m.ctrl.T.Helper()

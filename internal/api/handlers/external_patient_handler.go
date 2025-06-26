@@ -1,9 +1,12 @@
 package handlers
 
 import (
+	"context"
 	"net/http"
+	"strconv"
+	"time"
 
-	"go-fhir-demo/internal/domain"
+	"go-fhir-demo/internal/service"
 	"go-fhir-demo/pkg/logger"
 	"go-fhir-demo/pkg/utils"
 
@@ -13,17 +16,19 @@ import (
 // ExternalPatientHandlerInterface defines the contract for external patient handlers
 type ExternalPatientHandlerInterface interface {
 	GetExternalPatientByID(c *gin.Context)
+	GetExternalPatientByIDCached(c *gin.Context)
+	GetExternalPatientByIDDelayed(c *gin.Context)
 	SearchExternalPatients(c *gin.Context)
 	CreateExternalPatient(c *gin.Context)
 }
 
 // ExternalPatientHandler handles requests for external patient data.
 type ExternalPatientHandler struct {
-	service domain.ExternalPatientService
+	service service.ExternalPatientServiceInterface
 }
 
 // NewExternalPatientHandler creates a new ExternalPatientHandler.
-func NewExternalPatientHandler(service domain.ExternalPatientService) ExternalPatientHandlerInterface {
+func NewExternalPatientHandler(service service.ExternalPatientServiceInterface) ExternalPatientHandlerInterface {
 	return &ExternalPatientHandler{
 		service: service,
 	}
@@ -52,6 +57,90 @@ func (h *ExternalPatientHandler) GetExternalPatientByID(c *gin.Context) {
 		// Basic error handling, can be improved to differentiate 404 from 500
 		logger.Errorf("Failed to get external patient by ID %s: %v", id, err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve patient from external server", "details": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, patient)
+}
+
+// GetExternalPatientByIDCached godoc
+// @Summary Get an external patient by ID with caching
+// @Description Retrieves a patient resource from an external FHIR server by its ID with Redis caching
+// @Tags ExternalPatients
+// @Produce json
+// @Param id path string true "Patient ID"
+// @Success 200 {object} fhir.Patient "Successfully retrieved patient"
+// @Failure 400 {object} map[string]string "Invalid request"
+// @Failure 404 {object} map[string]string "Patient not found"
+// @Failure 500 {object} map[string]string "Internal server error"
+// @Router /external-patients/{id}/cached [get]
+func (h *ExternalPatientHandler) GetExternalPatientByIDCached(c *gin.Context) {
+	id := c.Param("id")
+	if id == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Patient ID is required"})
+		return
+	}
+
+	ctx := c.Request.Context()
+	patient, err := h.service.GetExternalPatientByIDCached(ctx, id)
+	if err != nil {
+		logger.Errorf("Failed to get cached external patient by ID %s: %v", id, err)
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error":   "Failed to retrieve patient from external server or cache",
+			"details": err.Error(),
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, patient)
+}
+
+// GetExternalPatientByIDDelayed godoc
+// @Summary Get an external patient by ID with timeout
+// @Description Retrieves a patient resource from an external FHIR server by its ID with configurable timeout
+// @Tags ExternalPatients
+// @Produce json
+// @Param id path string true "Patient ID"
+// @Param timeout query int false "Timeout in seconds (default: 10)"
+// @Success 200 {object} fhir.Patient "Successfully retrieved patient"
+// @Failure 400 {object} map[string]string "Invalid request"
+// @Failure 404 {object} map[string]string "Patient not found"
+// @Failure 408 {object} map[string]string "Request timeout"
+// @Failure 500 {object} map[string]string "Internal server error"
+// @Router /external-patients/{id}/delayed [get]
+func (h *ExternalPatientHandler) GetExternalPatientByIDDelayed(c *gin.Context) {
+	id := c.Param("id")
+	if id == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Patient ID is required"})
+		return
+	}
+
+	// Parse timeout parameter (default: 10 seconds)
+	timeoutStr := c.DefaultQuery("timeout", "10")
+	timeoutSeconds, err := strconv.Atoi(timeoutStr)
+	if err != nil || timeoutSeconds <= 0 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid timeout parameter"})
+		return
+	}
+
+	timeout := time.Duration(timeoutSeconds) * time.Second
+	ctx := c.Request.Context()
+
+	patient, err := h.service.GetExternalPatientByIDDelayed(ctx, id, timeout)
+	if err != nil {
+		if err == context.DeadlineExceeded {
+			logger.Errorf("Timeout occurred for patient %s: %v", id, err)
+			c.JSON(http.StatusRequestTimeout, gin.H{
+				"error":   "Request timeout",
+				"details": "The external FHIR server did not respond within the specified timeout",
+			})
+			return
+		}
+		logger.Errorf("Failed to get delayed external patient by ID %s: %v", id, err)
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error":   "Failed to retrieve patient from external server",
+			"details": err.Error(),
+		})
 		return
 	}
 
