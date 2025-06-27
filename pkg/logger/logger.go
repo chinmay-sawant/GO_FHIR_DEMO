@@ -2,6 +2,7 @@ package logger
 
 import (
 	"context"
+	"go-fhir-demo/pkg/utils"
 	"io"
 	"os"
 	"path/filepath"
@@ -188,6 +189,9 @@ func (l *GormLogger) Trace(ctx context.Context, begin time.Time, fc func() (stri
 	cleanSQL := strings.TrimSpace(strings.ReplaceAll(sql, "\n", " "))
 	cleanSQL = strings.TrimSpace(strings.ReplaceAll(cleanSQL, "\\", " "))
 	cleanSQL = strings.Join(strings.Fields(cleanSQL), " ")
+
+	// Redact PII fields from SQL before logging
+	cleanSQL = utils.RedactPIIFromSQL(cleanSQL)
 
 	// Extract trace/span IDs from context
 	traceID := ""
