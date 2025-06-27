@@ -80,7 +80,7 @@ services:
       retries: 3
 
   jaeger:
-    image: jaegertracing/all-in-one:1.50
+    image: jaegertracing/all-in-one:1.70.0
     container_name: fhir_jaeger
     ports:
       - "16686:16686"  # Jaeger UI

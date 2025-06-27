@@ -34,8 +34,7 @@ func NewPatientRepository(db *gorm.DB) PatientRepositoryInterface {
 func (r *patientRepository) Create(ctx context.Context, patient *domain.Patient) error {
 	ctx, span := tracer.StartSpan(ctx, "Create")
 	defer span.End()
-	// Ensure FHIRData is valid UTF-8 and does not contain null bytes
-	if err := r.db.Create(patient).Error; err != nil {
+	if err := r.db.WithContext(ctx).Create(patient).Error; err != nil {
 		logger.WithContext(ctx).Errorf("Failed to create patient: %v", err)
 		return err
 	}
@@ -46,7 +45,7 @@ func (r *patientRepository) Create(ctx context.Context, patient *domain.Patient)
 // GetByID retrieves a patient by ID
 func (r *patientRepository) GetByID(ctx context.Context, id uint) (*domain.Patient, error) {
 	var patient domain.Patient
-	if err := r.db.First(&patient, id).Error; err != nil {
+	if err := r.db.WithContext(ctx).First(&patient, id).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
 			logger.WithContext(ctx).Warnf("Patient not found with ID: %d", id)
 			return nil, err
@@ -60,7 +59,7 @@ func (r *patientRepository) GetByID(ctx context.Context, id uint) (*domain.Patie
 // GetAll retrieves all patients with pagination
 func (r *patientRepository) GetAll(ctx context.Context, limit, offset int) ([]*domain.Patient, error) {
 	var patients []*domain.Patient
-	query := r.db.Limit(limit).Offset(offset)
+	query := r.db.WithContext(ctx).Limit(limit).Offset(offset)
 
 	if err := query.Find(&patients).Error; err != nil {
 		logger.WithContext(ctx).Errorf("Failed to get patients: %v", err)
@@ -73,7 +72,7 @@ func (r *patientRepository) GetAll(ctx context.Context, limit, offset int) ([]*d
 
 // Update updates an existing patient record
 func (r *patientRepository) Update(ctx context.Context, patient *domain.Patient) error {
-	if err := r.db.Save(patient).Error; err != nil {
+	if err := r.db.WithContext(ctx).Save(patient).Error; err != nil {
 		logger.WithContext(ctx).Errorf("Failed to update patient with ID %d: %v", patient.ID, err)
 		return err
 	}
@@ -83,7 +82,7 @@ func (r *patientRepository) Update(ctx context.Context, patient *domain.Patient)
 
 // Delete soft deletes a patient record
 func (r *patientRepository) Delete(ctx context.Context, id uint) error {
-	if err := r.db.Delete(&domain.Patient{}, id).Error; err != nil {
+	if err := r.db.WithContext(ctx).Delete(&domain.Patient{}, id).Error; err != nil {
 		logger.WithContext(ctx).Errorf("Failed to delete patient with ID %d: %v", id, err)
 		return err
 	}
@@ -94,7 +93,7 @@ func (r *patientRepository) Delete(ctx context.Context, id uint) error {
 // Count returns the total number of patients
 func (r *patientRepository) Count(ctx context.Context) (int64, error) {
 	var count int64
-	if err := r.db.Model(&domain.Patient{}).Count(&count).Error; err != nil {
+	if err := r.db.WithContext(ctx).Model(&domain.Patient{}).Count(&count).Error; err != nil {
 		logger.WithContext(ctx).Errorf("Failed to count patients: %v", err)
 		return 0, err
 	}

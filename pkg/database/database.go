@@ -1,6 +1,7 @@
 package database
 
 import (
+	"context"
 	"fmt"
 
 	"go-fhir-demo/config"
@@ -8,7 +9,6 @@ import (
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
-	gormLogger "gorm.io/gorm/logger"
 )
 
 var DB *gorm.DB
@@ -17,17 +17,11 @@ var DB *gorm.DB
 func Initialize(cfg *config.DatabaseConfig) error {
 	dsn := cfg.DSN()
 
-	// Configure GORM logger
-	var gormLogLevel gormLogger.LogLevel
-	switch logger.GetLogger().Level {
-	case logger.GetLogger().Level:
-		gormLogLevel = gormLogger.Info
-	default:
-		gormLogLevel = gormLogger.Warn
-	}
+	// Use context-aware GORM logger with trace/span injection
+	gormLoggerWithTrace := logger.GetGormLogger(context.Background())
 
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{
-		Logger: gormLogger.Default.LogMode(gormLogLevel),
+		Logger: gormLoggerWithTrace,
 	})
 	if err != nil {
 		return fmt.Errorf("failed to connect to database: %w", err)
