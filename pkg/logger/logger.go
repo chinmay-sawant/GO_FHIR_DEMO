@@ -207,10 +207,7 @@ func (l *GormLogger) Trace(ctx context.Context, begin time.Time, fc func() (stri
 		}
 	}
 
-	// Enhanced formatting with colors and better spacing
-	var logMsg string
-
-	// Color codes for better visibility
+	// Simple color codes
 	const (
 		colorReset  = "\033[0m"
 		colorRed    = "\033[31m"
@@ -221,37 +218,29 @@ func (l *GormLogger) Trace(ctx context.Context, begin time.Time, fc func() (stri
 		colorBold   = "\033[1m"
 	)
 
-	// Compose trace/span info line
-	traceSpanLine := colorCyan + "║ " + colorBold + "trace_id=" + colorReset + colorBlue + traceID + colorReset +
-		" " + colorBold + "span_id=" + colorReset + colorBlue + spanID + colorReset + "\n"
-
+	// Simple minimal log format
+	var logMsg string
 	if err != nil {
-		logMsg = "\n" + colorBold + colorRed + "╔═══ SQL ERROR ═══════════════════════════════════════════════════════════════════╗" + colorReset + "\n" +
-			colorRed + "║ " + colorBold + "QUERY: " + colorReset + colorRed + cleanSQL + colorReset + "\n" +
-			colorRed + "║ " + colorBold + "ERROR: " + colorReset + colorRed + err.Error() + colorReset + "\n" +
-			colorRed + "║ " + colorBold + "TIME:  " + colorReset + colorRed + elapsed.String() + colorReset + "\n" +
-			colorRed + "║ " + colorBold + "ROWS:  " + colorReset + colorRed + "%d" + colorReset + "\n" +
-			traceSpanLine +
-			colorBold + colorRed + "╚═════════════════════════════════════════════════════════════════════════════════╝" + colorReset + "\n"
-		logMsg = strings.Replace(logMsg, "%d", formatRows(rows), 1)
+		logMsg = colorRed + "SQL ERROR: " + colorReset + cleanSQL +
+			colorRed + " | ERROR: " + err.Error() +
+			"\n\t\t\t" + "     TIME: " + elapsed.String() +
+			" | ROWS: " + formatRows(rows) +
+			" | trace_id: " + traceID +
+			" | span_id: " + spanID + colorReset
 		entry.Error(logMsg)
 	} else if l.slowThreshold != 0 && elapsed > l.slowThreshold {
-		logMsg = "\n" + colorBold + colorYellow + "╔═══ SLOW SQL QUERY ══════════════════════════════════════════════════════════════╗" + colorReset + "\n" +
-			colorYellow + "║ " + colorBold + "QUERY: " + colorReset + colorYellow + cleanSQL + colorReset + "\n" +
-			colorYellow + "║ " + colorBold + "TIME:  " + colorReset + colorYellow + elapsed.String() + colorReset + "\n" +
-			colorYellow + "║ " + colorBold + "ROWS:  " + colorReset + colorYellow + "%d" + colorReset + "\n" +
-			traceSpanLine +
-			colorBold + colorYellow + "╚═════════════════════════════════════════════════════════════════════════════════╝" + colorReset + "\n"
-		logMsg = strings.Replace(logMsg, "%d", formatRows(rows), 1)
+		logMsg = colorYellow + "SLOW SQL: " + colorReset + colorGreen + cleanSQL + colorReset +
+			colorYellow + "\n\t\t\t" + "     TIME: " + elapsed.String() +
+			" | ROWS: " + formatRows(rows) +
+			" | trace_id: " + traceID +
+			" | span_id: " + spanID + colorReset
 		entry.Warn(logMsg)
 	} else {
-		logMsg = "\n" + colorBold + colorCyan + "╔═══ SQL QUERY ═══════════════════════════════════════════════════════════════════╗" + colorReset + "\n" +
-			colorCyan + "║ " + colorBold + "QUERY: " + colorReset + colorGreen + cleanSQL + colorReset + "\n" +
-			colorCyan + "║ " + colorBold + "TIME:  " + colorReset + colorBlue + elapsed.String() + colorReset + "\n" +
-			colorCyan + "║ " + colorBold + "ROWS:  " + colorReset + colorBlue + "%d" + colorReset + "\n" +
-			traceSpanLine +
-			colorBold + colorCyan + "╚═════════════════════════════════════════════════════════════════════════════════╝" + colorReset + "\n"
-		logMsg = strings.Replace(logMsg, "%d", formatRows(rows), 1)
+		logMsg = colorCyan + "SQL: " + colorReset + colorGreen + cleanSQL + colorReset +
+			colorBlue + "\n\t\t\t" + "     TIME: " + elapsed.String() +
+			" | ROWS: " + formatRows(rows) +
+			" | trace_id: " + traceID +
+			" | span_id: " + spanID + colorReset
 		entry.Info(logMsg)
 	}
 
