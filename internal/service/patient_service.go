@@ -1,6 +1,7 @@
 package service
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"time"
@@ -14,14 +15,14 @@ import (
 
 // PatientServiceInterface defines the contract for patient service
 type PatientServiceInterface interface {
-	CreatePatient(fhirPatient *fhir.Patient) (*domain.Patient, error)
-	GetPatient(id uint) (*domain.Patient, error)
-	GetPatients(limit, offset int) ([]*domain.Patient, int64, error)
-	UpdatePatient(id uint, fhirPatient *fhir.Patient) (*domain.Patient, error)
-	PatchPatient(id uint, updates map[string]interface{}) (*domain.Patient, error)
-	DeletePatient(id uint) error
-	ConvertToFHIR(patient *domain.Patient) (*fhir.Patient, error)
-	ConvertFromFHIR(fhirPatient *fhir.Patient) (*domain.Patient, error)
+	CreatePatient(ctx context.Context, fhirPatient *fhir.Patient) (*domain.Patient, error)
+	GetPatient(ctx context.Context, id uint) (*domain.Patient, error)
+	GetPatients(ctx context.Context, limit, offset int) ([]*domain.Patient, int64, error)
+	UpdatePatient(ctx context.Context, id uint, fhirPatient *fhir.Patient) (*domain.Patient, error)
+	PatchPatient(ctx context.Context, id uint, updates map[string]interface{}) (*domain.Patient, error)
+	DeletePatient(ctx context.Context, id uint) error
+	ConvertToFHIR(ctx context.Context, patient *domain.Patient) (*fhir.Patient, error)
+	ConvertFromFHIR(ctx context.Context, fhirPatient *fhir.Patient) (*domain.Patient, error)
 }
 
 type patientService struct {
@@ -36,14 +37,14 @@ func NewPatientService(repo domain.PatientRepository) PatientServiceInterface {
 }
 
 // CreatePatient creates a new patient from FHIR data
-func (s *patientService) CreatePatient(fhirPatient *fhir.Patient) (*domain.Patient, error) {
-	patient, err := s.ConvertFromFHIR(fhirPatient)
+func (s *patientService) CreatePatient(ctx context.Context, fhirPatient *fhir.Patient) (*domain.Patient, error) {
+	patient, err := s.ConvertFromFHIR(ctx, fhirPatient)
 	if err != nil {
-		logger.Errorf("Failed to convert FHIR patient: %v", err)
+		logger.WithContext(ctx).Errorf("Failed to convert FHIR patient: %v", err)
 		return nil, err
 	}
 
-	if err := s.repo.Create(patient); err != nil {
+	if err := s.repo.Create(ctx, patient); err != nil {
 		return nil, err
 	}
 
@@ -51,18 +52,18 @@ func (s *patientService) CreatePatient(fhirPatient *fhir.Patient) (*domain.Patie
 }
 
 // GetPatient retrieves a patient by ID
-func (s *patientService) GetPatient(id uint) (*domain.Patient, error) {
-	return s.repo.GetByID(id)
+func (s *patientService) GetPatient(ctx context.Context, id uint) (*domain.Patient, error) {
+	return s.repo.GetByID(ctx, id)
 }
 
 // GetPatients retrieves all patients with pagination
-func (s *patientService) GetPatients(limit, offset int) ([]*domain.Patient, int64, error) {
-	patients, err := s.repo.GetAll(limit, offset)
+func (s *patientService) GetPatients(ctx context.Context, limit, offset int) ([]*domain.Patient, int64, error) {
+	patients, err := s.repo.GetAll(ctx, limit, offset)
 	if err != nil {
 		return nil, 0, err
 	}
 
-	count, err := s.repo.Count()
+	count, err := s.repo.Count(ctx)
 	if err != nil {
 		return nil, 0, err
 	}
@@ -71,14 +72,14 @@ func (s *patientService) GetPatients(limit, offset int) ([]*domain.Patient, int6
 }
 
 // UpdatePatient updates an existing patient
-func (s *patientService) UpdatePatient(id uint, fhirPatient *fhir.Patient) (*domain.Patient, error) {
-	existingPatient, err := s.repo.GetByID(id)
+func (s *patientService) UpdatePatient(ctx context.Context, id uint, fhirPatient *fhir.Patient) (*domain.Patient, error) {
+	existingPatient, err := s.repo.GetByID(ctx, id)
 	if err != nil {
 		return nil, err
 	}
 
 	// Convert FHIR data to domain model
-	updatedPatient, err := s.ConvertFromFHIR(fhirPatient)
+	updatedPatient, err := s.ConvertFromFHIR(ctx, fhirPatient)
 	if err != nil {
 		return nil, err
 	}
@@ -87,7 +88,7 @@ func (s *patientService) UpdatePatient(id uint, fhirPatient *fhir.Patient) (*dom
 	updatedPatient.ID = existingPatient.ID
 	updatedPatient.CreatedAt = existingPatient.CreatedAt
 
-	if err := s.repo.Update(updatedPatient); err != nil {
+	if err := s.repo.Update(ctx, updatedPatient); err != nil {
 		return nil, err
 	}
 
@@ -95,14 +96,14 @@ func (s *patientService) UpdatePatient(id uint, fhirPatient *fhir.Patient) (*dom
 }
 
 // PatchPatient partially updates a patient
-func (s *patientService) PatchPatient(id uint, updates map[string]interface{}) (*domain.Patient, error) {
-	patient, err := s.repo.GetByID(id)
+func (s *patientService) PatchPatient(ctx context.Context, id uint, updates map[string]interface{}) (*domain.Patient, error) {
+	patient, err := s.repo.GetByID(ctx, id)
 	if err != nil {
 		return nil, err
 	}
 
 	// Parse existing FHIR data
-	fhirPatient, err := s.ConvertToFHIR(patient)
+	fhirPatient, err := s.ConvertToFHIR(ctx, patient)
 	if err != nil {
 		return nil, fmt.Errorf("failed to parse existing FHIR data: %w", err)
 	}
@@ -113,7 +114,7 @@ func (s *patientService) PatchPatient(id uint, updates map[string]interface{}) (
 	}
 
 	// Convert back to domain model
-	updatedPatient, err := s.ConvertFromFHIR(fhirPatient)
+	updatedPatient, err := s.ConvertFromFHIR(ctx, fhirPatient)
 	if err != nil {
 		return nil, err
 	}
@@ -122,7 +123,7 @@ func (s *patientService) PatchPatient(id uint, updates map[string]interface{}) (
 	updatedPatient.ID = patient.ID
 	updatedPatient.CreatedAt = patient.CreatedAt
 
-	if err := s.repo.Update(updatedPatient); err != nil {
+	if err := s.repo.Update(ctx, updatedPatient); err != nil {
 		return nil, err
 	}
 
@@ -130,12 +131,12 @@ func (s *patientService) PatchPatient(id uint, updates map[string]interface{}) (
 }
 
 // DeletePatient deletes a patient
-func (s *patientService) DeletePatient(id uint) error {
-	return s.repo.Delete(id)
+func (s *patientService) DeletePatient(ctx context.Context, id uint) error {
+	return s.repo.Delete(ctx, id)
 }
 
 // ConvertToFHIR converts a domain patient to FHIR format
-func (s *patientService) ConvertToFHIR(patient *domain.Patient) (*fhir.Patient, error) {
+func (s *patientService) ConvertToFHIR(ctx context.Context, patient *domain.Patient) (*fhir.Patient, error) {
 	var fhirPatient fhir.Patient
 	if err := json.Unmarshal([]byte(patient.FHIRData), &fhirPatient); err != nil {
 		return nil, fmt.Errorf("failed to unmarshal FHIR data: %w", err)
@@ -144,7 +145,7 @@ func (s *patientService) ConvertToFHIR(patient *domain.Patient) (*fhir.Patient, 
 }
 
 // ConvertFromFHIR converts a FHIR patient to domain format
-func (s *patientService) ConvertFromFHIR(fhirPatient *fhir.Patient) (*domain.Patient, error) {
+func (s *patientService) ConvertFromFHIR(ctx context.Context, fhirPatient *fhir.Patient) (*domain.Patient, error) {
 	// Marshal FHIR patient to JSON
 	fhirJSON, err := json.Marshal(fhirPatient)
 	if err != nil {

@@ -23,9 +23,11 @@ import (
 	"go-fhir-demo/pkg/logger"
 	"go-fhir-demo/pkg/utils"
 	"go-fhir-demo/pkg/utils/consul"
+	"go-fhir-demo/pkg/utils/tracer"
 
 	"github.com/gin-gonic/gin"
 	"github.com/samply/golang-fhir-models/fhir-models/fhir"
+	"go.opentelemetry.io/contrib/instrumentation/github.com/gin-gonic/gin/otelgin"
 
 	// Swagger imports
 	swaggerFiles "github.com/swaggo/files"
@@ -75,6 +77,27 @@ func main() {
 
 	logger.Info("Starting FHIR Patient API server...")
 
+	// Initialize Jaeger tracing
+	tracerProvider, err := tracer.InitJaeger(tracer.Config{
+		Endpoint:    cfg.Jaeger.Endpoint,
+		ServiceName: cfg.Jaeger.ServiceName,
+		Environment: cfg.Jaeger.Environment,
+		Enabled:     cfg.Jaeger.Enabled,
+	})
+	if err != nil {
+		logger.Errorf("Failed to initialize Jaeger: %v", err)
+		os.Exit(1)
+	}
+	defer func() {
+		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+		defer cancel()
+		if err := tracerProvider.Shutdown(ctx); err != nil {
+			logger.Errorf("Failed to shutdown tracer: %v", err)
+		}
+	}()
+
+	logger.Infof("Jaeger tracing initialized successfully")
+
 	// Initialize database
 	if err := database.Initialize(&cfg.Database); err != nil {
 		logger.Errorf("Failed to initialize database: %v", err)
@@ -107,7 +130,7 @@ func main() {
 			Password: cfg.Redis.Password,
 			DB:       cfg.Redis.DB,
 		})
-		logger.Info("Redis cache initialized successfully")
+		logger.Infof("Redis cache initialized successfully")
 	} else {
 		logger.Warn("Redis cache not configured, caching features will be disabled")
 	}
@@ -220,7 +243,8 @@ func main() {
 				*dummy.BirthDate,
 			).Count(&count)
 		if count == 0 {
-			_, err := patientService.CreatePatient(&dummy)
+			ctx := context.Background()
+			_, err := patientService.CreatePatient(ctx, &dummy)
 			if err != nil {
 				logger.Warnf("Failed to seed dummy patient: %v", err)
 			} else {
@@ -239,9 +263,17 @@ func main() {
 
 	// Set Gin mode
 	gin.SetMode(cfg.Server.Mode)
-
 	// Setup routes (pass consulHandler)
 	router := routes.SetupRoutes(patientHandler, externalPatientHandler, cronJobHandler, consulHandler)
+
+	// Add OpenTelemetry middleware
+	if cfg.Jaeger.Enabled {
+		router.Use(otelgin.Middleware(cfg.Jaeger.ServiceName))
+	}
+
+	// Add other middlewares
+	router.Use(gin.Logger())
+	router.Use(gin.Recovery())
 
 	// Swagger endpoint
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
@@ -287,7 +319,7 @@ func main() {
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
 	<-quit
 
-	logger.Info("Shutting down server...")
+	logger.Infof("Shutting down server...")
 
 	// Gracefully shutdown the server with a timeout
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
@@ -298,5 +330,5 @@ func main() {
 		os.Exit(1)
 	}
 
-	logger.Info("Server exited")
+	logger.Infof("Server exited")
 }

@@ -17,6 +17,7 @@ type Config struct {
 	Redis    RedisConfig    `json:"redis"`
 	Consul   ConsulConfig   `json:"consul"`
 	Vault    VaultConfig    `json:"vault"`
+	Jaeger   JaegerConfig   `json:"jaeger"`
 }
 
 type ServerConfig struct {
@@ -69,6 +70,13 @@ type VaultConfig struct {
 	SecretPath string `json:"secret_path"`
 }
 
+type JaegerConfig struct {
+	Endpoint    string `json:"endpoint"`
+	ServiceName string `json:"service_name"`
+	Environment string `json:"environment"`
+	Enabled     bool   `json:"enabled"`
+}
+
 func Load() (*Config, error) {
 	// Load .env file from the root directory if it exists
 	_ = godotenv.Load()
@@ -102,6 +110,10 @@ func Load() (*Config, error) {
 	viper.SetDefault("vault.address", "http://localhost:8200")
 	viper.SetDefault("vault.token", "root")
 	viper.SetDefault("vault.secret_path", "secret/data/myapp")
+	viper.SetDefault("jaeger.endpoint", "http://localhost:14268/api/traces")
+	viper.SetDefault("jaeger.service_name", "go-fhir-demo")
+	viper.SetDefault("jaeger.environment", "development")
+	viper.SetDefault("jaeger.enabled", true)
 
 	// Bind environment variables
 	viper.BindEnv("server.port", "SERVER_PORT")
@@ -122,6 +134,10 @@ func Load() (*Config, error) {
 	viper.BindEnv("vault.address", "VAULT_ADDRESS")
 	viper.BindEnv("vault.token", "VAULT_TOKEN")
 	viper.BindEnv("vault.secret_path", "VAULT_SECRET_PATH")
+	viper.BindEnv("jaeger.endpoint", "JAEGER_ENDPOINT")
+	viper.BindEnv("jaeger.service_name", "JAEGER_SERVICE_NAME")
+	viper.BindEnv("jaeger.environment", "JAEGER_ENVIRONMENT")
+	viper.BindEnv("jaeger.enabled", "JAEGER_ENABLED")
 
 	if err := viper.ReadInConfig(); err != nil {
 		if _, ok := err.(viper.ConfigFileNotFoundError); !ok {
@@ -182,6 +198,20 @@ func Load() (*Config, error) {
 			config.Server.DevMode = true
 		}
 	}
+	// Override with environment variables for Jaeger
+	if endpoint := os.Getenv("JAEGER_ENDPOINT"); endpoint != "" {
+		config.Jaeger.Endpoint = endpoint
+	}
+	if serviceName := os.Getenv("JAEGER_SERVICE_NAME"); serviceName != "" {
+		config.Jaeger.ServiceName = serviceName
+	}
+	if environment := os.Getenv("JAEGER_ENVIRONMENT"); environment != "" {
+		config.Jaeger.Environment = environment
+	}
+	if enabled := os.Getenv("JAEGER_ENABLED"); enabled == "false" {
+		config.Jaeger.Enabled = false
+	}
+
 	return &config, nil
 }
 

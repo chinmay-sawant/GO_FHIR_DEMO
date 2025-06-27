@@ -11,6 +11,7 @@ package mocks
 
 import (
 	handlers "go-fhir-demo/internal/api/handlers"
+	cron "go-fhir-demo/internal/api/handlers/cron"
 	reflect "reflect"
 
 	gin "github.com/gin-gonic/gin"
@@ -42,9 +43,9 @@ func (m *MockRouteSetupInterface) EXPECT() *MockRouteSetupInterfaceMockRecorder 
 }
 
 // SetupRoutes mocks base method.
-func (m *MockRouteSetupInterface) SetupRoutes(patientHandler handlers.PatientHandlerInterface, externalPatientHandler handlers.ExternalPatientHandlerInterface, consulHandler ...handlers.ConsulHandlerInterface) *gin.Engine {
+func (m *MockRouteSetupInterface) SetupRoutes(patientHandler handlers.PatientHandlerInterface, externalPatientHandler handlers.ExternalPatientHandlerInterface, cronJobHandler cron.CronJobHandlerInterface, consulHandler ...handlers.ConsulHandlerInterface) *gin.Engine {
 	m.ctrl.T.Helper()
-	varargs := []any{patientHandler, externalPatientHandler}
+	varargs := []any{patientHandler, externalPatientHandler, cronJobHandler}
 	for _, a := range consulHandler {
 		varargs = append(varargs, a)
 	}
@@ -54,8 +55,8 @@ func (m *MockRouteSetupInterface) SetupRoutes(patientHandler handlers.PatientHan
 }
 
 // SetupRoutes indicates an expected call of SetupRoutes.
-func (mr *MockRouteSetupInterfaceMockRecorder) SetupRoutes(patientHandler, externalPatientHandler any, consulHandler ...any) *gomock.Call {
+func (mr *MockRouteSetupInterfaceMockRecorder) SetupRoutes(patientHandler, externalPatientHandler, cronJobHandler any, consulHandler ...any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	varargs := append([]any{patientHandler, externalPatientHandler}, consulHandler...)
+	varargs := append([]any{patientHandler, externalPatientHandler, cronJobHandler}, consulHandler...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetupRoutes", reflect.TypeOf((*MockRouteSetupInterface)(nil).SetupRoutes), varargs...)
 }

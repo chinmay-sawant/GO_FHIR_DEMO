@@ -4,24 +4,45 @@ import (
 	"time"
 
 	"go-fhir-demo/pkg/logger"
+	"go-fhir-demo/pkg/utils/tracer"
 
 	"github.com/gin-gonic/gin"
+	"go.opentelemetry.io/otel/attribute"
 )
 
-// RequestTracker middleware tracks request and response times
+// RequestTracker middleware tracks request and response times.
+// Tracing (e.g., Jaeger) should be handled in handlers/services, not middleware.
 func RequestTracker() gin.HandlerFunc {
-	return gin.LoggerWithFormatter(func(param gin.LogFormatterParams) string {
-		// Custom log format for request tracking
-		logger.Infof("Request: %s %s | Status: %d | Duration: %v | IP: %s | UserAgent: %s",
-			param.Method,
-			param.Path,
-			param.StatusCode,
-			param.Latency,
-			param.ClientIP,
-			param.Request.UserAgent(),
+	return func(c *gin.Context) {
+		// Start a span for the incoming request
+		ctx, span := tracer.StartSpan(c.Request.Context(), "HTTP "+c.Request.Method+" "+c.FullPath())
+		defer span.End()
+
+		// Replace the request context with the new context containing the span
+		c.Request = c.Request.WithContext(ctx)
+
+		start := time.Now()
+		c.Next()
+		duration := time.Since(start)
+		// Optionally, set attributes on the span for better observability
+		span.SetAttributes(
+			attribute.String("http.method", c.Request.Method),
+			attribute.String("http.path", c.FullPath()),
+			attribute.Int("http.status_code", c.Writer.Status()),
+			attribute.String("http.client_ip", c.ClientIP()),
+			attribute.String("http.user_agent", c.Request.UserAgent()),
+			attribute.String("http.request_id", c.GetString("request_id")),
 		)
-		return ""
-	})
+
+		logger.WithContext(ctx).Infof("Request: %s %s | Status: %d | Duration: %v | IP: %s | UserAgent: %s",
+			c.Request.Method,
+			c.Request.URL.Path,
+			c.Writer.Status(),
+			duration,
+			c.ClientIP(),
+			c.Request.UserAgent(),
+		)
+	}
 }
 
 // RequestTimer middleware adds request timing information to context

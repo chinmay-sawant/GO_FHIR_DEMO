@@ -10,6 +10,7 @@
 package mocks
 
 import (
+	context "context"
 	domain "go-fhir-demo/internal/domain"
 	reflect "reflect"
 
@@ -42,90 +43,90 @@ func (m *MockPatientRepository) EXPECT() *MockPatientRepositoryMockRecorder {
 }
 
 // Count mocks base method.
-func (m *MockPatientRepository) Count() (int64, error) {
+func (m *MockPatientRepository) Count(ctx context.Context) (int64, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Count")
+	ret := m.ctrl.Call(m, "Count", ctx)
 	ret0, _ := ret[0].(int64)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // Count indicates an expected call of Count.
-func (mr *MockPatientRepositoryMockRecorder) Count() *gomock.Call {
+func (mr *MockPatientRepositoryMockRecorder) Count(ctx any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Count", reflect.TypeOf((*MockPatientRepository)(nil).Count))
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Count", reflect.TypeOf((*MockPatientRepository)(nil).Count), ctx)
 }
 
 // Create mocks base method.
-func (m *MockPatientRepository) Create(patient *domain.Patient) error {
+func (m *MockPatientRepository) Create(ctx context.Context, patient *domain.Patient) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Create", patient)
+	ret := m.ctrl.Call(m, "Create", ctx, patient)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // Create indicates an expected call of Create.
-func (mr *MockPatientRepositoryMockRecorder) Create(patient any) *gomock.Call {
+func (mr *MockPatientRepositoryMockRecorder) Create(ctx, patient any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*MockPatientRepository)(nil).Create), patient)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*MockPatientRepository)(nil).Create), ctx, patient)
 }
 
 // Delete mocks base method.
-func (m *MockPatientRepository) Delete(id uint) error {
+func (m *MockPatientRepository) Delete(ctx context.Context, id uint) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Delete", id)
+	ret := m.ctrl.Call(m, "Delete", ctx, id)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // Delete indicates an expected call of Delete.
-func (mr *MockPatientRepositoryMockRecorder) Delete(id any) *gomock.Call {
+func (mr *MockPatientRepositoryMockRecorder) Delete(ctx, id any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Delete", reflect.TypeOf((*MockPatientRepository)(nil).Delete), id)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Delete", reflect.TypeOf((*MockPatientRepository)(nil).Delete), ctx, id)
 }
 
 // GetAll mocks base method.
-func (m *MockPatientRepository) GetAll(limit, offset int) ([]*domain.Patient, error) {
+func (m *MockPatientRepository) GetAll(ctx context.Context, limit, offset int) ([]*domain.Patient, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetAll", limit, offset)
+	ret := m.ctrl.Call(m, "GetAll", ctx, limit, offset)
 	ret0, _ := ret[0].([]*domain.Patient)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // GetAll indicates an expected call of GetAll.
-func (mr *MockPatientRepositoryMockRecorder) GetAll(limit, offset any) *gomock.Call {
+func (mr *MockPatientRepositoryMockRecorder) GetAll(ctx, limit, offset any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAll", reflect.TypeOf((*MockPatientRepository)(nil).GetAll), limit, offset)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAll", reflect.TypeOf((*MockPatientRepository)(nil).GetAll), ctx, limit, offset)
 }
 
 // GetByID mocks base method.
-func (m *MockPatientRepository) GetByID(id uint) (*domain.Patient, error) {
+func (m *MockPatientRepository) GetByID(ctx context.Context, id uint) (*domain.Patient, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetByID", id)
+	ret := m.ctrl.Call(m, "GetByID", ctx, id)
 	ret0, _ := ret[0].(*domain.Patient)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // GetByID indicates an expected call of GetByID.
-func (mr *MockPatientRepositoryMockRecorder) GetByID(id any) *gomock.Call {
+func (mr *MockPatientRepositoryMockRecorder) GetByID(ctx, id any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetByID", reflect.TypeOf((*MockPatientRepository)(nil).GetByID), id)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetByID", reflect.TypeOf((*MockPatientRepository)(nil).GetByID), ctx, id)
 }
 
 // Update mocks base method.
-func (m *MockPatientRepository) Update(patient *domain.Patient) error {
+func (m *MockPatientRepository) Update(ctx context.Context, patient *domain.Patient) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Update", patient)
+	ret := m.ctrl.Call(m, "Update", ctx, patient)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // Update indicates an expected call of Update.
-func (mr *MockPatientRepositoryMockRecorder) Update(patient any) *gomock.Call {
+func (mr *MockPatientRepositoryMockRecorder) Update(ctx, patient any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Update", reflect.TypeOf((*MockPatientRepository)(nil).Update), patient)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Update", reflect.TypeOf((*MockPatientRepository)(nil).Update), ctx, patient)
 }
 
 // MockPatientService is a mock of PatientService interface.
@@ -153,83 +154,83 @@ func (m *MockPatientService) EXPECT() *MockPatientServiceMockRecorder {
 }
 
 // ConvertFromFHIR mocks base method.
-func (m *MockPatientService) ConvertFromFHIR(fhirPatient *fhir.Patient) (*domain.Patient, error) {
+func (m *MockPatientService) ConvertFromFHIR(ctx context.Context, fhirPatient *fhir.Patient) (*domain.Patient, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "ConvertFromFHIR", fhirPatient)
+	ret := m.ctrl.Call(m, "ConvertFromFHIR", ctx, fhirPatient)
 	ret0, _ := ret[0].(*domain.Patient)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // ConvertFromFHIR indicates an expected call of ConvertFromFHIR.
-func (mr *MockPatientServiceMockRecorder) ConvertFromFHIR(fhirPatient any) *gomock.Call {
+func (mr *MockPatientServiceMockRecorder) ConvertFromFHIR(ctx, fhirPatient any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ConvertFromFHIR", reflect.TypeOf((*MockPatientService)(nil).ConvertFromFHIR), fhirPatient)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ConvertFromFHIR", reflect.TypeOf((*MockPatientService)(nil).ConvertFromFHIR), ctx, fhirPatient)
 }
 
 // ConvertToFHIR mocks base method.
-func (m *MockPatientService) ConvertToFHIR(patient *domain.Patient) (*fhir.Patient, error) {
+func (m *MockPatientService) ConvertToFHIR(ctx context.Context, patient *domain.Patient) (*fhir.Patient, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "ConvertToFHIR", patient)
+	ret := m.ctrl.Call(m, "ConvertToFHIR", ctx, patient)
 	ret0, _ := ret[0].(*fhir.Patient)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // ConvertToFHIR indicates an expected call of ConvertToFHIR.
-func (mr *MockPatientServiceMockRecorder) ConvertToFHIR(patient any) *gomock.Call {
+func (mr *MockPatientServiceMockRecorder) ConvertToFHIR(ctx, patient any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ConvertToFHIR", reflect.TypeOf((*MockPatientService)(nil).ConvertToFHIR), patient)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ConvertToFHIR", reflect.TypeOf((*MockPatientService)(nil).ConvertToFHIR), ctx, patient)
 }
 
 // CreatePatient mocks base method.
-func (m *MockPatientService) CreatePatient(fhirPatient *fhir.Patient) (*domain.Patient, error) {
+func (m *MockPatientService) CreatePatient(ctx context.Context, fhirPatient *fhir.Patient) (*domain.Patient, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "CreatePatient", fhirPatient)
+	ret := m.ctrl.Call(m, "CreatePatient", ctx, fhirPatient)
 	ret0, _ := ret[0].(*domain.Patient)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // CreatePatient indicates an expected call of CreatePatient.
-func (mr *MockPatientServiceMockRecorder) CreatePatient(fhirPatient any) *gomock.Call {
+func (mr *MockPatientServiceMockRecorder) CreatePatient(ctx, fhirPatient any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreatePatient", reflect.TypeOf((*MockPatientService)(nil).CreatePatient), fhirPatient)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreatePatient", reflect.TypeOf((*MockPatientService)(nil).CreatePatient), ctx, fhirPatient)
 }
 
 // DeletePatient mocks base method.
-func (m *MockPatientService) DeletePatient(id uint) error {
+func (m *MockPatientService) DeletePatient(ctx context.Context, id uint) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "DeletePatient", id)
+	ret := m.ctrl.Call(m, "DeletePatient", ctx, id)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // DeletePatient indicates an expected call of DeletePatient.
-func (mr *MockPatientServiceMockRecorder) DeletePatient(id any) *gomock.Call {
+func (mr *MockPatientServiceMockRecorder) DeletePatient(ctx, id any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeletePatient", reflect.TypeOf((*MockPatientService)(nil).DeletePatient), id)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeletePatient", reflect.TypeOf((*MockPatientService)(nil).DeletePatient), ctx, id)
 }
 
 // GetPatient mocks base method.
-func (m *MockPatientService) GetPatient(id uint) (*domain.Patient, error) {
+func (m *MockPatientService) GetPatient(ctx context.Context, id uint) (*domain.Patient, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetPatient", id)
+	ret := m.ctrl.Call(m, "GetPatient", ctx, id)
 	ret0, _ := ret[0].(*domain.Patient)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // GetPatient indicates an expected call of GetPatient.
-func (mr *MockPatientServiceMockRecorder) GetPatient(id any) *gomock.Call {
+func (mr *MockPatientServiceMockRecorder) GetPatient(ctx, id any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPatient", reflect.TypeOf((*MockPatientService)(nil).GetPatient), id)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPatient", reflect.TypeOf((*MockPatientService)(nil).GetPatient), ctx, id)
 }
 
 // GetPatients mocks base method.
-func (m *MockPatientService) GetPatients(limit, offset int) ([]*domain.Patient, int64, error) {
+func (m *MockPatientService) GetPatients(ctx context.Context, limit, offset int) ([]*domain.Patient, int64, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetPatients", limit, offset)
+	ret := m.ctrl.Call(m, "GetPatients", ctx, limit, offset)
 	ret0, _ := ret[0].([]*domain.Patient)
 	ret1, _ := ret[1].(int64)
 	ret2, _ := ret[2].(error)
@@ -237,37 +238,37 @@ func (m *MockPatientService) GetPatients(limit, offset int) ([]*domain.Patient, 
 }
 
 // GetPatients indicates an expected call of GetPatients.
-func (mr *MockPatientServiceMockRecorder) GetPatients(limit, offset any) *gomock.Call {
+func (mr *MockPatientServiceMockRecorder) GetPatients(ctx, limit, offset any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPatients", reflect.TypeOf((*MockPatientService)(nil).GetPatients), limit, offset)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPatients", reflect.TypeOf((*MockPatientService)(nil).GetPatients), ctx, limit, offset)
 }
 
 // PatchPatient mocks base method.
-func (m *MockPatientService) PatchPatient(id uint, updates map[string]any) (*domain.Patient, error) {
+func (m *MockPatientService) PatchPatient(ctx context.Context, id uint, updates map[string]any) (*domain.Patient, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "PatchPatient", id, updates)
+	ret := m.ctrl.Call(m, "PatchPatient", ctx, id, updates)
 	ret0, _ := ret[0].(*domain.Patient)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // PatchPatient indicates an expected call of PatchPatient.
-func (mr *MockPatientServiceMockRecorder) PatchPatient(id, updates any) *gomock.Call {
+func (mr *MockPatientServiceMockRecorder) PatchPatient(ctx, id, updates any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "PatchPatient", reflect.TypeOf((*MockPatientService)(nil).PatchPatient), id, updates)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "PatchPatient", reflect.TypeOf((*MockPatientService)(nil).PatchPatient), ctx, id, updates)
 }
 
 // UpdatePatient mocks base method.
-func (m *MockPatientService) UpdatePatient(id uint, fhirPatient *fhir.Patient) (*domain.Patient, error) {
+func (m *MockPatientService) UpdatePatient(ctx context.Context, id uint, fhirPatient *fhir.Patient) (*domain.Patient, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "UpdatePatient", id, fhirPatient)
+	ret := m.ctrl.Call(m, "UpdatePatient", ctx, id, fhirPatient)
 	ret0, _ := ret[0].(*domain.Patient)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // UpdatePatient indicates an expected call of UpdatePatient.
-func (mr *MockPatientServiceMockRecorder) UpdatePatient(id, fhirPatient any) *gomock.Call {
+func (mr *MockPatientServiceMockRecorder) UpdatePatient(ctx, id, fhirPatient any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdatePatient", reflect.TypeOf((*MockPatientService)(nil).UpdatePatient), id, fhirPatient)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdatePatient", reflect.TypeOf((*MockPatientService)(nil).UpdatePatient), ctx, id, fhirPatient)
 }

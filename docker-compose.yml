@@ -18,6 +18,8 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
+    networks:
+      - fhir-network
 
   consul:
     image: hashicorp/consul:1.21.0
@@ -30,6 +32,8 @@ services:
       CONSUL_DATA_DIR: /consul/data
     volumes:
       - consul_data:/consul/data
+    networks:
+      - fhir-network
     healthcheck:
       test: ["CMD", "consul", "members"]
       interval: 10s
@@ -46,6 +50,8 @@ services:
     cap_add:
       - IPC_LOCK
     command: "server"
+    networks:
+      - fhir-network
     healthcheck:
       test: ["CMD", "vault", "status"]
       interval: 10s
@@ -72,7 +78,26 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
-         
+
+  jaeger:
+    image: jaegertracing/all-in-one:1.70.0
+    container_name: fhir_jaeger
+    ports:
+      - "16686:16686"  # Jaeger UI
+      - "14268:14268"  # Jaeger collector HTTP
+      - "14250:14250"  # Jaeger collector gRPC
+      - "6831:6831/udp"    # Jaeger agent UDP
+      - "6832:6832/udp"    # Jaeger agent UDP
+    environment:
+      COLLECTOR_OTLP_ENABLED: true
+      COLLECTOR_ZIPKIN_HOST_PORT: ":9411"
+    networks:
+      - fhir-network
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:16686/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
   fhir-api:
     build: .
@@ -96,6 +121,9 @@ services:
       REDIS_PORT: 6379
       REDIS_PASSWORD: ""
       REDIS_DB: 0
+      JAEGER_ENDPOINT: http://jaeger:14268/api/traces
+      JAEGER_SERVICE_NAME: go-fhir-demo
+      JAEGER_ENVIRONMENT: docker
     ports:
       - "8080:8080"
     depends_on:
@@ -105,9 +133,12 @@ services:
         condition: service_started
       vault:
         condition: service_started
+      jaeger:
+        condition: service_healthy
     volumes:
       - ./logs:/root/logs
-
+    networks:
+      - fhir-network
 
 volumes:
   postgres_data:

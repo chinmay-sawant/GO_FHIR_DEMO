@@ -2,6 +2,7 @@ package fhirclient
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -14,9 +15,9 @@ import (
 
 // ClientInterface defines the contract for FHIR client
 type ClientInterface interface {
-	GetPatientByID(id string) (*fhir.Patient, error)
-	SearchPatients(queryParams map[string]string) (*fhir.Bundle, error)
-	CreatePatient(patient *fhir.Patient) (*fhir.Patient, error)
+	GetPatientByID(ctx context.Context, id string) (*fhir.Patient, error)
+	SearchPatients(ctx context.Context, queryParams map[string]string) (*fhir.Bundle, error)
+	CreatePatient(ctx context.Context, patient *fhir.Patient) (*fhir.Patient, error)
 }
 
 // Client is a client for interacting with a FHIR server.
@@ -36,7 +37,7 @@ func NewClient(baseURL string) ClientInterface {
 }
 
 // GetPatientByID fetches a Patient resource by its ID.
-func (c *Client) GetPatientByID(id string) (*fhir.Patient, error) {
+func (c *Client) GetPatientByID(ctx context.Context, id string) (*fhir.Patient, error) {
 	reqURL := fmt.Sprintf("%s/Patient/%s", c.BaseURL, id)
 	req, err := http.NewRequest("GET", reqURL, nil)
 	if err != nil {
@@ -65,7 +66,7 @@ func (c *Client) GetPatientByID(id string) (*fhir.Patient, error) {
 
 // SearchPatients searches for Patient resources based on query parameters.
 // It returns a FHIR Bundle containing the search results.
-func (c *Client) SearchPatients(queryParams map[string]string) (*fhir.Bundle, error) {
+func (c *Client) SearchPatients(ctx context.Context, queryParams map[string]string) (*fhir.Bundle, error) {
 	baseURL, err := url.Parse(fmt.Sprintf("%s/Patient", c.BaseURL))
 	if err != nil {
 		return nil, fmt.Errorf("failed to parse base URL: %w", err)
@@ -103,7 +104,7 @@ func (c *Client) SearchPatients(queryParams map[string]string) (*fhir.Bundle, er
 }
 
 // CreatePatient creates a new Patient resource on the FHIR server.
-func (c *Client) CreatePatient(patient *fhir.Patient) (*fhir.Patient, error) {
+func (c *Client) CreatePatient(ctx context.Context, patient *fhir.Patient) (*fhir.Patient, error) {
 	reqURL := fmt.Sprintf("%s/Patient", c.BaseURL)
 	body, err := json.Marshal(patient)
 	if err != nil {

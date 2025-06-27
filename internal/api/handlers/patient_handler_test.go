@@ -43,7 +43,7 @@ func (suite *PatientHandlerTestSuite) SetupTest() {
 
 	// Globally mock ConvertToFHIR for any input
 	suite.mockService.EXPECT().
-		ConvertToFHIR(gomock.Any()).
+		ConvertToFHIR(gomock.Any(), gomock.Any()).
 		AnyTimes().
 		Return(&fhir.Patient{Id: utils.CreateStringPtr("mocked")}, nil)
 }
@@ -75,7 +75,7 @@ func (suite *PatientHandlerTestSuite) TestCreatePatient_Success() {
 	}
 	domainPatient := &domain.Patient{ID: 1}
 	suite.mockService.EXPECT().
-		CreatePatient(fhirPatient).
+		CreatePatient(gomock.Any(), fhirPatient).
 		Return(domainPatient, nil)
 
 	body, _ := json.Marshal(fhirPatient)
@@ -103,7 +103,7 @@ func (suite *PatientHandlerTestSuite) TestCreatePatient_BadRequest() {
 func (suite *PatientHandlerTestSuite) TestCreatePatient_Error() {
 	fhirPatient := &fhir.Patient{Id: utils.CreateStringPtr("123")}
 	suite.mockService.EXPECT().
-		CreatePatient(fhirPatient).
+		CreatePatient(gomock.Any(), fhirPatient).
 		Return(&domain.Patient{}, errors.New("create error"))
 
 	body, _ := json.Marshal(fhirPatient)
@@ -117,7 +117,7 @@ func (suite *PatientHandlerTestSuite) TestCreatePatient_Error() {
 func (suite *PatientHandlerTestSuite) TestGetPatient_Success() {
 	domainPatient := &domain.Patient{ID: 1}
 	suite.mockService.EXPECT().
-		GetPatient(uint(1)).
+		GetPatient(gomock.Any(), uint(1)).
 		Return(domainPatient, nil)
 
 	req, _ := http.NewRequest("GET", "/patients/1", nil)
@@ -128,7 +128,7 @@ func (suite *PatientHandlerTestSuite) TestGetPatient_Success() {
 
 func (suite *PatientHandlerTestSuite) TestGetPatient_NotFound() {
 	suite.mockService.EXPECT().
-		GetPatient(uint(2)).
+		GetPatient(gomock.Any(), uint(2)).
 		Return(nil, errors.New("not found"))
 	req, _ := http.NewRequest("GET", "/patients/2", nil)
 	w := httptest.NewRecorder()
@@ -151,7 +151,7 @@ func (suite *PatientHandlerTestSuite) TestGetPatients_Success() {
 		{ID: 2, Family: "Smith", Given: "Jane", Gender: "female", Active: &active},
 	}
 	suite.mockService.EXPECT().
-		GetPatients(10, 0).
+		GetPatients(gomock.Any(), 10, 0).
 		Return(domainPatients, int64(2), nil)
 
 	req, _ := http.NewRequest("GET", "/patients?limit=10&offset=0", nil)
@@ -179,7 +179,7 @@ func (suite *PatientHandlerTestSuite) TestUpdatePatient_Success() {
 	}
 	domainPatient := &domain.Patient{ID: 1}
 	suite.mockService.EXPECT().
-		UpdatePatient(uint(1), fhirPatient).
+		UpdatePatient(gomock.Any(), uint(1), fhirPatient).
 		Return(domainPatient, nil)
 
 	body, _ := json.Marshal(fhirPatient)
@@ -194,7 +194,7 @@ func (suite *PatientHandlerTestSuite) TestPatchPatient_Success() {
 	patch := map[string]interface{}{"family": "Updated"}
 	domainPatient := &domain.Patient{ID: 1, Family: "Updated"}
 	suite.mockService.EXPECT().
-		PatchPatient(uint(1), patch).
+		PatchPatient(gomock.Any(), uint(1), patch).
 		Return(domainPatient, nil)
 
 	body, _ := json.Marshal(patch)
@@ -207,7 +207,7 @@ func (suite *PatientHandlerTestSuite) TestPatchPatient_Success() {
 
 func (suite *PatientHandlerTestSuite) TestDeletePatient_Success() {
 	suite.mockService.EXPECT().
-		DeletePatient(uint(1)).
+		DeletePatient(gomock.Any(), uint(1)).
 		Return(nil)
 	req, _ := http.NewRequest("DELETE", "/patients/1", nil)
 	w := httptest.NewRecorder()
@@ -224,7 +224,7 @@ func (suite *PatientHandlerTestSuite) TestDeletePatient_BadRequest() {
 
 func (suite *PatientHandlerTestSuite) TestDeletePatient_Error() {
 	suite.mockService.EXPECT().
-		DeletePatient(uint(2)).
+		DeletePatient(gomock.Any(), uint(2)).
 		Return(errors.New("delete error"))
 	req, _ := http.NewRequest("DELETE", "/patients/2", nil)
 	w := httptest.NewRecorder()

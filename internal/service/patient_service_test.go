@@ -1,6 +1,7 @@
 package service
 
 import (
+	"context"
 	"errors"
 	"testing"
 	"time"
@@ -51,12 +52,12 @@ func (suite *PatientServiceTestSuite) TestCreatePatient_Success() {
 	}
 
 	suite.mockRepo.EXPECT().
-		Create(gomock.Any()).
+		Create(gomock.Any(), gomock.Any()).
 		Return(nil).
 		Times(1)
 
 	// Act
-	patient, err := suite.service.CreatePatient(fhirPatient)
+	patient, err := suite.service.CreatePatient(context.Background(), fhirPatient)
 
 	// Assert
 	assert.NoError(suite.T(), err)
@@ -80,12 +81,12 @@ func (suite *PatientServiceTestSuite) TestCreatePatient_Error() {
 	}
 
 	suite.mockRepo.EXPECT().
-		Create(gomock.Any()).
+		Create(gomock.Any(), gomock.Any()).
 		Return(errors.New("database error")).
 		Times(1)
 
 	// Act
-	patient, err := suite.service.CreatePatient(fhirPatient)
+	patient, err := suite.service.CreatePatient(context.Background(), fhirPatient)
 
 	// Assert
 	assert.Error(suite.T(), err)
@@ -105,12 +106,12 @@ func (suite *PatientServiceTestSuite) TestGetPatient_Success() {
 	}
 
 	suite.mockRepo.EXPECT().
-		GetByID(patientID).
+		GetByID(gomock.Any(), patientID).
 		Return(expectedPatient, nil).
 		Times(1)
 
 	// Act
-	patient, err := suite.service.GetPatient(patientID)
+	patient, err := suite.service.GetPatient(context.Background(), patientID)
 
 	// Assert
 	assert.NoError(suite.T(), err)
@@ -124,12 +125,12 @@ func (suite *PatientServiceTestSuite) TestGetPatient_NotFound() {
 	// Arrange
 	patientID := uint(999)
 	suite.mockRepo.EXPECT().
-		GetByID(patientID).
+		GetByID(gomock.Any(), patientID).
 		Return(nil, errors.New("patient not found")).
 		Times(1)
 
 	// Act
-	patient, err := suite.service.GetPatient(patientID)
+	patient, err := suite.service.GetPatient(context.Background(), patientID)
 
 	// Assert
 	assert.Error(suite.T(), err)
@@ -147,17 +148,17 @@ func (suite *PatientServiceTestSuite) TestGetPatients_Success() {
 	expectedCount := int64(2)
 
 	suite.mockRepo.EXPECT().
-		GetAll(limit, offset).
+		GetAll(gomock.Any(), limit, offset).
 		Return(expectedPatients, nil).
 		Times(1)
 
 	suite.mockRepo.EXPECT().
-		Count().
+		Count(gomock.Any()).
 		Return(expectedCount, nil).
 		Times(1)
 
 	// Act
-	patients, count, err := suite.service.GetPatients(limit, offset)
+	patients, count, err := suite.service.GetPatients(context.Background(), limit, offset)
 
 	// Assert
 	assert.NoError(suite.T(), err)
@@ -171,12 +172,12 @@ func (suite *PatientServiceTestSuite) TestGetPatients_Error() {
 	// Arrange
 	limit, offset := 10, 0
 	suite.mockRepo.EXPECT().
-		GetAll(limit, offset).
+		GetAll(gomock.Any(), limit, offset).
 		Return(nil, errors.New("database error")).
 		Times(1)
 
 	// Act
-	patients, count, err := suite.service.GetPatients(limit, offset)
+	patients, count, err := suite.service.GetPatients(context.Background(), limit, offset)
 
 	// Assert
 	assert.Error(suite.T(), err)
@@ -206,17 +207,17 @@ func (suite *PatientServiceTestSuite) TestUpdatePatient_Success() {
 	}
 
 	suite.mockRepo.EXPECT().
-		GetByID(patientID).
+		GetByID(gomock.Any(), patientID).
 		Return(existingPatient, nil).
 		Times(1)
 
 	suite.mockRepo.EXPECT().
-		Update(gomock.Any()).
+		Update(gomock.Any(), gomock.Any()).
 		Return(nil).
 		Times(1)
 
 	// Act
-	patient, err := suite.service.UpdatePatient(patientID, updatedFhirPatient)
+	patient, err := suite.service.UpdatePatient(context.Background(), patientID, updatedFhirPatient)
 
 	// Assert
 	assert.NoError(suite.T(), err)
@@ -239,12 +240,12 @@ func (suite *PatientServiceTestSuite) TestUpdatePatient_NotFound() {
 	}
 
 	suite.mockRepo.EXPECT().
-		GetByID(patientID).
+		GetByID(gomock.Any(), patientID).
 		Return(nil, errors.New("patient not found")).
 		Times(1)
 
 	// Act
-	patient, err := suite.service.UpdatePatient(patientID, updatedFhirPatient)
+	patient, err := suite.service.UpdatePatient(context.Background(), patientID, updatedFhirPatient)
 
 	// Assert
 	assert.Error(suite.T(), err)
@@ -256,12 +257,12 @@ func (suite *PatientServiceTestSuite) TestDeletePatient_Success() {
 	// Arrange
 	patientID := uint(1)
 	suite.mockRepo.EXPECT().
-		Delete(patientID).
+		Delete(gomock.Any(), patientID).
 		Return(nil).
 		Times(1)
 
 	// Act
-	err := suite.service.DeletePatient(patientID)
+	err := suite.service.DeletePatient(context.Background(), patientID)
 
 	// Assert
 	assert.NoError(suite.T(), err)
@@ -272,12 +273,12 @@ func (suite *PatientServiceTestSuite) TestDeletePatient_Error() {
 	// Arrange
 	patientID := uint(1)
 	suite.mockRepo.EXPECT().
-		Delete(patientID).
+		Delete(gomock.Any(), patientID).
 		Return(errors.New("delete failed")).
 		Times(1)
 
 	// Act
-	err := suite.service.DeletePatient(patientID)
+	err := suite.service.DeletePatient(context.Background(), patientID)
 
 	// Assert
 	assert.Error(suite.T(), err)
@@ -293,7 +294,7 @@ func (suite *PatientServiceTestSuite) TestConvertToFHIR_Success() {
 	}
 
 	// Act
-	fhirPatient, err := suite.service.ConvertToFHIR(patient)
+	fhirPatient, err := suite.service.ConvertToFHIR(context.Background(), patient)
 
 	// Assert
 	assert.NoError(suite.T(), err)
@@ -311,7 +312,7 @@ func (suite *PatientServiceTestSuite) TestConvertToFHIR_InvalidJSON() {
 	}
 
 	// Act
-	fhirPatient, err := suite.service.ConvertToFHIR(patient)
+	fhirPatient, err := suite.service.ConvertToFHIR(context.Background(), patient)
 
 	// Assert
 	assert.Error(suite.T(), err)
@@ -335,7 +336,7 @@ func (suite *PatientServiceTestSuite) TestConvertFromFHIR_Success() {
 	}
 
 	// Act
-	patient, err := suite.service.ConvertFromFHIR(fhirPatient)
+	patient, err := suite.service.ConvertFromFHIR(context.Background(), fhirPatient)
 
 	// Assert
 	assert.NoError(suite.T(), err)
@@ -361,17 +362,17 @@ func (suite *PatientServiceTestSuite) TestPatchPatient_Success() {
 	}
 
 	suite.mockRepo.EXPECT().
-		GetByID(patientID).
+		GetByID(gomock.Any(), patientID).
 		Return(existingPatient, nil).
 		Times(1)
 
 	suite.mockRepo.EXPECT().
-		Update(gomock.Any()).
+		Update(gomock.Any(), gomock.Any()).
 		Return(nil).
 		Times(1)
 
 	// Act
-	patient, err := suite.service.PatchPatient(patientID, updates)
+	patient, err := suite.service.PatchPatient(context.Background(), patientID, updates)
 
 	// Assert
 	assert.NoError(suite.T(), err)
