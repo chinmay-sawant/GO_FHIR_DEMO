@@ -88,6 +88,7 @@ services:
       - "14250:14250"  # Jaeger collector gRPC
       - "6831:6831/udp"    # Jaeger agent UDP
       - "6832:6832/udp"    # Jaeger agent UDP
+      - "4318:4318"        # OTLP HTTP endpoint
     environment:
       COLLECTOR_OTLP_ENABLED: true
       COLLECTOR_ZIPKIN_HOST_PORT: ":9411"

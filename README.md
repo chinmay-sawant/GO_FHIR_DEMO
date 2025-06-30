@@ -731,3 +731,18 @@ gotestsum provides:
 - Support for various output formats
 - Better test result visualization
 - Support for various output formats
+
+### Development & Tooling
+
+#### Linting
+
+- **golangci-lint** is used for static code analysis and linting.
+- To install:  
+  ```sh
+  go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
+  ```
+- To run lint checks:  
+  ```sh
+  make lint
+  ```
+- This will check your codebase for common Go issues and enforce code quality.
