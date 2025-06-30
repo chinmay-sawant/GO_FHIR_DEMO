@@ -120,7 +120,8 @@ func (suite *PatientRepositoryTestSuite) TestGetByID_Success() {
 		Gender:    "female",
 		BirthDate: &birthDate,
 	}
-	suite.repository.Create(context.Background(), patient)
+	err := suite.repository.Create(context.Background(), patient)
+	assert.NoError(suite.T(), err)
 	got, err := suite.repository.GetByID(context.Background(), patient.ID)
 	assert.NoError(suite.T(), err)
 	assert.NotNil(suite.T(), got)
@@ -157,8 +158,10 @@ func (suite *PatientRepositoryTestSuite) TestGetAll_Success() {
 		Gender:    "female",
 		BirthDate: &birthDate2,
 	}
-	suite.repository.Create(context.Background(), p1)
-	suite.repository.Create(context.Background(), p2)
+	err := suite.repository.Create(context.Background(), p1)
+	assert.NoError(suite.T(), err)
+	err = suite.repository.Create(context.Background(), p2)
+	assert.NoError(suite.T(), err)
 	list, err := suite.repository.GetAll(context.Background(), 10, 0)
 	assert.NoError(suite.T(), err)
 	assert.Len(suite.T(), list, 2)
@@ -176,7 +179,8 @@ func (suite *PatientRepositoryTestSuite) TestGetAll_WithPagination() {
 			Gender:    "male",
 			BirthDate: utils.CreateTimePtr(time.Now().AddDate(-20-i, 0, 0).String()),
 		}
-		suite.repository.Create(context.Background(), patient)
+		err := suite.repository.Create(context.Background(), patient)
+		assert.NoError(suite.T(), err)
 	}
 
 	// Act
@@ -202,10 +206,11 @@ func (suite *PatientRepositoryTestSuite) TestUpdate_Success() {
 		Gender:    "male",
 		BirthDate: &birthDate,
 	}
-	suite.repository.Create(context.Background(), patient)
-	patient.Family = "Delta"
-	err := suite.repository.Update(context.Background(), patient)
+	err := suite.repository.Create(context.Background(), patient)
 	assert.NoError(suite.T(), err)
+	patient.Family = "Delta"
+	err2 := suite.repository.Update(context.Background(), patient)
+	assert.NoError(suite.T(), err2)
 	got, _ := suite.repository.GetByID(context.Background(), patient.ID)
 	assert.Equal(suite.T(), "Delta", got.Family)
 }
@@ -222,8 +227,9 @@ func (suite *PatientRepositoryTestSuite) TestDelete_Success() {
 		Gender:    "female",
 		BirthDate: &birthDate,
 	}
-	suite.repository.Create(context.Background(), patient)
-	err := suite.repository.Delete(context.Background(), patient.ID)
+	err := suite.repository.Create(context.Background(), patient)
+	assert.NoError(suite.T(), err)
+	err = suite.repository.Delete(context.Background(), patient.ID)
 	assert.NoError(suite.T(), err)
 	got, err := suite.repository.GetByID(context.Background(), patient.ID)
 	assert.Error(suite.T(), err)
@@ -250,8 +256,10 @@ func (suite *PatientRepositoryTestSuite) TestCount_Success() {
 		Gender:    "female",
 		BirthDate: &birthDate,
 	}
-	suite.repository.Create(context.Background(), p1)
-	suite.repository.Create(context.Background(), p2)
+	err := suite.repository.Create(context.Background(), p1)
+	assert.NoError(suite.T(), err)
+	err = suite.repository.Create(context.Background(), p2)
+	assert.NoError(suite.T(), err)
 	count, err := suite.repository.Count(context.Background())
 	assert.NoError(suite.T(), err)
 	assert.Equal(suite.T(), int64(2), count)

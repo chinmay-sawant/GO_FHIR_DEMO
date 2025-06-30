@@ -7,7 +7,7 @@ import (
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/codes"
-	"go.opentelemetry.io/otel/exporters/jaeger"
+	jaeger "go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp"
 	"go.opentelemetry.io/otel/propagation"
 	"go.opentelemetry.io/otel/sdk/resource"
 	tracesdk "go.opentelemetry.io/otel/sdk/trace"
@@ -39,16 +39,15 @@ func InitJaeger(cfg Config) (*TracerProvider, error) {
 	}
 
 	// Create Jaeger exporter
-	exp, err := jaeger.New(jaeger.WithCollectorEndpoint(jaeger.WithEndpoint(cfg.Endpoint)))
+	exp, err := jaeger.New(context.Background(), jaeger.WithEndpointURL(cfg.Endpoint))
 	if err != nil {
 		return nil, fmt.Errorf("failed to create Jaeger exporter: %w", err)
 	}
 
-	// Create resource with service information
-	res, err := resource.Merge(
-		resource.Default(),
-		resource.NewWithAttributes(
-			semconv.SchemaURL,
+	// Create resource with service information (do NOT merge with resource.Default to avoid schema conflict)
+	res, err := resource.New(
+		context.Background(),
+		resource.WithAttributes(
 			semconv.ServiceName(cfg.ServiceName),
 			semconv.ServiceVersion("1.0.0"),
 			attribute.String("environment", cfg.Environment),

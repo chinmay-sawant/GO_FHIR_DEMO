@@ -30,7 +30,7 @@
     "secret_path": "secret/data/myapp"
   },
   "jaeger": {
-    "endpoint": "http://localhost:14268/api/traces",
+    "endpoint": "http://localhost:4318",
     "service_name": "go-fhir-demo",
     "environment": "development",
     "enabled": true

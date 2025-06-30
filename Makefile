@@ -66,6 +66,10 @@ install-migrate:
 install-gotestsum:
 	go install gotest.tools/gotestsum@latest
 
+## Install golangci-lint
+install-golangci-lint:
+	go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
+
 ## Setup development environment
 setup: deps install-migrate install-gotestsum
 	copy .env.example .env
@@ -111,6 +115,11 @@ clean-mocks:
 	)
 	@echo Mock cleanup completed.
 
+## Run golangci-lint
+.PHONY: lint
+lint:
+	golangci-lint run
+
 ## Display help
 help:
 	@echo Available commands:
@@ -126,6 +135,8 @@ help:
 	@echo   migrate-create     - Create new migration (use: make migrate-create name=migration_name)
 	@echo   install-migrate    - Install migration tools
 	@echo   install-gotestsum  - Install gotestsum for JUnit XML reports
+	@echo   install-golangci-lint - Install golangci-lint for linting
+	@echo   lint               - Run golangci-lint on the codebase
 	@echo   setup              - Setup development environment
 	@echo   help               - Display this help
 	@echo   mocks              - Generate all mocks
