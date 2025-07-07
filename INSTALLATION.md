@@ -36,6 +36,13 @@ This guide provides detailed instructions for setting up and running the Go FHIR
   psql --version
   ```
 
+#### 5. **Apache Kafka** (for manual setup)
+- **Download:** [https://kafka.apache.org/downloads](https://kafka.apache.org/downloads)
+- **Verify installation:**
+  ```bash
+  kafka-topics --version
+  ```
+
 ### Optional Development Tools
 
 #### 1. **golang-migrate** (Database migrations)
@@ -111,6 +118,11 @@ CONSUL_KEY=myapp/secret
 VAULT_ADDRESS=http://vault:8200
 VAULT_TOKEN=root
 VAULT_SECRET_PATH=secret/data/myapp
+
+# Kafka Configuration
+KAFKA_BROKER=localhost:9092
+KAFKA_TOPIC=async-topic
+KAFKA_GROUP_ID=async-group
 ```
 
 #### Step 3: Start Services
@@ -158,9 +170,9 @@ cd Go_FHIR_Demo
 go mod tidy
 ```
 
-#### Step 3: Database Setup
+#### Step 3: Database & Kafka Setup
 
-##### Option A: Using Docker for PostgreSQL only
+##### Option A: Using Docker for PostgreSQL and Kafka
 ```bash
 docker run --name fhir_postgres \
   -e POSTGRES_DB=fhir_demo \
@@ -168,16 +180,22 @@ docker run --name fhir_postgres \
   -e POSTGRES_PASSWORD=fhir_password \
   -p 5432:5432 \
   -d postgres:15-alpine
+
+docker run --name zookeeper -p 2181:2181 -d zookeeper:3.8
+docker run --name kafka \
+  -e KAFKA_ZOOKEEPER_CONNECT=host.docker.internal:2181 \
+  -e KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://localhost:9092 \
+  -p 9092:9092 \
+  -d bitnami/kafka:latest
 ```
 
-##### Option B: Manual PostgreSQL Setup
-1. Install PostgreSQL
-2. Create database and user:
-```sql
-CREATE DATABASE fhir_demo;
-CREATE USER fhir_user WITH PASSWORD 'fhir_password';
-GRANT ALL PRIVILEGES ON DATABASE fhir_demo TO fhir_user;
-```
+##### Option B: Manual Kafka Setup
+1. [Install Kafka](https://kafka.apache.org/quickstart)
+2. Start Zookeeper and Kafka brokers
+3. Create the topic:
+   ```bash
+   kafka-topics --create --topic async-topic --bootstrap-server localhost:9092 --partitions 1 --replication-factor 1
+   ```
 
 #### Step 4: Environment Configuration
 Create `.env` file:
@@ -208,6 +226,11 @@ CONSUL_KEY=myapp/secret
 VAULT_ADDRESS=http://localhost:8200
 VAULT_TOKEN=root
 VAULT_SECRET_PATH=secret/data/myapp
+
+# Kafka Configuration
+KAFKA_BROKER=localhost:9092
+KAFKA_TOPIC=async-topic
+KAFKA_GROUP_ID=async-group
 ```
 
 #### Step 5: Run Database Migrations
@@ -268,6 +291,11 @@ air
     "address": "http://localhost:8200",
     "token": "root",
     "secret_path": "secret/data/myapp"
+  },
+  "kafka": {
+    "broker": "localhost:9092",
+    "topic": "async-topic",
+    "group_id": "async-group"
   }
 }
 ```
@@ -308,6 +336,9 @@ cluster_addr = "http://fhir_vault:8201"
 | `VAULT_ADDRESS` | Vault server address | `http://localhost:8200` | No |
 | `VAULT_TOKEN` | Vault authentication token | `root` | No |
 | `VAULT_SECRET_PATH` | Vault secret path | `secret/data/myapp` | No |
+| `KAFKA_BROKER` | Kafka broker address | `localhost:9092` | No |
+| `KAFKA_TOPIC` | Kafka topic name | `async-topic` | No |
+| `KAFKA_GROUP_ID` | Kafka consumer group | `async-group` | No |
 
 ## 🧪 Testing Setup
 
@@ -435,6 +466,19 @@ migrate -path migrations -database "postgres://..." version
 
 # Force migration version
 migrate -path migrations -database "postgres://..." force <version>
+```
+
+#### 5. **Kafka Topic Not Found**
+If you see errors like `Unknown Topic Or Partition`, create the topic:
+```bash
+docker exec -it fhir_kafka kafka-topics --create --topic async-topic --bootstrap-server localhost:9092 --partitions 1 --replication-factor 1
+```
+
+#### 6. **Kafka Cluster ID Mismatch**
+If you see `InconsistentClusterIdException`, remove Kafka and Zookeeper volumes:
+```bash
+docker-compose down -v
+docker-compose up -d
 ```
 
 ### Docker Issues

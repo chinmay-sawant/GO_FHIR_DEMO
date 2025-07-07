@@ -156,6 +156,9 @@ Closing (cancelling) already running jobs in Go is not straightforward, especial
 - **Consul** - Service discovery and key-value store integration
 - **HashiCorp Vault** - Secure secret management and storage
 
+### Messaging
+- **Apache Kafka** - Asynchronous messaging and event streaming
+
 ## 📋 Prerequisites
 
 For detailed installation instructions, see [INSTALLATION.md](INSTALLATION.md).
@@ -241,6 +244,12 @@ swag init --parseDependency --parseDepth 99
 | `GET` | `/consul/secret` | Get secret from Consul KV store | JSON secret data |
 | `GET` | `/vault/secret` | Get secret from Vault KV store | JSON secret data |
 
+### Kafka Integration Endpoints
+
+| Method | Endpoint | Description | Request Body |
+|--------|----------|-------------|--------------|
+| `POST` | `/api/v1/async/publish` | Publish async data to Kafka topic | `{ "id": "some-id", "data": "your-payload" }` |
+
 ### Example Usage
 
 #### Create a New Patient (Local)
@@ -309,6 +318,13 @@ curl -X GET http://localhost:8080/consul/secret
 curl -X GET http://localhost:8080/vault/secret
 ```
 
+#### Publish Async Data to Kafka
+```bash
+curl -X POST http://localhost:8080/api/v1/async/publish \
+  -H "Content-Type: application/json" \
+  -d '{"id": "123", "data": "Sample async data"}'
+```
+
 ## ⚙️ Configuration
 
 ### Environment Variables
@@ -334,6 +350,9 @@ curl -X GET http://localhost:8080/vault/secret
 | `REDIS_PORT` | Redis server port | `6379` | No |
 | `REDIS_PASSWORD` | Redis password | `` | No |
 | `REDIS_DB` | Redis database number | `0` | No |
+| `KAFKA_BROKER` | Kafka broker address | `localhost:9092` | No |
+| `KAFKA_TOPIC` | Kafka topic to publish/consume | `async-topic` | No |
+| `KAFKA_GROUP_ID` | Kafka consumer group ID | `myapp-group` | No |
 
 ### Configuration File
 The application also supports JSON configuration via `config/config.json` for default values. Environment variables take precedence over configuration file settings.
@@ -381,6 +400,22 @@ REDIS_HOST=localhost
 REDIS_PORT=6379
 REDIS_PASSWORD=
 REDIS_DB=0
+```
+
+#### Kafka Configuration
+Configure Kafka integration in your environment:
+```env
+KAFKA_BROKER=localhost:9092
+KAFKA_TOPIC=async-topic
+KAFKA_GROUP_ID=myapp-group
+```
+Or in `config/config.json`:
+```json
+"kafka": {
+  "broker": "localhost:9092",
+  "topic": "myapp-topic",
+  "group_id": "myapp-group"
+}
 ```
 
 Popular public FHIR servers for testing:
