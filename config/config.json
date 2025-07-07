@@ -34,5 +34,10 @@
     "service_name": "go-fhir-demo",
     "environment": "development",
     "enabled": true
+  },
+  "kafka": {
+    "broker": "localhost:9092",
+    "topic": "myapp-topic",
+    "group_id": "myapp-group"
   }
 }

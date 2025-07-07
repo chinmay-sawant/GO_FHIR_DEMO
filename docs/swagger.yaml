@@ -1,5 +1,12 @@
 basePath: /api/v1
 definitions:
+  domain.Async:
+    properties:
+      data:
+        type: string
+      id:
+        type: string
+    type: object
   fhir.Address:
     properties:
       city:
@@ -1502,6 +1509,39 @@ paths:
       summary: Get secret from Vault KV
       tags:
       - Vault
+  /async/publish:
+    post:
+      consumes:
+      - application/json
+      description: Publishes async data to Kafka topic
+      parameters:
+      - description: Async data
+        in: body
+        name: async
+        required: true
+        schema:
+          $ref: '#/definitions/domain.Async'
+      produces:
+      - application/json
+      responses:
+        "202":
+          description: Accepted
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Publish async data to Kafka
+      tags:
+      - Async
   /cron/cleanup:
     post:
       description: Triggers a background cleanup job.

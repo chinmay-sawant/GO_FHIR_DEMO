@@ -100,6 +100,41 @@ services:
       timeout: 10s
       retries: 3
 
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.5.0
+    container_name: fhir_zookeeper
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      - "2181:2181"
+    volumes:
+      - zookeeper_data:/var/lib/zookeeper
+    networks:
+      - fhir-network
+
+  kafka:
+    image: confluentinc/cp-kafka:7.5.0
+    container_name: fhir_kafka
+    depends_on:
+      - zookeeper
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT_INTERNAL://localhost:29092,PLAINTEXT_EXTERNAL://localhost:9092
+      KAFKA_LISTENERS: PLAINTEXT_INTERNAL://0.0.0.0:29092,PLAINTEXT_EXTERNAL://0.0.0.0:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT_INTERNAL:PLAINTEXT,PLAINTEXT_EXTERNAL:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT_INTERNAL
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+    volumes:
+      - kafka_data:/var/lib/kafka/data
+    networks:
+      - fhir-network
+
   fhir-api:
     build: .
     container_name: fhir_api
@@ -125,6 +160,9 @@ services:
       JAEGER_ENDPOINT: http://jaeger:14268/api/traces
       JAEGER_SERVICE_NAME: go-fhir-demo
       JAEGER_ENVIRONMENT: docker
+      KAFKA_BROKER: kafka:29092
+      KAFKA_TOPIC: async-topic
+      KAFKA_GROUP_ID: async-group
     ports:
       - "8080:8080"
     depends_on:
@@ -136,6 +174,8 @@ services:
         condition: service_started
       jaeger:
         condition: service_healthy
+      kafka:
+        condition: service_started
     volumes:
       - ./logs:/root/logs
     networks:
@@ -146,6 +186,8 @@ volumes:
   consul_data:
   vault_data:
   redis_data:
+  zookeeper_data:
+  kafka_data:
 
 networks:
   fhir-network:
