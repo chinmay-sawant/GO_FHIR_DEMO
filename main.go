@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"log"
 	"net"
 	"net/http"
 	"os"
@@ -14,6 +15,7 @@ import (
 	"go-fhir-demo/internal/api/handlers"
 	"go-fhir-demo/internal/api/handlers/cron"
 	"go-fhir-demo/internal/api/routes"
+	"go-fhir-demo/internal/consumer" // <-- Add this import
 	"go-fhir-demo/internal/domain"
 	"go-fhir-demo/internal/repository"
 	"go-fhir-demo/internal/service"
@@ -65,15 +67,28 @@ func main() {
 	// Load configuration
 	cfg, err := config.Load()
 	if err != nil {
-		fmt.Printf("Failed to load configuration: %v\n", err)
-		os.Exit(1)
+		log.Fatalf("Failed to load config: %v", err)
+	}
+
+	// Kafka configuration from environment variables
+	kafkaBroker := cfg.Kafka.Broker
+	kafkaTopic := cfg.Kafka.Topic
+	kafkaGroupID := cfg.Kafka.GroupID
+
+	// Start Kafka async consumer (runs in background)
+	if kafkaBroker != "" && kafkaTopic != "" && kafkaGroupID != "" {
+		log.Printf("Starting Kafka consumer for topic %s", kafkaTopic)
+		consumer.StartAsyncConsumer(kafkaBroker, kafkaTopic, kafkaGroupID)
+	}
+
+	// Initialize async handler for Kafka publishing
+	var asyncHandler handlers.AsyncHandlerInterface
+	if kafkaBroker != "" && kafkaTopic != "" {
+		asyncHandler = handlers.NewAsyncHandler(kafkaBroker, kafkaTopic)
 	}
 
 	// Initialize logger
-	if err := logger.Initialize(cfg.Logging.Level, cfg.Logging.Format, cfg.Logging.File); err != nil {
-		fmt.Printf("Failed to initialize logger: %v\n", err)
-		os.Exit(1)
-	}
+	logger.Initialize(cfg.Log.Level, cfg.Log.File, cfg.Log.Format)
 
 	logger.Info("Starting FHIR Patient API server...")
 
@@ -99,7 +114,7 @@ func main() {
 	logger.Infof("Jaeger tracing initialized successfully")
 
 	// Initialize database
-	if err := database.Initialize(&cfg.Database); err != nil {
+	if err := database.Initialize(&cfg.DB); err != nil {
 		logger.Errorf("Failed to initialize database: %v", err)
 		os.Exit(1)
 	}
@@ -260,11 +275,11 @@ func main() {
 	externalPatientHandler := handlers.NewExternalPatientHandler(externalPatientService)
 	cronJobHandler := cron.NewCronJobHandler() // or nil if not used
 	consulHandler := handlers.NewConsulHandler(&cfg.Consul)
-
+	vaultHandler := handlers.NewVaultHandler(&cfg.Vault)
 	// Set Gin mode
 	gin.SetMode(cfg.Server.Mode)
 	// Setup routes (pass consulHandler)
-	router := routes.SetupRoutes(patientHandler, externalPatientHandler, cronJobHandler, consulHandler)
+	router := routes.SetupRoutes(patientHandler, externalPatientHandler, cronJobHandler, vaultHandler, asyncHandler, consulHandler)
 
 	// Add OpenTelemetry middleware
 	if cfg.Jaeger.Enabled {

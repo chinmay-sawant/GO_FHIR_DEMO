@@ -10,7 +10,7 @@ import (
 
 // RouteSetupInterface defines the contract for route setup
 type RouteSetupInterface interface {
-	SetupRoutes(patientHandler handlers.PatientHandlerInterface, externalPatientHandler handlers.ExternalPatientHandlerInterface, cronJobHandler cron.CronJobHandlerInterface, consulHandler ...handlers.ConsulHandlerInterface) *gin.Engine
+	SetupRoutes(patientHandler handlers.PatientHandlerInterface, externalPatientHandler handlers.ExternalPatientHandlerInterface, cronJobHandler cron.CronJobHandlerInterface, vaultHandler handlers.VaultHandlerInterface, asyncHandler handlers.AsyncHandlerInterface, consulHandler ...handlers.ConsulHandlerInterface) *gin.Engine
 }
 
 // RouteSetup implements RouteSetupInterface
@@ -22,9 +22,9 @@ func NewRouteSetup() RouteSetupInterface {
 }
 
 // Legacy function for backward compatibility
-func SetupRoutes(patientHandler handlers.PatientHandlerInterface, externalPatientHandler handlers.ExternalPatientHandlerInterface, cronJobHandler cron.CronJobHandlerInterface, consulHandler ...handlers.ConsulHandlerInterface) *gin.Engine {
+func SetupRoutes(patientHandler handlers.PatientHandlerInterface, externalPatientHandler handlers.ExternalPatientHandlerInterface, cronJobHandler cron.CronJobHandlerInterface, vaultHandler handlers.VaultHandlerInterface, asyncHandler handlers.AsyncHandlerInterface, consulHandler ...handlers.ConsulHandlerInterface) *gin.Engine {
 	routeSetup := NewRouteSetup()
-	return routeSetup.SetupRoutes(patientHandler, externalPatientHandler, cronJobHandler, consulHandler...)
+	return routeSetup.SetupRoutes(patientHandler, externalPatientHandler, cronJobHandler, vaultHandler, asyncHandler, consulHandler...)
 }
 
 // SetupRoutes configures all the routes for the application
@@ -33,6 +33,8 @@ func (r *RouteSetup) SetupRoutes(
 	externalPatientHandler handlers.ExternalPatientHandlerInterface,
 	cronJobHandler cron.CronJobHandlerInterface,
 	// Add optional handlers
+	vaultHandler handlers.VaultHandlerInterface,
+	asyncHandler handlers.AsyncHandlerInterface,
 	consulHandler ...handlers.ConsulHandlerInterface,
 ) *gin.Engine {
 	router := gin.New()
@@ -77,6 +79,14 @@ func (r *RouteSetup) SetupRoutes(
 			externalPatients.POST("", externalPatientHandler.CreateExternalPatient)
 		}
 
+		// Consul routes
+		if len(consulHandler) > 0 && consulHandler[0] != nil {
+			v1.GET("/consul/secret", consulHandler[0].GetConsulSecret)
+		}
+
+		// Vault routes
+		v1.GET("/vault/secret", vaultHandler.GetVaultSecret)
+
 		// Cron job routes
 		if cronJobHandler != nil {
 			cronJobs := v1.Group("/cron")
@@ -85,10 +95,12 @@ func (r *RouteSetup) SetupRoutes(
 				cronJobs.POST("/sync", cronJobHandler.TriggerDataSyncJob)
 			}
 		}
-		// Consul secret endpoint
-		if len(consulHandler) > 0 && consulHandler[0] != nil {
-			v1.GET("/consul/secret", consulHandler[0].GetConsulSecret)
+
+		// Register async publish endpoint if handler is initialized
+		if asyncHandler != nil {
+			v1.POST("/async/publish", asyncHandler.PublishAsync)
 		}
+
 	}
 
 	// FHIR metadata endpoint

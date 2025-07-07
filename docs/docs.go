@@ -71,6 +71,55 @@ const docTemplate = `{
                 }
             }
         },
+        "/async/publish": {
+            "post": {
+                "description": "Publishes async data to Kafka topic",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Async"
+                ],
+                "summary": "Publish async data to Kafka",
+                "parameters": [
+                    {
+                        "description": "Async data",
+                        "name": "async",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/domain.Async"
+                        }
+                    }
+                ],
+                "responses": {
+                    "202": {
+                        "description": "Accepted",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
         "/cron/cleanup": {
             "post": {
                 "description": "Triggers a background cleanup job.",
@@ -693,6 +742,17 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "domain.Async": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                }
+            }
+        },
         "fhir.Address": {
             "type": "object",
             "properties": {

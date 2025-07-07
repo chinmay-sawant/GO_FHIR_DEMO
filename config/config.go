@@ -9,74 +9,92 @@ import (
 	"github.com/spf13/viper"
 )
 
-type Config struct {
-	Server   ServerConfig   `json:"server"`
-	Database DatabaseConfig `json:"database"`
-	Logging  LoggingConfig  `json:"logging"`
-	FHIR     FHIRConfig     `json:"fhir"`
-	Redis    RedisConfig    `json:"redis"`
-	Consul   ConsulConfig   `json:"consul"`
-	Vault    VaultConfig    `json:"vault"`
-	Jaeger   JaegerConfig   `json:"jaeger"`
-}
-
-type ServerConfig struct {
-	Port                      string        `json:"port"`
-	Mode                      string        `json:"mode"`
-	ReadTimeout               time.Duration `json:"read_timeout"`
-	WriteTimeout              time.Duration `json:"write_timeout"`
-	ExternalFHIRServerBaseURL string        `json:"external_fhir_server_base_url"`
-	DevMode                   bool          `json:"dev_mode"`
-}
-
-type DatabaseConfig struct {
-	Host            string        `json:"host"`
-	Port            string        `json:"port"`
-	User            string        `json:"user"`
-	Password        string        `json:"password"`
-	Name            string        `json:"name"`
-	SSLMode         string        `json:"sslmode"`
-	MaxIdleConns    int           `json:"max_idle_conns"`
-	MaxOpenConns    int           `json:"max_open_conns"`
-	ConnMaxLifetime time.Duration `json:"conn_max_lifetime"`
-}
-
-type LoggingConfig struct {
-	Level  string `json:"level"`
-	Format string `json:"format"`
-	File   string `json:"file"`
-}
-
-type FHIRConfig struct {
-	BaseURL string `json:"base_url"`
-	Version string `json:"version"`
-}
-
-type RedisConfig struct {
-	Host     string `json:"host"`
-	Port     string `json:"port"`
-	Password string `json:"password"`
-	DB       int    `json:"db"`
-}
-
-type ConsulConfig struct {
-	Address string `json:"address"`
-	Key     string `json:"key"`
-}
-
-type VaultConfig struct {
-	Address    string `json:"address"`
-	Token      string `json:"token"`
-	SecretPath string `json:"secret_path"`
-}
-
+// JaegerConfig holds Jaeger-related configuration
 type JaegerConfig struct {
-	Endpoint    string `json:"endpoint"`
-	ServiceName string `json:"service_name"`
-	Environment string `json:"environment"`
-	Enabled     bool   `json:"enabled"`
+	Endpoint    string `mapstructure:"JAEGER_ENDPOINT"`
+	ServiceName string `mapstructure:"JAEGER_SERVICE_NAME"`
+	Environment string `mapstructure:"JAEGER_ENVIRONMENT"`
+	Enabled     bool   `mapstructure:"JAEGER_ENABLED"`
 }
 
+// KafkaConfig holds Kafka-related configuration
+type KafkaConfig struct {
+	Broker  string `mapstructure:"broker"`
+	Topic   string `mapstructure:"topic"`
+	GroupID string `mapstructure:"group_id"`
+}
+
+// Config holds all configuration for the application
+type Config struct {
+	DB     DatabaseConfig `mapstructure:"database"`
+	Server ServerConfig   `mapstructure:"server"`
+	Log    LogConfig      `mapstructure:"logging"`
+	Consul ConsulConfig   `mapstructure:"consul"`
+	Vault  VaultConfig    `mapstructure:"vault"`
+	Redis  RedisConfig    `mapstructure:"redis"`
+	Jaeger JaegerConfig   `mapstructure:"jaeger"`
+	Kafka  KafkaConfig    `mapstructure:"kafka"`
+	FHIR   FHIRConfig     `mapstructure:"fhir"`
+}
+
+// ServerConfig holds server-related configuration
+type ServerConfig struct {
+	Port                      string        `mapstructure:"port"`
+	Mode                      string        `mapstructure:"mode"`
+	ReadTimeout               time.Duration `mapstructure:"read_timeout"`
+	WriteTimeout              time.Duration `mapstructure:"write_timeout"`
+	ExternalFHIRServerBaseURL string        `mapstructure:"externalFHIRServerBaseURL"`
+	DevMode                   bool          `mapstructure:"dev_mode"`
+}
+
+// DatabaseConfig holds database-related configuration
+type DatabaseConfig struct {
+	Host            string        `mapstructure:"host"`
+	Port            string        `mapstructure:"port"`
+	User            string        `mapstructure:"user"`
+	Password        string        `mapstructure:"password"`
+	Name            string        `mapstructure:"name"`
+	SSLMode         string        `mapstructure:"sslmode"`
+	MaxIdleConns    int           `mapstructure:"max_idle_conns"`
+	MaxOpenConns    int           `mapstructure:"max_open_conns"`
+	ConnMaxLifetime time.Duration `mapstructure:"conn_max_lifetime"`
+}
+
+// LogConfig holds logging-related configuration
+type LogConfig struct {
+	Level  string `mapstructure:"level"`
+	Format string `mapstructure:"format"`
+	File   string `mapstructure:"file"`
+}
+
+// FHIRConfig holds FHIR-related configuration
+type FHIRConfig struct {
+	BaseURL string `mapstructure:"base_url"`
+	Version string `mapstructure:"version"`
+}
+
+// RedisConfig holds Redis-related configuration
+type RedisConfig struct {
+	Host     string `mapstructure:"host"`
+	Port     string `mapstructure:"port"`
+	Password string `mapstructure:"password"`
+	DB       int    `mapstructure:"db"`
+}
+
+// ConsulConfig holds Consul-related configuration
+type ConsulConfig struct {
+	Address string `mapstructure:"address"`
+	Key     string `mapstructure:"key"`
+}
+
+// VaultConfig holds Vault-related configuration
+type VaultConfig struct {
+	Address    string `mapstructure:"address"`
+	Token      string `mapstructure:"token"`
+	SecretPath string `mapstructure:"secret_path"`
+}
+
+// LoadConfig loads configuration from file and environment variables
 func Load() (*Config, error) {
 	// Load .env file from the root directory if it exists
 	_ = godotenv.Load()
@@ -114,9 +132,12 @@ func Load() (*Config, error) {
 	viper.SetDefault("jaeger.service_name", "go-fhir-demo")
 	viper.SetDefault("jaeger.environment", "development")
 	viper.SetDefault("jaeger.enabled", true)
+	viper.SetDefault("kafka.broker", "localhost:9092")
+	viper.SetDefault("kafka.topic", "myapp-topic")
+	viper.SetDefault("kafka.group_id", "myapp-group")
 
 	// Bind environment variables
-	_ = viper.BindEnv("server.port", "SERVER_PORT")
+	_ = viper.BindEnv("server.port", "SERVER_PORT", "PORT")
 	_ = viper.BindEnv("server.mode", "GIN_MODE")
 	_ = viper.BindEnv("database.host", "DB_HOST")
 	_ = viper.BindEnv("database.port", "DB_PORT")
@@ -138,6 +159,9 @@ func Load() (*Config, error) {
 	_ = viper.BindEnv("jaeger.service_name", "JAEGER_SERVICE_NAME")
 	_ = viper.BindEnv("jaeger.environment", "JAEGER_ENVIRONMENT")
 	_ = viper.BindEnv("jaeger.enabled", "JAEGER_ENABLED")
+	_ = viper.BindEnv("kafka.broker", "KAFKA_BROKER")
+	_ = viper.BindEnv("kafka.topic", "KAFKA_TOPIC")
+	_ = viper.BindEnv("kafka.group_id", "KAFKA_GROUP_ID")
 
 	if err := viper.ReadInConfig(); err != nil {
 		if _, ok := err.(viper.ConfigFileNotFoundError); !ok {
@@ -152,19 +176,19 @@ func Load() (*Config, error) {
 
 	// Override with environment variables for database
 	if host := os.Getenv("DB_HOST"); host != "" {
-		config.Database.Host = host
+		config.DB.Host = host
 	}
 	if port := os.Getenv("DB_PORT"); port != "" {
-		config.Database.Port = port
+		config.DB.Port = port
 	}
 	if user := os.Getenv("DB_USER"); user != "" {
-		config.Database.User = user
+		config.DB.User = user
 	}
 	if password := os.Getenv("DB_PASSWORD"); password != "" {
-		config.Database.Password = password
+		config.DB.Password = password
 	}
 	if name := os.Getenv("DB_NAME"); name != "" {
-		config.Database.Name = name
+		config.DB.Name = name
 	}
 	// Override with environment variables for Redis
 	if host := os.Getenv("REDIS_HOST"); host != "" {
@@ -210,6 +234,16 @@ func Load() (*Config, error) {
 	}
 	if enabled := os.Getenv("JAEGER_ENABLED"); enabled == "false" {
 		config.Jaeger.Enabled = false
+	}
+	// Override with environment variables for Kafka
+	if broker := os.Getenv("KAFKA_BROKER"); broker != "" {
+		config.Kafka.Broker = broker
+	}
+	if topic := os.Getenv("KAFKA_TOPIC"); topic != "" {
+		config.Kafka.Topic = topic
+	}
+	if groupID := os.Getenv("KAFKA_GROUP_ID"); groupID != "" {
+		config.Kafka.GroupID = groupID
 	}
 
 	return &config, nil
