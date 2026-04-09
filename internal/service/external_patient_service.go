@@ -5,7 +5,7 @@ import (
 	"context"
 	"time"
 
-	"go-fhir-demo/internal/domain"
+	"go-fhir-demo/internal/models"
 	"go-fhir-demo/pkg/cache"
 	"go-fhir-demo/pkg/fhirclient"
 
@@ -26,27 +26,27 @@ type NoopExternalPatientService struct{}
 
 // GetExternalPatientByID is a no-op implementation.
 func (NoopExternalPatientService) GetExternalPatientByID(_ context.Context, _ string) (*fhir.Patient, error) {
-	return nil, domain.ErrNotFound
+	return nil, models.ErrNotFound
 }
 
 // SearchExternalPatients is a no-op implementation.
 func (NoopExternalPatientService) SearchExternalPatients(_ context.Context, _ map[string]string) (*fhir.Bundle, error) {
-	return nil, domain.ErrInternal
+	return nil, models.ErrInternal
 }
 
 // CreateExternalPatient is a no-op implementation.
 func (NoopExternalPatientService) CreateExternalPatient(_ context.Context, _ *fhir.Patient) (*fhir.Patient, error) {
-	return nil, domain.ErrInternal
+	return nil, models.ErrInternal
 }
 
 // GetPatientCached is a no-op implementation.
 func (NoopExternalPatientService) GetPatientCached(_ context.Context, _ string) (*fhir.Patient, error) {
-	return nil, domain.ErrNotFound
+	return nil, models.ErrNotFound
 }
 
 // GetPatientDelayed is a no-op implementation.
 func (NoopExternalPatientService) GetPatientDelayed(_ context.Context, _ string, _ time.Duration) (*fhir.Patient, error) {
-	return nil, domain.ErrNotFound
+	return nil, models.ErrNotFound
 }
 
 // ExternalPatientServiceImpl implements ExternalPatientService.
@@ -82,7 +82,7 @@ func (s *ExternalPatientServiceImpl) CreateExternalPatient(ctx context.Context, 
 func (s *ExternalPatientServiceImpl) GetPatientCached(ctx context.Context, id string) (*fhir.Patient, error) {
 	// Try to get from cache first
 	if s.cache != nil {
-		cachedPatient, err := s.cache.GetPatient(id)
+		cachedPatient, err := s.cache.GetPatient(ctx, id)
 		if err == nil && cachedPatient != nil {
 			return cachedPatient, nil
 		}

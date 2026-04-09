@@ -9,7 +9,7 @@ import (
 	"testing"
 	"time"
 
-	"go-fhir-demo/internal/domain"
+	"go-fhir-demo/internal/models"
 	"go-fhir-demo/pkg/fhirconv"
 
 	"github.com/stretchr/testify/assert"
@@ -49,7 +49,7 @@ func (suite *PatientRepositoryTestSuite) SetupSuite() {
 	})
 	suite.Require().NoError(err)
 
-	err = db.AutoMigrate(&domain.Patient{})
+	err = db.AutoMigrate(&models.Patient{})
 	suite.Require().NoError(err)
 
 	sqlDB, err := db.DB()
@@ -85,7 +85,7 @@ func TestPatientRepositoryTestSuite(t *testing.T) {
 func (suite *PatientRepositoryTestSuite) TestCreate_Success() {
 	active := true
 	birthDate := time.Date(1990, 1, 1, 0, 0, 0, 0, time.UTC)
-	patient := &domain.Patient{
+	patient := &models.Patient{
 		FHIRData:  []byte(`{"resourceType":"Patient","id":"p1"}`),
 		Active:    &active,
 		Family:    "Doe",
@@ -102,7 +102,7 @@ func (suite *PatientRepositoryTestSuite) TestCreate_Success() {
 // TestCreate_Error tests creation with invalid data
 func (suite *PatientRepositoryTestSuite) TestCreate_Error() {
 	// Arrange - Create a patient with the minimal allowed data.
-	patient := &domain.Patient{
+	patient := &models.Patient{
 		FHIRData: []byte(`{"resourceType":"Patient","id":"invalid"}`),
 	}
 
@@ -119,7 +119,7 @@ func (suite *PatientRepositoryTestSuite) TestCreate_Error() {
 func (suite *PatientRepositoryTestSuite) TestGetByID_Success() {
 	active := true
 	birthDate := time.Date(1985, 5, 15, 0, 0, 0, 0, time.UTC)
-	patient := &domain.Patient{
+	patient := &models.Patient{
 		FHIRData:  []byte(`{"resourceType":"Patient","id":"p2"}`),
 		Active:    &active,
 		Family:    "Smith",
@@ -150,7 +150,7 @@ func (suite *PatientRepositoryTestSuite) TestGetAll_Success() {
 	active := true
 	birthDate1 := time.Date(1990, 1, 1, 0, 0, 0, 0, time.UTC)
 	birthDate2 := time.Date(1992, 2, 2, 0, 0, 0, 0, time.UTC)
-	p1 := &domain.Patient{
+	p1 := &models.Patient{
 		FHIRData:  []byte(`{"resourceType":"Patient","id":"p3"}`),
 		Active:    &active,
 		Family:    "Alpha",
@@ -158,7 +158,7 @@ func (suite *PatientRepositoryTestSuite) TestGetAll_Success() {
 		Gender:    "male",
 		BirthDate: &birthDate1,
 	}
-	p2 := &domain.Patient{
+	p2 := &models.Patient{
 		FHIRData:  []byte(`{"resourceType":"Patient","id":"p4"}`),
 		Active:    &active,
 		Family:    "Beta",
@@ -180,7 +180,7 @@ func (suite *PatientRepositoryTestSuite) TestGetAll_Success() {
 func (suite *PatientRepositoryTestSuite) TestGetAll_WithPagination() {
 	// Arrange
 	for i := 0; i < 5; i++ {
-		patient := &domain.Patient{
+		patient := &models.Patient{
 			FHIRData:  []byte(`{"resourceType":"Patient","id":"p5"}`),
 			Active:    func() *bool { v := true; return &v }(),
 			Family:    "Patient",
@@ -208,7 +208,7 @@ func (suite *PatientRepositoryTestSuite) TestGetAll_WithPagination() {
 func (suite *PatientRepositoryTestSuite) TestUpdate_Success() {
 	active := true
 	birthDate := time.Date(1990, 1, 1, 0, 0, 0, 0, time.UTC)
-	patient := &domain.Patient{
+	patient := &models.Patient{
 		FHIRData:  []byte(`{"resourceType":"Patient","id":"p5"}`),
 		Active:    &active,
 		Family:    "Gamma",
@@ -230,7 +230,7 @@ func (suite *PatientRepositoryTestSuite) TestUpdate_Success() {
 func (suite *PatientRepositoryTestSuite) TestDelete_Success() {
 	active := true
 	birthDate := time.Date(1990, 1, 1, 0, 0, 0, 0, time.UTC)
-	patient := &domain.Patient{
+	patient := &models.Patient{
 		FHIRData:  []byte(`{"resourceType":"Patient","id":"p6"}`),
 		Active:    &active,
 		Family:    "Epsilon",
@@ -252,7 +252,7 @@ func (suite *PatientRepositoryTestSuite) TestDelete_Success() {
 func (suite *PatientRepositoryTestSuite) TestCount_Success() {
 	active := true
 	birthDate := time.Date(1990, 1, 1, 0, 0, 0, 0, time.UTC)
-	p1 := &domain.Patient{
+	p1 := &models.Patient{
 		FHIRData:  []byte(`{"resourceType":"Patient","id":"p7"}`),
 		Active:    &active,
 		Family:    "Zeta",
@@ -260,7 +260,7 @@ func (suite *PatientRepositoryTestSuite) TestCount_Success() {
 		Gender:    "male",
 		BirthDate: &birthDate,
 	}
-	p2 := &domain.Patient{
+	p2 := &models.Patient{
 		FHIRData:  []byte(`{"resourceType":"Patient","id":"p8"}`),
 		Active:    &active,
 		Family:    "Eta",

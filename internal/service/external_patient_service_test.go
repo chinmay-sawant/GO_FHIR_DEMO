@@ -3,7 +3,7 @@ package service
 import (
 	"context"
 	"errors"
-	"go-fhir-demo/internal/domain"
+	"go-fhir-demo/internal/models"
 	redisclientmock "go-fhir-demo/pkg/cache/mocks"
 	fhirclientmocks "go-fhir-demo/pkg/fhirclient/mocks"
 	"testing"
@@ -61,7 +61,7 @@ func (suite *ExternalPatientServiceTestSuite) TestGetExternalPatientByID_Success
 func (suite *ExternalPatientServiceTestSuite) TestGetExternalPatientByID_Error() {
 	// Arrange
 	testID := "notfound"
-	suite.mockClient.EXPECT().GetPatientByID(gomock.Any(), testID).Return(nil, domain.ErrNotFound)
+	suite.mockClient.EXPECT().GetPatientByID(gomock.Any(), testID).Return(nil, models.ErrNotFound)
 
 	// Act
 	patient, err := suite.service.GetExternalPatientByID(context.Background(), testID)
@@ -164,7 +164,7 @@ func (suite *ExternalPatientServiceTestSuite) TestGetExternalPatientByIDCached_C
 	testID := "cached-id"
 	mockPatient := &fhir.Patient{Id: &testID}
 
-	suite.mockRedisClient.EXPECT().GetPatient(testID).Return(mockPatient, nil)
+	suite.mockRedisClient.EXPECT().GetPatient(ctx, testID).Return(mockPatient, nil)
 
 	patient, err := suite.service.GetPatientCached(ctx, testID)
 
@@ -180,7 +180,7 @@ func (suite *ExternalPatientServiceTestSuite) TestGetExternalPatientByIDCached_C
 	testID := "miss-id"
 	mockPatient := &fhir.Patient{Id: &testID}
 
-	suite.mockRedisClient.EXPECT().GetPatient(testID).Return(nil, nil)
+	suite.mockRedisClient.EXPECT().GetPatient(ctx, testID).Return(nil, nil)
 	suite.mockClient.EXPECT().GetPatientByID(ctx, testID).Return(mockPatient, nil)
 	suite.mockRedisClient.EXPECT().SetPatient(ctx, testID, mockPatient, gomock.Any()).Return(nil)
 
@@ -197,8 +197,8 @@ func (suite *ExternalPatientServiceTestSuite) TestGetExternalPatientByIDCached_C
 	ctx := context.Background()
 	testID := "error-id"
 
-	suite.mockRedisClient.EXPECT().GetPatient(testID).Return(nil, nil)
-	suite.mockClient.EXPECT().GetPatientByID(ctx, testID).Return(nil, domain.ErrNotFound)
+	suite.mockRedisClient.EXPECT().GetPatient(ctx, testID).Return(nil, nil)
+	suite.mockClient.EXPECT().GetPatientByID(ctx, testID).Return(nil, models.ErrNotFound)
 
 	patient, err := suite.service.GetPatientCached(ctx, testID)
 
@@ -214,7 +214,7 @@ func (suite *ExternalPatientServiceTestSuite) TestGetExternalPatientByIDCached_C
 	testID := "cache-get-error"
 	mockPatient := &fhir.Patient{Id: &testID}
 
-	suite.mockRedisClient.EXPECT().GetPatient(testID).Return(nil, errors.New("redis down"))
+	suite.mockRedisClient.EXPECT().GetPatient(ctx, testID).Return(nil, errors.New("redis down"))
 	suite.mockClient.EXPECT().GetPatientByID(ctx, testID).Return(mockPatient, nil)
 	suite.mockRedisClient.EXPECT().SetPatient(ctx, testID, mockPatient, gomock.Any()).Return(nil)
 
@@ -232,7 +232,7 @@ func (suite *ExternalPatientServiceTestSuite) TestGetExternalPatientByIDCached_C
 	testID := "cache-set-error"
 	mockPatient := &fhir.Patient{Id: &testID}
 
-	suite.mockRedisClient.EXPECT().GetPatient(testID).Return(nil, nil)
+	suite.mockRedisClient.EXPECT().GetPatient(ctx, testID).Return(nil, nil)
 	suite.mockClient.EXPECT().GetPatientByID(ctx, testID).Return(mockPatient, nil)
 	suite.mockRedisClient.EXPECT().SetPatient(ctx, testID, mockPatient, gomock.Any()).Return(errors.New("set failed"))
 

@@ -57,18 +57,18 @@ func (mr *MockRedisCacheMockRecorder) DeletePatient(ctx, id any) *gomock.Call {
 }
 
 // GetPatient mocks base method.
-func (m *MockRedisCache) GetPatient(id string) (*fhir.Patient, error) {
+func (m *MockRedisCache) GetPatient(ctx context.Context, id string) (*fhir.Patient, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetPatient", id)
+	ret := m.ctrl.Call(m, "GetPatient", ctx, id)
 	ret0, _ := ret[0].(*fhir.Patient)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // GetPatient indicates an expected call of GetPatient.
-func (mr *MockRedisCacheMockRecorder) GetPatient(id any) *gomock.Call {
+func (mr *MockRedisCacheMockRecorder) GetPatient(ctx, id any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPatient", reflect.TypeOf((*MockRedisCache)(nil).GetPatient), id)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPatient", reflect.TypeOf((*MockRedisCache)(nil).GetPatient), ctx, id)
 }
 
 // Ping mocks base method.

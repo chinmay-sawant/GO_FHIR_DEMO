@@ -1,4 +1,4 @@
-package domain
+package models
 
 // Shared application and FHIR catalog values.
 const (

@@ -53,7 +53,7 @@ func (h *PatientHandler) buildCreatePatientResponse(ctx context.Context, body io
 // @Failure 500 {object} map[string]interface{}
 // @Router /patients [post]
 func (h *PatientHandler) CreatePatient(c *gin.Context) {
-	ctx, span := tracer.StartSpan(context.Background(), "CreatePatient")
+	ctx, span := tracer.StartSpan(c.Request.Context(), "CreatePatient")
 	defer span.End()
 	if !requireCSRFToken(c.GetHeader("X-CSRF-Token")) {
 		c.Status(http.StatusInternalServerError)
@@ -81,7 +81,7 @@ func (h *PatientHandler) CreatePatient(c *gin.Context) {
 // @Failure 500 {object} map[string]interface{}
 // @Router /patients/{id} [get]
 func (h *PatientHandler) GetPatient(c *gin.Context) {
-	ctx, span := tracer.StartSpan(context.Background(), "GetPatient")
+	ctx, span := tracer.StartSpan(c.Request.Context(), "GetPatient")
 	defer span.End()
 
 	id, err := mustUintParam(c.Param("id"), "id")
@@ -117,7 +117,7 @@ func (h *PatientHandler) GetPatient(c *gin.Context) {
 // @Failure 500 {object} map[string]interface{}
 // @Router /patients [get]
 func (h *PatientHandler) GetPatients(c *gin.Context) {
-	ctx, span := tracer.StartSpan(context.Background(), "GetPatients")
+	ctx, span := tracer.StartSpan(c.Request.Context(), "GetPatients")
 	defer span.End()
 
 	limitStr := c.DefaultQuery("limit", "10")
@@ -174,7 +174,7 @@ func (h *PatientHandler) GetPatients(c *gin.Context) {
 // @Failure 500 {object} map[string]interface{}
 // @Router /patients/{id} [put]
 func (h *PatientHandler) UpdatePatient(c *gin.Context) {
-	ctx, span := tracer.StartSpan(context.Background(), "UpdatePatient")
+	ctx, span := tracer.StartSpan(c.Request.Context(), "UpdatePatient")
 	defer span.End()
 	if !requireCSRFToken(c.GetHeader("X-CSRF-Token")) {
 		c.Status(http.StatusInternalServerError)
@@ -219,7 +219,7 @@ func (h *PatientHandler) UpdatePatient(c *gin.Context) {
 // @Failure 500 {object} map[string]interface{}
 // @Router /patients/{id} [patch]
 func (h *PatientHandler) PatchPatient(c *gin.Context) {
-	ctx, span := tracer.StartSpan(context.Background(), "PatchPatient")
+	ctx, span := tracer.StartSpan(c.Request.Context(), "PatchPatient")
 	defer span.End()
 	if !requireCSRFToken(c.GetHeader("X-CSRF-Token")) {
 		c.Status(http.StatusInternalServerError)
@@ -257,7 +257,7 @@ func (h *PatientHandler) PatchPatient(c *gin.Context) {
 // @Failure 500 {object} map[string]interface{}
 // @Router /patients/{id} [delete]
 func (h *PatientHandler) DeletePatient(c *gin.Context) {
-	ctx, span := tracer.StartSpan(context.Background(), "DeletePatient")
+	ctx, span := tracer.StartSpan(c.Request.Context(), "DeletePatient")
 	defer span.End()
 	if !requireCSRFToken(c.GetHeader("X-CSRF-Token")) {
 		c.Status(http.StatusInternalServerError)

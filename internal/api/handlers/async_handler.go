@@ -55,14 +55,14 @@ func NewAsyncHandler(broker, topic string) *AsyncHandler {
 // @Failure 500 {object} map[string]interface{}
 // @Router /async/publish [post]
 func (h *AsyncHandler) PublishAsync(c *gin.Context) {
-	ctx := context.Background()
+	ctx := c.Request.Context()
 	var asyncData asyncdto.Message
 	if err := c.ShouldBindJSON(&asyncData); err != nil {
-		c.Status(http.StatusInternalServerError)
+		c.Status(http.StatusBadRequest)
 		return
 	}
 	if err := h.publishAsyncMessage(ctx, asyncData); err != nil {
-		c.Status(http.StatusInternalServerError)
+		c.Status(http.StatusBadGateway)
 		return
 	}
 	c.JSON(http.StatusAccepted, StatusResponse{Status: "published"})

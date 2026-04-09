@@ -6,8 +6,8 @@ import (
 	"testing"
 	"time"
 
-	"go-fhir-demo/internal/domain"
-	"go-fhir-demo/internal/domain/mocks"
+	"go-fhir-demo/internal/models"
+	"go-fhir-demo/internal/models/mocks"
 	"go-fhir-demo/pkg/fhirconv"
 	patchpkg "go-fhir-demo/pkg/patch"
 	"go-fhir-demo/pkg/utils"
@@ -102,7 +102,7 @@ func (suite *PatientServiceTestSuite) TestCreatePatient_Error() {
 func (suite *PatientServiceTestSuite) TestGetPatient_Success() {
 	// Arrange
 	patientID := uint(1)
-	expectedPatient := &domain.Patient{
+	expectedPatient := &models.Patient{
 		ID:     patientID,
 		Family: "Doe",
 		Given:  "John",
@@ -131,7 +131,7 @@ func (suite *PatientServiceTestSuite) TestGetPatient_NotFound() {
 	patientID := uint(999)
 	suite.mockRepo.EXPECT().
 		GetByID(gomock.Any(), patientID).
-		Return(nil, domain.ErrNotFound).
+		Return(nil, models.ErrNotFound).
 		Times(1)
 
 	// Act
@@ -146,7 +146,7 @@ func (suite *PatientServiceTestSuite) TestGetPatient_NotFound() {
 func (suite *PatientServiceTestSuite) TestGetPatients_Success() {
 	// Arrange
 	limit, offset := 10, 0
-	expectedPatients := []*domain.Patient{
+	expectedPatients := []*models.Patient{
 		{ID: 1, Family: "Doe", Given: "John"},
 		{ID: 2, Family: "Smith", Given: "Jane"},
 	}
@@ -196,7 +196,7 @@ func (suite *PatientServiceTestSuite) TestGetPatients_Error() {
 func (suite *PatientServiceTestSuite) TestUpdatePatient_Success() {
 	// Arrange
 	patientID := uint(1)
-	existingPatient := &domain.Patient{
+	existingPatient := &models.Patient{
 		ID:        patientID,
 		Family:    "Doe",
 		Given:     "John",
@@ -249,7 +249,7 @@ func (suite *PatientServiceTestSuite) TestUpdatePatient_NotFound() {
 
 	suite.mockRepo.EXPECT().
 		GetByID(gomock.Any(), patientID).
-		Return(nil, domain.ErrNotFound).
+		Return(nil, models.ErrNotFound).
 		Times(1)
 
 	// Act
@@ -298,7 +298,7 @@ func (suite *PatientServiceTestSuite) TestDeletePatient_Error() {
 // TestConvertToFHIR_Success tests successful conversion to FHIR
 func (suite *PatientServiceTestSuite) TestConvertToFHIR_Success() {
 	// Arrange
-	patient := &domain.Patient{
+	patient := &models.Patient{
 		ID:       1,
 		FHIRData: []byte(`{"resourceType":"Patient","active":true,"name":[{"family":"Doe","given":["John"]}]}`),
 	}
@@ -317,7 +317,7 @@ func (suite *PatientServiceTestSuite) TestConvertToFHIR_Success() {
 // TestConvertToFHIR_InvalidJSON tests conversion with invalid JSON
 func (suite *PatientServiceTestSuite) TestConvertToFHIR_InvalidJSON() {
 	// Arrange
-	patient := &domain.Patient{
+	patient := &models.Patient{
 		ID:       1,
 		FHIRData: []byte(`invalid json`),
 	}
@@ -364,7 +364,7 @@ func (suite *PatientServiceTestSuite) TestConvertFromFHIR_Success() {
 func (suite *PatientServiceTestSuite) TestPatchPatient_Success() {
 	// Arrange
 	patientID := uint(1)
-	existingPatient := &domain.Patient{
+	existingPatient := &models.Patient{
 		ID:       patientID,
 		FHIRData: []byte(`{"resourceType":"Patient","active":true,"name":[{"family":"Doe","given":["John"]}]}`),
 	}

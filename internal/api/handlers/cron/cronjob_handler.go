@@ -3,7 +3,8 @@ package cron
 
 import (
 	"context"
-	"math/rand"
+	"crypto/rand"
+	"math/big"
 	"net/http"
 	"sync"
 	"time"
@@ -84,13 +85,13 @@ func (h *JobHandlerImpl) TriggerDataSyncJob(c *gin.Context) {
 	// Trigger jobs with delays 1,2,3,4,5 seconds
 	h.mu.Lock()
 	h.jobs[99] = stateQueued // Initialize a dummy job
-	r := rand.New(rand.NewSource(time.Now().UnixNano()))
 
 	// Use a WaitGroup to coordinate the spawned goroutines
 	var wg sync.WaitGroup
 	wg.Add(5)
 	for i := 1; i <= 5; i++ {
-		sec := 6 + r.Intn(5) // random seconds between 6 and 10
+		rndVal, _ := rand.Int(rand.Reader, big.NewInt(5))
+		sec := 6 + int(rndVal.Int64()) // random seconds between 6 and 10
 		logger.WithContext(ctx).Infof("Queuing data sync job %d with delay %d seconds", i, sec)
 		h.jobs[i] = stateQueued
 

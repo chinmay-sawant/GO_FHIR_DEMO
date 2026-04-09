@@ -11,7 +11,7 @@ package mocks
 
 import (
 	context "context"
-	domain "go-fhir-demo/internal/domain"
+	models "go-fhir-demo/internal/models"
 	reflect "reflect"
 
 	fhir "github.com/samply/golang-fhir-models/fhir-models/fhir"
@@ -44,10 +44,10 @@ func (m *MockPatientService) EXPECT() *MockPatientServiceMockRecorder {
 }
 
 // ConvertFromFHIR mocks base method.
-func (m *MockPatientService) ConvertFromFHIR(ctx context.Context, fhirPatient *fhir.Patient) (*domain.Patient, error) {
+func (m *MockPatientService) ConvertFromFHIR(ctx context.Context, fhirPatient *fhir.Patient) (*models.Patient, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ConvertFromFHIR", ctx, fhirPatient)
-	ret0, _ := ret[0].(*domain.Patient)
+	ret0, _ := ret[0].(*models.Patient)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -59,7 +59,7 @@ func (mr *MockPatientServiceMockRecorder) ConvertFromFHIR(ctx, fhirPatient any) 
 }
 
 // ConvertToFHIR mocks base method.
-func (m *MockPatientService) ConvertToFHIR(ctx context.Context, patient *domain.Patient) (*fhir.Patient, error) {
+func (m *MockPatientService) ConvertToFHIR(ctx context.Context, patient *models.Patient) (*fhir.Patient, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ConvertToFHIR", ctx, patient)
 	ret0, _ := ret[0].(*fhir.Patient)
@@ -74,10 +74,10 @@ func (mr *MockPatientServiceMockRecorder) ConvertToFHIR(ctx, patient any) *gomoc
 }
 
 // CreatePatient mocks base method.
-func (m *MockPatientService) CreatePatient(ctx context.Context, fhirPatient *fhir.Patient) (*domain.Patient, error) {
+func (m *MockPatientService) CreatePatient(ctx context.Context, fhirPatient *fhir.Patient) (*models.Patient, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreatePatient", ctx, fhirPatient)
-	ret0, _ := ret[0].(*domain.Patient)
+	ret0, _ := ret[0].(*models.Patient)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -103,10 +103,10 @@ func (mr *MockPatientServiceMockRecorder) DeletePatient(ctx, id any) *gomock.Cal
 }
 
 // GetPatient mocks base method.
-func (m *MockPatientService) GetPatient(ctx context.Context, id uint) (*domain.Patient, error) {
+func (m *MockPatientService) GetPatient(ctx context.Context, id uint) (*models.Patient, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetPatient", ctx, id)
-	ret0, _ := ret[0].(*domain.Patient)
+	ret0, _ := ret[0].(*models.Patient)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -118,10 +118,10 @@ func (mr *MockPatientServiceMockRecorder) GetPatient(ctx, id any) *gomock.Call {
 }
 
 // GetPatients mocks base method.
-func (m *MockPatientService) GetPatients(ctx context.Context, limit, offset int) ([]*domain.Patient, int64, error) {
+func (m *MockPatientService) GetPatients(ctx context.Context, limit, offset int) ([]*models.Patient, int64, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetPatients", ctx, limit, offset)
-	ret0, _ := ret[0].([]*domain.Patient)
+	ret0, _ := ret[0].([]*models.Patient)
 	ret1, _ := ret[1].(int64)
 	ret2, _ := ret[2].(error)
 	return ret0, ret1, ret2
@@ -134,10 +134,10 @@ func (mr *MockPatientServiceMockRecorder) GetPatients(ctx, limit, offset any) *g
 }
 
 // PatchPatient mocks base method.
-func (m *MockPatientService) PatchPatient(ctx context.Context, id uint, updates patch.PatientPatch) (*domain.Patient, error) {
+func (m *MockPatientService) PatchPatient(ctx context.Context, id uint, updates patch.PatientPatch) (*models.Patient, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "PatchPatient", ctx, id, updates)
-	ret0, _ := ret[0].(*domain.Patient)
+	ret0, _ := ret[0].(*models.Patient)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -149,10 +149,10 @@ func (mr *MockPatientServiceMockRecorder) PatchPatient(ctx, id, updates any) *go
 }
 
 // UpdatePatient mocks base method.
-func (m *MockPatientService) UpdatePatient(ctx context.Context, id uint, fhirPatient *fhir.Patient) (*domain.Patient, error) {
+func (m *MockPatientService) UpdatePatient(ctx context.Context, id uint, fhirPatient *fhir.Patient) (*models.Patient, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "UpdatePatient", ctx, id, fhirPatient)
-	ret0, _ := ret[0].(*domain.Patient)
+	ret0, _ := ret[0].(*models.Patient)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }

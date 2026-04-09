@@ -3,13 +3,13 @@ package bootstrap
 import (
 	"context"
 
-	"go-fhir-demo/internal/domain"
+	"go-fhir-demo/internal/models"
 	"gorm.io/gorm"
 )
 
 // Migrate applies the database schema for the application.
 func Migrate(db *gorm.DB) error {
-	return db.AutoMigrate(&domain.Patient{})
+	return db.AutoMigrate(&models.Patient{})
 }
 
 // SeedDummyPatients inserts sample patients when they are missing.

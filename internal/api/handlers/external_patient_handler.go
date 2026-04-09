@@ -51,8 +51,9 @@ func (h *ExternalPatientHandler) createExternalPatientResponse(ctx context.Conte
 // @Failure 404 {object} map[string]string "Patient not found"
 // @Failure 500 {object} map[string]string "Internal server error"
 // @Router /external-patients/{id} [get]
+// @Router /external-patients/{id} [get]
 func (h *ExternalPatientHandler) GetExternalPatientByID(c *gin.Context) {
-	ctx, span := tracer.StartSpan(context.Background(), "GetExternalPatientByID")
+	ctx, span := tracer.StartSpan(c.Request.Context(), "GetExternalPatientByID")
 	defer span.End()
 	id, err := mustStringParam(c.Param("id"), "id")
 	if err != nil {
@@ -82,7 +83,7 @@ func (h *ExternalPatientHandler) GetExternalPatientByID(c *gin.Context) {
 // @Failure 500 {object} map[string]string "Internal server error"
 // @Router /external-patients/{id}/cached [get]
 func (h *ExternalPatientHandler) GetPatientCached(c *gin.Context) {
-	ctx, span := tracer.StartSpan(context.Background(), "GetPatientCached")
+	ctx, span := tracer.StartSpan(c.Request.Context(), "GetPatientCached")
 	defer span.End()
 
 	id, err := mustStringParam(c.Param("id"), "id")
@@ -118,7 +119,7 @@ func (h *ExternalPatientHandler) GetPatientCached(c *gin.Context) {
 // @Failure 500 {object} map[string]string "Internal server error"
 // @Router /external-patients/{id}/delayed [get]
 func (h *ExternalPatientHandler) GetPatientDelayed(c *gin.Context) {
-	ctx, span := tracer.StartSpan(context.Background(), "GetPatientDelayed")
+	ctx, span := tracer.StartSpan(c.Request.Context(), "GetPatientDelayed")
 	defer span.End()
 
 	id, err := mustStringParam(c.Param("id"), "id")
@@ -132,7 +133,7 @@ func (h *ExternalPatientHandler) GetPatientDelayed(c *gin.Context) {
 	timeoutStr := c.DefaultQuery("timeout", "10")
 	timeoutSeconds, err := strconv.Atoi(timeoutStr)
 	if err != nil || timeoutSeconds <= 0 {
-		c.Status(http.StatusInternalServerError)
+		c.Status(http.StatusBadRequest)
 		return
 	}
 
@@ -160,7 +161,7 @@ func (h *ExternalPatientHandler) GetPatientDelayed(c *gin.Context) {
 // @Failure 500 {object} map[string]string "Internal server error"
 // @Router /external-patients [get]
 func (h *ExternalPatientHandler) SearchExternalPatients(c *gin.Context) {
-	ctx, span := tracer.StartSpan(context.Background(), "SearchExternalPatients")
+	ctx, span := tracer.StartSpan(c.Request.Context(), "SearchExternalPatients")
 	defer span.End()
 
 	filters := parseRawQueryParams(c.Request.URL.RawQuery)
@@ -187,7 +188,7 @@ func (h *ExternalPatientHandler) SearchExternalPatients(c *gin.Context) {
 // @Failure 500 {object} map[string]string "Internal server error"
 // @Router /external-patients [post]
 func (h *ExternalPatientHandler) CreateExternalPatient(c *gin.Context) {
-	ctx, span := tracer.StartSpan(context.Background(), "CreateExternalPatient")
+	ctx, span := tracer.StartSpan(c.Request.Context(), "CreateExternalPatient")
 	defer span.End()
 	if !requireCSRFToken(c.GetHeader("X-CSRF-Token")) {
 		c.Status(http.StatusInternalServerError)

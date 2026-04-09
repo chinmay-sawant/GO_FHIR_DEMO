@@ -13,7 +13,7 @@ import (
 
 // RedisCache defines the contract for cache operations
 type RedisCache interface {
-	GetPatient(id string) (*fhir.Patient, error)
+	GetPatient(ctx context.Context, id string) (*fhir.Patient, error)
 	SetPatient(ctx context.Context, id string, patient *fhir.Patient, expiration time.Duration) error
 	DeletePatient(ctx context.Context, id string) error
 	Ping(ctx context.Context) error
@@ -48,9 +48,11 @@ func NewRedisCache(config Config) RedisCache {
 }
 
 // GetPatient retrieves a patient from Redis cache
-func (r *RedisCacheImpl) GetPatient(id string) (*fhir.Patient, error) {
+func (r *RedisCacheImpl) GetPatient(ctx context.Context, id string) (*fhir.Patient, error) {
 	key := "patient:" + id
-	result, err := r.client.Get(context.Background(), key).Result()
+	getCommand := r.client.Get
+	cmd := getCommand(ctx, key)
+	result, err := cmd.Result()
 	if err != nil {
 		if err == redis.Nil {
 			return nil, nil // Cache miss

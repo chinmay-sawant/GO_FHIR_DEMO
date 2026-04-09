@@ -91,7 +91,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/domain.Async"
+                            "$ref": "#/definitions/models.Async"
                         }
                     }
                 ],
@@ -742,7 +742,7 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "domain.Async": {
+        "models.Async": {
             "type": "object",
             "properties": {
                 "data": {

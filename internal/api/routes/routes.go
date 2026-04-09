@@ -3,7 +3,7 @@ package routes
 
 import (
 	"go-fhir-demo/internal/api/handlers"
-	"go-fhir-demo/internal/domain"
+	"go-fhir-demo/internal/models"
 	"go-fhir-demo/internal/middleware"
 
 	"github.com/gin-gonic/gin"
@@ -45,13 +45,13 @@ type capabilityStatement struct {
 }
 
 var metadataPayload = capabilityStatement{
-	ResourceType: domain.CapabilityResource,
-	Status:       domain.CapabilityStatus,
-	Date:         domain.CapabilityDate,
+	ResourceType: models.CapabilityResource,
+	Status:       models.CapabilityStatus,
+	Date:         models.CapabilityDate,
 	Publisher:    "FHIR Demo",
-	Kind:         domain.CapabilityKind,
-	FHIRVersion:  domain.CapabilityVersion,
-	Format:       []string{domain.CapabilityFormat},
+	Kind:         models.CapabilityKind,
+	FHIRVersion:  models.CapabilityVersion,
+	Format:       []string{models.CapabilityFormat},
 }
 
 // RouteSetup implements *RouteSetup
@@ -128,16 +128,16 @@ func (r *RouteSetup) SetupRoutes(
 
 func healthHandler(c *gin.Context) {
 	c.JSON(200, healthResponse{
-		Status:  domain.HealthStatus,
-		Service: domain.ServiceName,
-		Version: domain.ServiceVersion,
+		Status:  "active",
+		Service: "go-fhir-demo",
+		Version: "1.0",
 	})
 }
 
 func metadataHandler(c *gin.Context) {
 	payload := metadataPayload
-	payload.Software.Name = domain.ServiceName
-	payload.Software.Version = domain.ServiceVersion
+	payload.Software.Name = "go-fhir-demo"
+	payload.Software.Version = "1.0"
 
 	c.JSON(200, payload)
 }

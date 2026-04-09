@@ -3,6 +3,6 @@ Source files discovered: 58
 Source files analyzed: 43
 Functions fingerprinted: 200
 Findings: 0
-Index summary: packages=23 symbols=248 imports=265
+Index summary: packages=23 symbols=248 imports=266
 Parse failures: 0
-Timings: discover=2ms parse=37ms index=0ms heuristics=10ms total=49ms
+Timings: discover=2ms parse=53ms index=0ms heuristics=13ms total=70ms

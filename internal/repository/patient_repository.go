@@ -6,7 +6,7 @@ import (
 	"database/sql"
 	"fmt"
 
-	"go-fhir-demo/internal/domain"
+	"go-fhir-demo/internal/models"
 	"go-fhir-demo/pkg/logger"
 	"go-fhir-demo/pkg/utils/tracer"
 )
@@ -24,7 +24,7 @@ type PatientRepositoryImpl struct {
 }
 
 // Create creates a new patient record.
-func (r *PatientRepositoryImpl) Create(ctx context.Context, patient *domain.Patient) error {
+func (r *PatientRepositoryImpl) Create(ctx context.Context, patient *models.Patient) error {
 	ctx, span := tracer.StartSpan(ctx, "Create")
 	defer span.End()
 
@@ -54,7 +54,7 @@ func (r *PatientRepositoryImpl) Create(ctx context.Context, patient *domain.Pati
 }
 
 // GetByID retrieves a patient by ID.
-func (r *PatientRepositoryImpl) GetByID(ctx context.Context, id uint) (*domain.Patient, error) {
+func (r *PatientRepositoryImpl) GetByID(ctx context.Context, id uint) (*models.Patient, error) {
 	row := r.db.QueryRowContext(
 		ctx,
 		`SELECT id, fhir_data, active, family, given, gender, birth_date, created_at, updated_at
@@ -63,7 +63,7 @@ func (r *PatientRepositoryImpl) GetByID(ctx context.Context, id uint) (*domain.P
 		id,
 	)
 
-	var patient domain.Patient
+	var patient models.Patient
 	var active sql.NullBool
 	var birthDate sql.NullTime
 	if err := row.Scan(
@@ -94,7 +94,7 @@ func (r *PatientRepositoryImpl) GetByID(ctx context.Context, id uint) (*domain.P
 }
 
 // GetAll retrieves all patients with pagination.
-func (r *PatientRepositoryImpl) GetAll(ctx context.Context, limit, offset int) ([]*domain.Patient, error) {
+func (r *PatientRepositoryImpl) GetAll(ctx context.Context, limit, offset int) ([]*models.Patient, error) {
 	rows, err := r.db.QueryContext(
 		ctx,
 		`SELECT id, fhir_data, active, family, given, gender, birth_date, created_at, updated_at
@@ -113,9 +113,9 @@ func (r *PatientRepositoryImpl) GetAll(ctx context.Context, limit, offset int) (
 		}
 	}()
 
-	patients := make([]*domain.Patient, 0, limit)
+	patients := make([]*models.Patient, 0, limit)
 	for rows.Next() {
-		var patient domain.Patient
+		var patient models.Patient
 		var active sql.NullBool
 		var birthDate sql.NullTime
 		if err := rows.Scan(
@@ -148,7 +148,7 @@ func (r *PatientRepositoryImpl) GetAll(ctx context.Context, limit, offset int) (
 }
 
 // Update updates an existing patient record.
-func (r *PatientRepositoryImpl) Update(ctx context.Context, patient *domain.Patient) error {
+func (r *PatientRepositoryImpl) Update(ctx context.Context, patient *models.Patient) error {
 	var active any
 	if patient.Active != nil {
 		active = *patient.Active

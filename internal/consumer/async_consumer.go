@@ -35,6 +35,9 @@ func StartAsyncConsumer(ctx context.Context, wg *sync.WaitGroup, broker, topic, 
 
 		logger.GetLogger().Info("Async Kafka consumer started")
 
+		retryTimer := time.NewTimer(0)
+		<-retryTimer.C // drain immediately
+
 		for {
 			m, err := r.ReadMessage(ctx)
 			if err != nil {
@@ -45,14 +48,12 @@ func StartAsyncConsumer(ctx context.Context, wg *sync.WaitGroup, broker, topic, 
 				}
 				logger.GetLogger().Errorf("Failed to read message from Kafka: %v", err)
 
-				timer := time.NewTimer(2 * time.Second)
+				retryTimer.Reset(2 * time.Second)
 				select {
-				case <-timer.C:
+				case <-retryTimer.C:
 					continue
 				case <-ctx.Done():
-					if !timer.Stop() {
-						<-timer.C
-					}
+					retryTimer.Stop()
 					return
 				}
 			}

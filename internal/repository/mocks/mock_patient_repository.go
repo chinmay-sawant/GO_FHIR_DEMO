@@ -11,7 +11,7 @@ package mocks
 
 import (
 	context "context"
-	domain "go-fhir-demo/internal/domain"
+	models "go-fhir-demo/internal/models"
 	reflect "reflect"
 
 	gomock "go.uber.org/mock/gomock"
@@ -57,7 +57,7 @@ func (mr *MockPatientRepositoryMockRecorder) Count(ctx any) *gomock.Call {
 }
 
 // Create mocks base method.
-func (m *MockPatientRepository) Create(ctx context.Context, patient *domain.Patient) error {
+func (m *MockPatientRepository) Create(ctx context.Context, patient *models.Patient) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Create", ctx, patient)
 	ret0, _ := ret[0].(error)
@@ -85,10 +85,10 @@ func (mr *MockPatientRepositoryMockRecorder) Delete(ctx, id any) *gomock.Call {
 }
 
 // GetAll mocks base method.
-func (m *MockPatientRepository) GetAll(ctx context.Context, limit, offset int) ([]*domain.Patient, error) {
+func (m *MockPatientRepository) GetAll(ctx context.Context, limit, offset int) ([]*models.Patient, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetAll", ctx, limit, offset)
-	ret0, _ := ret[0].([]*domain.Patient)
+	ret0, _ := ret[0].([]*models.Patient)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -100,10 +100,10 @@ func (mr *MockPatientRepositoryMockRecorder) GetAll(ctx, limit, offset any) *gom
 }
 
 // GetByID mocks base method.
-func (m *MockPatientRepository) GetByID(ctx context.Context, id uint) (*domain.Patient, error) {
+func (m *MockPatientRepository) GetByID(ctx context.Context, id uint) (*models.Patient, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetByID", ctx, id)
-	ret0, _ := ret[0].(*domain.Patient)
+	ret0, _ := ret[0].(*models.Patient)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -115,7 +115,7 @@ func (mr *MockPatientRepositoryMockRecorder) GetByID(ctx, id any) *gomock.Call {
 }
 
 // Update mocks base method.
-func (m *MockPatientRepository) Update(ctx context.Context, patient *domain.Patient) error {
+func (m *MockPatientRepository) Update(ctx context.Context, patient *models.Patient) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Update", ctx, patient)
 	ret0, _ := ret[0].(error)
