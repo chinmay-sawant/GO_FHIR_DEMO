@@ -2,6 +2,7 @@ package bootstrap
 
 import (
 	"context"
+	"errors"
 
 	"go-fhir-demo/internal/models"
 	"gorm.io/gorm"
@@ -13,6 +14,20 @@ func Migrate(db *gorm.DB) error {
 }
 
 // SeedDummyPatients inserts sample patients when they are missing.
-func SeedDummyPatients(_ context.Context, _ *gorm.DB) error {
-	return nil
+func SeedDummyPatients(ctx context.Context, db *gorm.DB) error {
+	var patient models.Patient
+	err := db.WithContext(ctx).Select("id").First(&patient).Error
+	if err == nil {
+		return nil
+	}
+	if !errors.Is(err, gorm.ErrRecordNotFound) {
+		return err
+	}
+
+	dummy := models.Patient{
+		Family: "Doe",
+		Given:  "John",
+		Gender: "male",
+	}
+	return db.WithContext(ctx).Create(&dummy).Error
 }

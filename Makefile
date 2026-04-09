@@ -31,7 +31,7 @@ clean:
 
 ## Run tests
 test:
-	$(GOTEST) -v ./...
+	go test -race -v ./...
 
 ## Run tests with JUnit XML report generation
 test-with-junit:

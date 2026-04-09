@@ -154,7 +154,7 @@ func (r *PatientRepositoryImpl) Update(ctx context.Context, patient *models.Pati
 		active = *patient.Active
 	}
 
-	if _, err := r.db.ExecContext(
+	res, err := r.db.ExecContext(
 		ctx,
 		`UPDATE patients
 		 SET fhir_data = $1, active = $2, family = $3, given = $4, gender = $5, birth_date = $6, updated_at = CURRENT_TIMESTAMP
@@ -166,8 +166,17 @@ func (r *PatientRepositoryImpl) Update(ctx context.Context, patient *models.Pati
 		patient.Gender,
 		patient.BirthDate,
 		patient.ID,
-	); err != nil {
+	)
+	if err != nil {
 		return fmt.Errorf("failed to update patient with ID %d: %w", patient.ID, err)
+	}
+
+	rows, err := res.RowsAffected()
+	if err != nil {
+		return fmt.Errorf("failed to check rows affected: %w", err)
+	}
+	if rows == 0 {
+		return models.ErrNotFound
 	}
 
 	logger.WithContext(ctx).Infof("Patient updated successfully with ID: %d", patient.ID)
@@ -176,8 +185,16 @@ func (r *PatientRepositoryImpl) Update(ctx context.Context, patient *models.Pati
 
 // Delete soft deletes a patient record.
 func (r *PatientRepositoryImpl) Delete(ctx context.Context, id uint) error {
-	if _, err := r.db.ExecContext(ctx, "DELETE FROM patients WHERE id = $1", id); err != nil {
+	res, err := r.db.ExecContext(ctx, "DELETE FROM patients WHERE id = $1", id)
+	if err != nil {
 		return fmt.Errorf("failed to delete patient with ID %d: %w", id, err)
+	}
+	rows, err := res.RowsAffected()
+	if err != nil {
+		return fmt.Errorf("failed to check rows affected: %w", err)
+	}
+	if rows == 0 {
+		return models.ErrNotFound
 	}
 	logger.WithContext(ctx).Infof("Patient deleted successfully with ID: %d", id)
 	return nil

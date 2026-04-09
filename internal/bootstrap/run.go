@@ -6,6 +6,9 @@ import (
 	"log"
 	"net"
 	"net/http"
+	"os"
+	"os/signal"
+	"syscall"
 	"time"
 
 	"go-fhir-demo/config"
@@ -17,6 +20,7 @@ import (
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 	"go.opentelemetry.io/contrib/instrumentation/github.com/gin-gonic/gin/otelgin"
+	"golang.org/x/sync/errgroup"
 )
 
 const localhost = "localhost"
@@ -99,9 +103,38 @@ func Run(ctx context.Context) error {
 		log.Printf("Registered service '%s' with Consul at %s", appName, cfg.Consul.Address)
 	}
 
-	log.Printf("Server starting on port %s", cfg.Server.Port)
-	if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-		return fmt.Errorf("failed to start server: %w", err)
+	g, gCtx := errgroup.WithContext(ctx)
+
+	g.Go(func() error {
+		log.Printf("Server starting on port %s", cfg.Server.Port)
+		if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+			return fmt.Errorf("failed to start server: %w", err)
+		}
+		return nil
+	})
+
+	g.Go(func() error {
+		quit := make(chan os.Signal, 1)
+		signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
+
+		select {
+		case sig := <-quit:
+			log.Printf("Received signal: %v", sig)
+		case <-gCtx.Done():
+			return gCtx.Err()
+		}
+
+		log.Println("Shutting down server...")
+		shutdownCtx, cancel := context.WithTimeout(context.WithoutCancel(gCtx), 5*time.Second)
+		defer cancel()
+		if err := server.Shutdown(shutdownCtx); err != nil {
+			return fmt.Errorf("server forced to shutdown: %w", err)
+		}
+		return nil
+	})
+
+	if err := g.Wait(); err != nil && err != context.Canceled {
+		return err
 	}
 
 	log.Printf("Server exited")

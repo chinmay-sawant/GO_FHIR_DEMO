@@ -8,6 +8,8 @@ import (
 	"net"
 	"net/http"
 	"os"
+	"os/signal"
+	"syscall"
 	"time"
 
 	"go-fhir-demo/config"
@@ -17,6 +19,7 @@ import (
 	"go-fhir-demo/pkg/utils/tracer"
 
 	"github.com/gin-gonic/gin"
+	"golang.org/x/sync/errgroup"
 )
 
 import _ "go-fhir-demo/docs"
@@ -107,9 +110,38 @@ func run() error {
 		return fmt.Errorf("consul registration failed: %w", err)
 	}
 
-	log.Printf("Server starting on port %s", cfg.Server.Port)
-	if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-		return fmt.Errorf("failed to start server: %w", err)
+	g, gCtx := errgroup.WithContext(ctx)
+
+	g.Go(func() error {
+		log.Printf("Server starting on port %s", cfg.Server.Port)
+		if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+			return fmt.Errorf("failed to start server: %w", err)
+		}
+		return nil
+	})
+
+	g.Go(func() error {
+		quit := make(chan os.Signal, 1)
+		signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
+
+		select {
+		case sig := <-quit:
+			log.Printf("Received signal: %v", sig)
+		case <-gCtx.Done():
+			return gCtx.Err()
+		}
+
+		log.Println("Shutting down server...")
+		shutdownCtx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+		defer cancel()
+		if err := server.Shutdown(shutdownCtx); err != nil {
+			return fmt.Errorf("server forced to shutdown: %w", err)
+		}
+		return nil
+	})
+
+	if err := g.Wait(); err != nil && err != context.Canceled {
+		return err
 	}
 
 	log.Printf("Server exited")

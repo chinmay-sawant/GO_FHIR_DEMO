@@ -18,12 +18,13 @@ func GetConsulKV(ctx context.Context, consulAddr, key string) (string, error) {
 		return "", fmt.Errorf("failed to create search request: %w", err)
 	}
 
-	resp, err := http.DefaultClient.Do(req)
+	resp, err := SharedClient.Do(req)
 	if err != nil {
 		return "", fmt.Errorf("failed to contact consul: %w", err)
 	}
 	defer func() {
-		_ = resp.Body.Close()
+		_, _ = io.Copy(io.Discard, resp.Body)
+		resp.Body.Close()
 	}()
 	if resp.StatusCode != http.StatusOK {
 		return "", fmt.Errorf("consul returned status %d", resp.StatusCode)

@@ -24,6 +24,9 @@ func BuildRouter(cfg *config.Config, db *gorm.DB) (*gin.Engine, error) {
 	if err != nil {
 		return nil, err
 	}
+	sqlDB.SetMaxIdleConns(cfg.DB.MaxIdleConns)
+	sqlDB.SetMaxOpenConns(cfg.DB.MaxOpenConns)
+	sqlDB.SetConnMaxLifetime(cfg.DB.ConnMaxLifetime)
 	patientRepo := repository.NewPatientRepository(sqlDB)
 	patientService := service.NewPatientService(patientRepo)
 

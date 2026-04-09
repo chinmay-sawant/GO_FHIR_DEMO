@@ -6,8 +6,11 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 	"strconv"
+
+	"go-fhir-demo/pkg/utils"
 )
 
 // RegisterWithConsul registers this service with Consul agent
@@ -34,12 +37,13 @@ func RegisterWithConsul(ctx context.Context, consulAddr, serviceName, serviceID,
 		return fmt.Errorf("failed to create request: %w", err)
 	}
 	req.Header.Set("Content-Type", "application/json")
-	resp, err := http.DefaultClient.Do(req)
+	resp, err := utils.SharedClient.Do(req)
 	if err != nil {
 		return fmt.Errorf("failed to register with consul: %w", err)
 	}
 	defer func() {
-		_ = resp.Body.Close()
+		_, _ = io.Copy(io.Discard, resp.Body)
+		resp.Body.Close()
 	}()
 	if resp.StatusCode != http.StatusOK {
 		return fmt.Errorf("consul registration failed: %s", resp.Status)

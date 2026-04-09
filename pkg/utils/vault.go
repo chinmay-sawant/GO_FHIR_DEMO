@@ -5,16 +5,12 @@ import (
 	"encoding/json"
 	"fmt"
 	"go-fhir-demo/pkg/vaultdto"
+	"io"
 	"net/http"
-	"time"
 )
 
 // GetVaultKV fetches a key-value secret from Vault.
 func GetVaultKV(ctx context.Context, vaultAddr, token, secretPath string) (map[string]string, error) {
-	client := &http.Client{
-		Timeout: 10 * time.Second,
-	}
-
 	reqURL := vaultAddr + "/v1/" + secretPath
 
 	req, err := http.NewRequestWithContext(ctx, "GET", reqURL, nil)
@@ -25,12 +21,13 @@ func GetVaultKV(ctx context.Context, vaultAddr, token, secretPath string) (map[s
 	req.Header.Set("X-Vault-Token", token)
 	req.Header.Set("Content-Type", "application/json")
 
-	resp, err := client.Do(req)
+	resp, err := SharedClient.Do(req)
 	if err != nil {
 		return nil, fmt.Errorf("failed to make request to Vault: %w", err)
 	}
 	defer func() {
-		_ = resp.Body.Close()
+		_, _ = io.Copy(io.Discard, resp.Body)
+		resp.Body.Close()
 	}()
 
 	if resp.StatusCode != http.StatusOK {
