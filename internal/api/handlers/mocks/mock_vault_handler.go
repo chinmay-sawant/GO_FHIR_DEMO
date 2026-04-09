@@ -16,38 +16,38 @@ import (
 	gomock "go.uber.org/mock/gomock"
 )
 
-// MockVaultHandlerInterface is a mock of VaultHandlerInterface interface.
-type MockVaultHandlerInterface struct {
+// MockVaultHandler is a mock of *VaultHandler interface.
+type MockVaultHandler struct {
 	ctrl     *gomock.Controller
-	recorder *MockVaultHandlerInterfaceMockRecorder
+	recorder *MockVaultHandlerMockRecorder
 	isgomock struct{}
 }
 
-// MockVaultHandlerInterfaceMockRecorder is the mock recorder for MockVaultHandlerInterface.
-type MockVaultHandlerInterfaceMockRecorder struct {
-	mock *MockVaultHandlerInterface
+// MockVaultHandlerMockRecorder is the mock recorder for MockVaultHandler.
+type MockVaultHandlerMockRecorder struct {
+	mock *MockVaultHandler
 }
 
-// NewMockVaultHandlerInterface creates a new mock instance.
-func NewMockVaultHandlerInterface(ctrl *gomock.Controller) *MockVaultHandlerInterface {
-	mock := &MockVaultHandlerInterface{ctrl: ctrl}
-	mock.recorder = &MockVaultHandlerInterfaceMockRecorder{mock}
+// NewMockVaultHandler creates a new mock instance.
+func NewMockVaultHandler(ctrl *gomock.Controller) *MockVaultHandler {
+	mock := &MockVaultHandler{ctrl: ctrl}
+	mock.recorder = &MockVaultHandlerMockRecorder{mock}
 	return mock
 }
 
 // EXPECT returns an object that allows the caller to indicate expected use.
-func (m *MockVaultHandlerInterface) EXPECT() *MockVaultHandlerInterfaceMockRecorder {
+func (m *MockVaultHandler) EXPECT() *MockVaultHandlerMockRecorder {
 	return m.recorder
 }
 
 // GetVaultSecret mocks base method.
-func (m *MockVaultHandlerInterface) GetVaultSecret(c *gin.Context) {
+func (m *MockVaultHandler) GetVaultSecret(c *gin.Context) {
 	m.ctrl.T.Helper()
 	m.ctrl.Call(m, "GetVaultSecret", c)
 }
 
 // GetVaultSecret indicates an expected call of GetVaultSecret.
-func (mr *MockVaultHandlerInterfaceMockRecorder) GetVaultSecret(c any) *gomock.Call {
+func (mr *MockVaultHandlerMockRecorder) GetVaultSecret(c any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetVaultSecret", reflect.TypeOf((*MockVaultHandlerInterface)(nil).GetVaultSecret), c)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetVaultSecret", reflect.TypeOf((*MockVaultHandler)(nil).GetVaultSecret), c)
 }

@@ -1,10 +1,13 @@
 package handlers
 
 import (
+	"context"
+	"encoding/json"
+	"io"
 	"net/http"
 	"strconv"
 
-	"go-fhir-demo/internal/domain"
+	"go-fhir-demo/internal/service"
 	"go-fhir-demo/pkg/logger"
 	"go-fhir-demo/pkg/utils/tracer"
 
@@ -12,26 +15,30 @@ import (
 	"github.com/samply/golang-fhir-models/fhir-models/fhir"
 )
 
-// PatientHandlerInterface defines the contract for patient handlers
-type PatientHandlerInterface interface {
-	CreatePatient(c *gin.Context)
-	GetPatient(c *gin.Context)
-	GetPatients(c *gin.Context)
-	UpdatePatient(c *gin.Context)
-	PatchPatient(c *gin.Context)
-	DeletePatient(c *gin.Context)
-}
-
 // PatientHandler struct
 type PatientHandler struct {
-	service domain.PatientService
+	service service.PatientService
 }
 
 // NewPatientHandler creates a new patient handler
-func NewPatientHandler(service domain.PatientService) PatientHandlerInterface {
+func NewPatientHandler(service service.PatientService) *PatientHandler {
 	return &PatientHandler{
 		service: service,
 	}
+}
+
+func (h *PatientHandler) buildCreatePatientResponse(ctx context.Context, body io.Reader) (*fhir.Patient, error) {
+	var fhirPatient fhir.Patient
+	if err := json.NewDecoder(body).Decode(&fhirPatient); err != nil {
+		return nil, err
+	}
+
+	patient, err := h.service.CreatePatient(ctx, &fhirPatient)
+	if err != nil {
+		return nil, err
+	}
+
+	return h.service.ConvertToFHIR(ctx, patient)
 }
 
 // CreatePatient handles POST /patients
@@ -48,38 +55,14 @@ func NewPatientHandler(service domain.PatientService) PatientHandlerInterface {
 func (h *PatientHandler) CreatePatient(c *gin.Context) {
 	ctx, span := tracer.StartSpan(c.Request.Context(), "CreatePatient")
 	defer span.End()
-
-	var fhirPatient fhir.Patient
-
-	if err := c.ShouldBindJSON(&fhirPatient); err != nil {
-		logger.WithContext(ctx).Errorf("Failed to bind JSON: %v", err)
-		// Return a 400 Bad Request if JSON binding fails
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error":   "Invalid JSON",
-			"message": err.Error(),
-		})
+	if !requireCSRFToken(c.GetHeader("X-CSRF-Token")) {
+		c.Status(http.StatusInternalServerError)
 		return
 	}
 
-	// Create patient
-	patient, err := h.service.CreatePatient(ctx, &fhirPatient)
+	fhirResponse, err := h.buildCreatePatientResponse(ctx, c.Request.Body)
 	if err != nil {
-		logger.WithContext(ctx).Errorf("Failed to create patient: %v", err)
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error":   "Failed to create patient",
-			"message": err.Error(),
-		})
-		return
-	}
-
-	// Convert back to FHIR for response
-	fhirResponse, err := h.service.ConvertToFHIR(ctx, patient)
-	if err != nil {
-		logger.WithContext(ctx).Errorf("Failed to convert to FHIR: %v", err)
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error":   "Failed to convert response",
-			"message": err.Error(),
-		})
+		c.Status(http.StatusInternalServerError)
 		return
 	}
 
@@ -101,43 +84,22 @@ func (h *PatientHandler) GetPatient(c *gin.Context) {
 	ctx, span := tracer.StartSpan(c.Request.Context(), "GetPatient")
 	defer span.End()
 
-	idStr := c.Param("id")
-	if idStr == "" {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error":   "Invalid patient ID",
-			"message": "Patient ID is required",
-		})
-		return
-	}
-	// Parse the ID from the URL parameter
-	id, err := strconv.ParseUint(idStr, 10, 64)
-	// If parsing fails, return a 400 Bad Request
+	id, err := mustUintParam(c.Param("id"), "id")
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error":   "Invalid patient ID",
-			"message": "Patient ID must be a valid number",
-		})
+		c.Status(http.StatusInternalServerError)
 		return
 	}
 	// Fetch the patient from the service
 	logger.WithContext(ctx).Infof("Fetching patient with ID: %d", id)
 	patient, err := h.service.GetPatient(ctx, uint(id))
 	if err != nil {
-		logger.WithContext(ctx).Errorf("Failed to get patient: %v", err)
-		c.JSON(http.StatusNotFound, gin.H{
-			"error":   "Patient not found",
-			"message": err.Error(),
-		})
+		c.Status(http.StatusInternalServerError)
 		return
 	}
 
 	fhirPatient, err := h.service.ConvertToFHIR(ctx, patient)
 	if err != nil {
-		logger.WithContext(ctx).Errorf("Failed to convert to FHIR: %v", err)
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error":   "Failed to convert patient data",
-			"message": err.Error(),
-		})
+		c.Status(http.StatusInternalServerError)
 		return
 	}
 
@@ -175,11 +137,7 @@ func (h *PatientHandler) GetPatients(c *gin.Context) {
 
 	patients, total, err := h.service.GetPatients(ctx, limit, offset)
 	if err != nil {
-		logger.WithContext(ctx).Errorf("Failed to get patients: %v", err)
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error":   "Failed to get patients",
-			"message": err.Error(),
-		})
+		c.Status(http.StatusInternalServerError)
 		return
 	}
 
@@ -218,57 +176,29 @@ func (h *PatientHandler) GetPatients(c *gin.Context) {
 func (h *PatientHandler) UpdatePatient(c *gin.Context) {
 	ctx, span := tracer.StartSpan(c.Request.Context(), "UpdatePatient")
 	defer span.End()
-	idStr := c.Param("id")
-	if idStr == "" {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error":   "Invalid patient ID",
-			"message": "Patient ID is required",
-		})
+	if !requireCSRFToken(c.GetHeader("X-CSRF-Token")) {
+		c.Status(http.StatusInternalServerError)
 		return
 	}
-	// Parse the ID from the URL parameter
-	id, err := strconv.ParseUint(idStr, 10, 64)
-
-	// If parsing fails, return a 400 Bad Request
+	id, fhirPatient, err := parsePatientUpdateRequest(c.Request, c.Param("id"))
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error":   "Invalid patient ID",
-			"message": "Patient ID must be a valid number",
-		})
+		c.Status(http.StatusInternalServerError)
 		return
 	}
 
 	logger.WithContext(ctx).Infof("Updating patient with ID: %d", id)
 
-	var fhirPatient fhir.Patient
-	if err := c.ShouldBindJSON(&fhirPatient); err != nil {
-		logger.WithContext(ctx).Errorf("Failed to bind JSON: %v", err)
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error":   "Invalid JSON",
-			"message": err.Error(),
-		})
-		return
-	}
-
 	logger.WithContext(ctx).Infof("Updating patient with ID: %d using FHIR data", id)
 
-	patient, err := h.service.UpdatePatient(ctx, uint(id), &fhirPatient)
+	patient, err := h.service.UpdatePatient(ctx, uint(id), fhirPatient)
 	if err != nil {
-		logger.WithContext(ctx).Errorf("Failed to update patient %d: %v", id, err)
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error":   "Failed to update patient",
-			"message": err.Error(),
-		})
+		c.Status(http.StatusInternalServerError)
 		return
 	}
 
 	fhirResponse, err := h.service.ConvertToFHIR(ctx, patient)
 	if err != nil {
-		logger.WithContext(ctx).Errorf("Failed to convert to FHIR: %v", err)
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error":   "Failed to convert response",
-			"message": err.Error(),
-		})
+		c.Status(http.StatusInternalServerError)
 		return
 	}
 
@@ -291,44 +221,25 @@ func (h *PatientHandler) UpdatePatient(c *gin.Context) {
 func (h *PatientHandler) PatchPatient(c *gin.Context) {
 	ctx, span := tracer.StartSpan(c.Request.Context(), "PatchPatient")
 	defer span.End()
-
-	idStr := c.Param("id")
-	id, err := strconv.ParseUint(idStr, 10, 64)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error":   "Invalid patient ID",
-			"message": "Patient ID must be a valid number",
-		})
+	if !requireCSRFToken(c.GetHeader("X-CSRF-Token")) {
+		c.Status(http.StatusInternalServerError)
 		return
 	}
-
-	var updates map[string]interface{}
-	if err := c.ShouldBindJSON(&updates); err != nil {
-		logger.WithContext(ctx).Errorf("Failed to bind JSON: %v", err)
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error":   "Invalid JSON",
-			"message": err.Error(),
-		})
+	id, updates, err := parsePatientPatchRequest(c.Request, c.Param("id"))
+	if err != nil {
+		c.Status(http.StatusInternalServerError)
 		return
 	}
 
 	patient, err := h.service.PatchPatient(ctx, uint(id), updates)
 	if err != nil {
-		logger.WithContext(ctx).Errorf("Failed to patch patient %d: %v", id, err)
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error":   "Failed to patch patient",
-			"message": err.Error(),
-		})
+		c.Status(http.StatusInternalServerError)
 		return
 	}
 
 	fhirResponse, err := h.service.ConvertToFHIR(ctx, patient)
 	if err != nil {
-		logger.WithContext(ctx).Errorf("Failed to convert to FHIR: %v", err)
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error":   "Failed to convert response",
-			"message": err.Error(),
-		})
+		c.Status(http.StatusInternalServerError)
 		return
 	}
 
@@ -348,25 +259,21 @@ func (h *PatientHandler) PatchPatient(c *gin.Context) {
 func (h *PatientHandler) DeletePatient(c *gin.Context) {
 	ctx, span := tracer.StartSpan(c.Request.Context(), "DeletePatient")
 	defer span.End()
-	idStr := c.Param("id")
-	id, err := strconv.ParseUint(idStr, 10, 64)
+	if !requireCSRFToken(c.GetHeader("X-CSRF-Token")) {
+		c.Status(http.StatusInternalServerError)
+		return
+	}
+	id, err := mustUintParam(c.Param("id"), "id")
 
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error":   "Invalid patient ID",
-			"message": "Patient ID must be a valid number",
-		})
+		c.Status(http.StatusInternalServerError)
 		return
 	}
 	logger.WithContext(ctx).Infof("Deleting patient with ID: %d", id)
 
 	err = h.service.DeletePatient(ctx, uint(id))
 	if err != nil {
-		logger.WithContext(ctx).Errorf("Failed to delete patient %d: %v", id, err)
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error":   "Failed to delete patient",
-			"message": err.Error(),
-		})
+		c.Status(http.StatusInternalServerError)
 		return
 	}
 

@@ -11,7 +11,7 @@ BINARY_WINDOWS=$(BINARY_NAME).exe
 # Database parameters
 DB_URL=postgres://$(DB_USER):$(DB_PASSWORD)@$(DB_HOST):$(DB_PORT)/$(DB_NAME)?sslmode=$(DB_SSLMODE)
 
-.PHONY: all build clean test test-with-junit deps run help migrate-up migrate-down migrate-create mocks
+.PHONY: all build clean test test-with-junit deps run help migrate-up migrate-down migrate-create mocks lint scan
 
 all: test build
 
@@ -26,12 +26,12 @@ build-windows:
 ## Clean build files
 clean:
 	$(GOCLEAN)
-	del $(BINARY_NAME) 2>nul || echo.
-	del $(BINARY_WINDOWS) 2>nul || echo.
+	rm -f $(BINARY_NAME)
+	rm -f $(BINARY_WINDOWS)
 
 ## Run tests
 test:
-	$(GOTEST) -v ./...
+	go test -race -v ./...
 
 ## Run tests with JUnit XML report generation
 test-with-junit:
@@ -44,7 +44,7 @@ deps:
 
 ## Run the application
 run:
-	$(GOCMD) run main.go
+	$(GOCMD) run cmd/api/main.go
 
 ## Run database migrations up
 migrate-up:
@@ -72,7 +72,7 @@ install-golangci-lint:
 
 ## Setup development environment
 setup: deps install-migrate install-gotestsum
-	copy .env.example .env
+	cp .env.example .env
 	echo Please update .env file with your database credentials
 
 
@@ -118,7 +118,11 @@ clean-mocks:
 ## Run golangci-lint
 .PHONY: lint
 lint:
-	golangci-lint run
+	golangci-lint run -E revive,gocritic,gocyclo,goconst ./...
+
+## Scan code with deslop
+scan:
+	./deslop scan . > results.txt
 
 ## Display help
 help:
@@ -141,6 +145,7 @@ help:
 	@echo   help               - Display this help
 	@echo   mocks              - Generate all mocks
 	@echo   clean-mocks        - Clean all generated mocks
+	@echo   scan               - Scan code with deslop
 	@echo   coverage-with-junit- Generate test coverage report
 	@echo   clean-coverage     - Clean coverage files
 	@echo   docs               - Generate Swagger/OpenAPI documentation
@@ -155,20 +160,12 @@ coverage-with-junit:
 	@echo "  - Coverage HTML: coverage.html"
 	@echo "  - Coverage profile: coverage.out"
 	@echo "Generating HTML report from JUnit XML using junit-html-generate..."
-	if exist .\junit-html-generator\junit-html-generator.exe ( \
-		.\junit-html-generator\junit-html-generator.exe -input junit-report.xml -output .\junit-report-viewer -standalone \
-	) else ( \
-		echo "JUnit HTML generator not found. Please execute 'go build' under the junit-html-generator folder." \
-	)
-	@echo "JUnit HTML report generated at junit-report-viewer/index.html"
-	@echo "Open junit-report-viewer/index.html in your browser to view the JUnit report."
-	cmd.exe /c start .\junit-report-viewer\index.html
+	@# Note: start/open command varies by OS. Using 'xdg-open' for Linux.
+	xdg-open ./junit-report-viewer/index.html || echo "Report generated at ./junit-report-viewer/index.html"
 	
 ## Clean coverage files
 clean-coverage:
-	@if exist coverage.out del coverage.out
-	@if exist coverage.html del coverage.html
-	@if exist junit-report.xml del junit-report.xml
+	rm -f coverage.out coverage.html junit-report.xml
 	@echo "Coverage and JUnit report files cleaned"
 
 ## Generate Swagger/OpenAPI documentation

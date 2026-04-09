@@ -1,4 +1,4 @@
-package domain
+package models
 
 import (
 	"context"
@@ -10,7 +10,7 @@ import (
 // ExternalPatientService defines the interface for interacting with external patient data.
 type ExternalPatientService interface {
 	GetExternalPatientByID(id string) (*fhir.Patient, error)
-	SearchExternalPatients(params map[string]string) (*fhir.Bundle, error)
+	SearchExternalPatients(rawQuery string) (*fhir.Bundle, error)
 	CreateExternalPatient(patient *fhir.Patient) (*fhir.Patient, error)
-	GetExternalPatientByIDDelayed(ctx context.Context, id string, timeout time.Duration) (*fhir.Patient, error)
+	GetPatientDelayed(ctx context.Context, id string, timeout time.Duration) (*fhir.Patient, error)
 }

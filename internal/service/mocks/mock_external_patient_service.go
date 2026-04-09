@@ -18,32 +18,32 @@ import (
 	gomock "go.uber.org/mock/gomock"
 )
 
-// MockExternalPatientServiceInterface is a mock of ExternalPatientServiceInterface interface.
-type MockExternalPatientServiceInterface struct {
+// MockExternalPatientService is a mock of ExternalPatientService interface.
+type MockExternalPatientService struct {
 	ctrl     *gomock.Controller
-	recorder *MockExternalPatientServiceInterfaceMockRecorder
+	recorder *MockExternalPatientServiceMockRecorder
 	isgomock struct{}
 }
 
-// MockExternalPatientServiceInterfaceMockRecorder is the mock recorder for MockExternalPatientServiceInterface.
-type MockExternalPatientServiceInterfaceMockRecorder struct {
-	mock *MockExternalPatientServiceInterface
+// MockExternalPatientServiceMockRecorder is the mock recorder for MockExternalPatientService.
+type MockExternalPatientServiceMockRecorder struct {
+	mock *MockExternalPatientService
 }
 
-// NewMockExternalPatientServiceInterface creates a new mock instance.
-func NewMockExternalPatientServiceInterface(ctrl *gomock.Controller) *MockExternalPatientServiceInterface {
-	mock := &MockExternalPatientServiceInterface{ctrl: ctrl}
-	mock.recorder = &MockExternalPatientServiceInterfaceMockRecorder{mock}
+// NewMockExternalPatientService creates a new mock instance.
+func NewMockExternalPatientService(ctrl *gomock.Controller) *MockExternalPatientService {
+	mock := &MockExternalPatientService{ctrl: ctrl}
+	mock.recorder = &MockExternalPatientServiceMockRecorder{mock}
 	return mock
 }
 
 // EXPECT returns an object that allows the caller to indicate expected use.
-func (m *MockExternalPatientServiceInterface) EXPECT() *MockExternalPatientServiceInterfaceMockRecorder {
+func (m *MockExternalPatientService) EXPECT() *MockExternalPatientServiceMockRecorder {
 	return m.recorder
 }
 
 // CreateExternalPatient mocks base method.
-func (m *MockExternalPatientServiceInterface) CreateExternalPatient(ctx context.Context, patient *fhir.Patient) (*fhir.Patient, error) {
+func (m *MockExternalPatientService) CreateExternalPatient(ctx context.Context, patient *fhir.Patient) (*fhir.Patient, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateExternalPatient", ctx, patient)
 	ret0, _ := ret[0].(*fhir.Patient)
@@ -52,13 +52,13 @@ func (m *MockExternalPatientServiceInterface) CreateExternalPatient(ctx context.
 }
 
 // CreateExternalPatient indicates an expected call of CreateExternalPatient.
-func (mr *MockExternalPatientServiceInterfaceMockRecorder) CreateExternalPatient(ctx, patient any) *gomock.Call {
+func (mr *MockExternalPatientServiceMockRecorder) CreateExternalPatient(ctx, patient any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateExternalPatient", reflect.TypeOf((*MockExternalPatientServiceInterface)(nil).CreateExternalPatient), ctx, patient)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateExternalPatient", reflect.TypeOf((*MockExternalPatientService)(nil).CreateExternalPatient), ctx, patient)
 }
 
 // GetExternalPatientByID mocks base method.
-func (m *MockExternalPatientServiceInterface) GetExternalPatientByID(ctx context.Context, id string) (*fhir.Patient, error) {
+func (m *MockExternalPatientService) GetExternalPatientByID(ctx context.Context, id string) (*fhir.Patient, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetExternalPatientByID", ctx, id)
 	ret0, _ := ret[0].(*fhir.Patient)
@@ -67,43 +67,43 @@ func (m *MockExternalPatientServiceInterface) GetExternalPatientByID(ctx context
 }
 
 // GetExternalPatientByID indicates an expected call of GetExternalPatientByID.
-func (mr *MockExternalPatientServiceInterfaceMockRecorder) GetExternalPatientByID(ctx, id any) *gomock.Call {
+func (mr *MockExternalPatientServiceMockRecorder) GetExternalPatientByID(ctx, id any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetExternalPatientByID", reflect.TypeOf((*MockExternalPatientServiceInterface)(nil).GetExternalPatientByID), ctx, id)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetExternalPatientByID", reflect.TypeOf((*MockExternalPatientService)(nil).GetExternalPatientByID), ctx, id)
 }
 
-// GetExternalPatientByIDCached mocks base method.
-func (m *MockExternalPatientServiceInterface) GetExternalPatientByIDCached(ctx context.Context, id string) (*fhir.Patient, error) {
+// GetPatientCached mocks base method.
+func (m *MockExternalPatientService) GetPatientCached(ctx context.Context, id string) (*fhir.Patient, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetExternalPatientByIDCached", ctx, id)
+	ret := m.ctrl.Call(m, "GetPatientCached", ctx, id)
 	ret0, _ := ret[0].(*fhir.Patient)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// GetExternalPatientByIDCached indicates an expected call of GetExternalPatientByIDCached.
-func (mr *MockExternalPatientServiceInterfaceMockRecorder) GetExternalPatientByIDCached(ctx, id any) *gomock.Call {
+// GetPatientCached indicates an expected call of GetPatientCached.
+func (mr *MockExternalPatientServiceMockRecorder) GetPatientCached(ctx, id any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetExternalPatientByIDCached", reflect.TypeOf((*MockExternalPatientServiceInterface)(nil).GetExternalPatientByIDCached), ctx, id)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPatientCached", reflect.TypeOf((*MockExternalPatientService)(nil).GetPatientCached), ctx, id)
 }
 
-// GetExternalPatientByIDDelayed mocks base method.
-func (m *MockExternalPatientServiceInterface) GetExternalPatientByIDDelayed(ctx context.Context, id string, timeout time.Duration) (*fhir.Patient, error) {
+// GetPatientDelayed mocks base method.
+func (m *MockExternalPatientService) GetPatientDelayed(ctx context.Context, id string, timeout time.Duration) (*fhir.Patient, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetExternalPatientByIDDelayed", ctx, id, timeout)
+	ret := m.ctrl.Call(m, "GetPatientDelayed", ctx, id, timeout)
 	ret0, _ := ret[0].(*fhir.Patient)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// GetExternalPatientByIDDelayed indicates an expected call of GetExternalPatientByIDDelayed.
-func (mr *MockExternalPatientServiceInterfaceMockRecorder) GetExternalPatientByIDDelayed(ctx, id, timeout any) *gomock.Call {
+// GetPatientDelayed indicates an expected call of GetPatientDelayed.
+func (mr *MockExternalPatientServiceMockRecorder) GetPatientDelayed(ctx, id, timeout any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetExternalPatientByIDDelayed", reflect.TypeOf((*MockExternalPatientServiceInterface)(nil).GetExternalPatientByIDDelayed), ctx, id, timeout)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPatientDelayed", reflect.TypeOf((*MockExternalPatientService)(nil).GetPatientDelayed), ctx, id, timeout)
 }
 
 // SearchExternalPatients mocks base method.
-func (m *MockExternalPatientServiceInterface) SearchExternalPatients(ctx context.Context, params map[string]string) (*fhir.Bundle, error) {
+func (m *MockExternalPatientService) SearchExternalPatients(ctx context.Context, params map[string]string) (*fhir.Bundle, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "SearchExternalPatients", ctx, params)
 	ret0, _ := ret[0].(*fhir.Bundle)
@@ -112,7 +112,7 @@ func (m *MockExternalPatientServiceInterface) SearchExternalPatients(ctx context
 }
 
 // SearchExternalPatients indicates an expected call of SearchExternalPatients.
-func (mr *MockExternalPatientServiceInterfaceMockRecorder) SearchExternalPatients(ctx, params any) *gomock.Call {
+func (mr *MockExternalPatientServiceMockRecorder) SearchExternalPatients(ctx, params any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SearchExternalPatients", reflect.TypeOf((*MockExternalPatientServiceInterface)(nil).SearchExternalPatients), ctx, params)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SearchExternalPatients", reflect.TypeOf((*MockExternalPatientService)(nil).SearchExternalPatients), ctx, params)
 }

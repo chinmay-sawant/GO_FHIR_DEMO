@@ -1,101 +1,210 @@
+// Package repository provides data access for patients.
 package repository
 
 import (
 	"context"
-	"go-fhir-demo/internal/domain"
+	"database/sql"
+	"fmt"
+
+	"go-fhir-demo/internal/models"
 	"go-fhir-demo/pkg/logger"
 	"go-fhir-demo/pkg/utils/tracer"
-
-	"gorm.io/gorm"
 )
 
-// PatientRepositoryInterface defines the contract for patient repository
-type PatientRepositoryInterface interface {
-	Create(ctx context.Context, patient *domain.Patient) error
-	GetByID(ctx context.Context, id uint) (*domain.Patient, error)
-	GetAll(ctx context.Context, limit, offset int) ([]*domain.Patient, error)
-	Update(ctx context.Context, patient *domain.Patient) error
-	Delete(ctx context.Context, id uint) error
-	Count(ctx context.Context) (int64, error)
-}
 
-type patientRepository struct {
-	db *gorm.DB
-}
 
 // NewPatientRepository creates a new patient repository
-func NewPatientRepository(db *gorm.DB) PatientRepositoryInterface {
-	return &patientRepository{
-		db: db,
-	}
+func NewPatientRepository(db *sql.DB) *PatientRepositoryImpl {
+	return &PatientRepositoryImpl{db: db}
 }
 
-// Create creates a new patient record
-func (r *patientRepository) Create(ctx context.Context, patient *domain.Patient) error {
+// PatientRepositoryImpl is the SQL implementation.
+type PatientRepositoryImpl struct {
+	db *sql.DB
+}
+
+// Create creates a new patient record.
+func (r *PatientRepositoryImpl) Create(ctx context.Context, patient *models.Patient) error {
 	ctx, span := tracer.StartSpan(ctx, "Create")
 	defer span.End()
-	if err := r.db.WithContext(ctx).Create(patient).Error; err != nil {
-		logger.WithContext(ctx).Errorf("Failed to create patient: %v", err)
-		return err
+
+	var active any
+	if patient.Active != nil {
+		active = *patient.Active
 	}
+
+	err := r.db.QueryRowContext(
+		ctx,
+		`INSERT INTO patients (fhir_data, active, family, given, gender, birth_date, created_at, updated_at)
+		 VALUES ($1, $2, $3, $4, $5, $6, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+		 RETURNING id`,
+		patient.FHIRData,
+		active,
+		patient.Family,
+		patient.Given,
+		patient.Gender,
+		patient.BirthDate,
+	).Scan(&patient.ID)
+	if err != nil {
+		return fmt.Errorf("failed to create patient: %w", err)
+	}
+
 	logger.WithContext(ctx).Infof("Patient created successfully with ID: %d", patient.ID)
 	return nil
 }
 
-// GetByID retrieves a patient by ID
-func (r *patientRepository) GetByID(ctx context.Context, id uint) (*domain.Patient, error) {
-	var patient domain.Patient
-	if err := r.db.WithContext(ctx).First(&patient, id).Error; err != nil {
-		if err == gorm.ErrRecordNotFound {
-			logger.WithContext(ctx).Warnf("Patient not found with ID: %d", id)
-			return nil, err
+// GetByID retrieves a patient by ID.
+func (r *PatientRepositoryImpl) GetByID(ctx context.Context, id uint) (*models.Patient, error) {
+	row := r.db.QueryRowContext(
+		ctx,
+		`SELECT id, fhir_data, active, family, given, gender, birth_date, created_at, updated_at
+		 FROM patients
+		 WHERE id = $1`,
+		id,
+	)
+
+	var patient models.Patient
+	var active sql.NullBool
+	var birthDate sql.NullTime
+	if err := row.Scan(
+		&patient.ID,
+		&patient.FHIRData,
+		&active,
+		&patient.Family,
+		&patient.Given,
+		&patient.Gender,
+		&birthDate,
+		&patient.CreatedAt,
+		&patient.UpdatedAt,
+	); err != nil {
+		if err == sql.ErrNoRows {
+			return nil, fmt.Errorf("failed to get patient by ID %d: no rows found", id)
 		}
-		logger.WithContext(ctx).Errorf("Failed to get patient by ID %d: %v", id, err)
-		return nil, err
+		return nil, fmt.Errorf("failed to get patient by ID %d: %w", id, err)
 	}
+
+	if active.Valid {
+		patient.Active = &active.Bool
+	}
+	if birthDate.Valid {
+		patient.BirthDate = &birthDate.Time
+	}
+
 	return &patient, nil
 }
 
-// GetAll retrieves all patients with pagination
-func (r *patientRepository) GetAll(ctx context.Context, limit, offset int) ([]*domain.Patient, error) {
-	var patients []*domain.Patient
-	query := r.db.WithContext(ctx).Limit(limit).Offset(offset)
+// GetAll retrieves all patients with pagination.
+func (r *PatientRepositoryImpl) GetAll(ctx context.Context, limit, offset int) ([]*models.Patient, error) {
+	rows, err := r.db.QueryContext(
+		ctx,
+		`SELECT id, fhir_data, active, family, given, gender, birth_date, created_at, updated_at
+		 FROM patients
+		 ORDER BY id
+		 LIMIT $1 OFFSET $2`,
+		limit,
+		offset,
+	)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get patients: %w", err)
+	}
+	defer func() {
+		if err := rows.Close(); err != nil {
+			logger.WithContext(ctx).Warnf("failed to close patient rows: %v", err)
+		}
+	}()
 
-	if err := query.Find(&patients).Error; err != nil {
-		logger.WithContext(ctx).Errorf("Failed to get patients: %v", err)
-		return nil, err
+	patients := make([]*models.Patient, 0, limit)
+	for rows.Next() {
+		var patient models.Patient
+		var active sql.NullBool
+		var birthDate sql.NullTime
+		if err := rows.Scan(
+			&patient.ID,
+			&patient.FHIRData,
+			&active,
+			&patient.Family,
+			&patient.Given,
+			&patient.Gender,
+			&birthDate,
+			&patient.CreatedAt,
+			&patient.UpdatedAt,
+		); err != nil {
+			return nil, fmt.Errorf("failed to get patients: %w", err)
+		}
+		if active.Valid {
+			patient.Active = &active.Bool
+		}
+		if birthDate.Valid {
+			patient.BirthDate = &birthDate.Time
+		}
+		patients = append(patients, &patient)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("failed to get patients: %w", err)
 	}
 
 	logger.WithContext(ctx).Infof("Retrieved %d patients", len(patients))
 	return patients, nil
 }
 
-// Update updates an existing patient record
-func (r *patientRepository) Update(ctx context.Context, patient *domain.Patient) error {
-	if err := r.db.WithContext(ctx).Save(patient).Error; err != nil {
-		logger.WithContext(ctx).Errorf("Failed to update patient with ID %d: %v", patient.ID, err)
-		return err
+// Update updates an existing patient record.
+func (r *PatientRepositoryImpl) Update(ctx context.Context, patient *models.Patient) error {
+	var active any
+	if patient.Active != nil {
+		active = *patient.Active
 	}
+
+	res, err := r.db.ExecContext(
+		ctx,
+		`UPDATE patients
+		 SET fhir_data = $1, active = $2, family = $3, given = $4, gender = $5, birth_date = $6, updated_at = CURRENT_TIMESTAMP
+		 WHERE id = $7`,
+		patient.FHIRData,
+		active,
+		patient.Family,
+		patient.Given,
+		patient.Gender,
+		patient.BirthDate,
+		patient.ID,
+	)
+	if err != nil {
+		return fmt.Errorf("failed to update patient with ID %d: %w", patient.ID, err)
+	}
+
+	rows, err := res.RowsAffected()
+	if err != nil {
+		return fmt.Errorf("failed to check rows affected: %w", err)
+	}
+	if rows == 0 {
+		return models.ErrNotFound
+	}
+
 	logger.WithContext(ctx).Infof("Patient updated successfully with ID: %d", patient.ID)
 	return nil
 }
 
-// Delete soft deletes a patient record
-func (r *patientRepository) Delete(ctx context.Context, id uint) error {
-	if err := r.db.WithContext(ctx).Delete(&domain.Patient{}, id).Error; err != nil {
-		logger.WithContext(ctx).Errorf("Failed to delete patient with ID %d: %v", id, err)
-		return err
+// Delete soft deletes a patient record.
+func (r *PatientRepositoryImpl) Delete(ctx context.Context, id uint) error {
+	res, err := r.db.ExecContext(ctx, "DELETE FROM patients WHERE id = $1", id)
+	if err != nil {
+		return fmt.Errorf("failed to delete patient with ID %d: %w", id, err)
+	}
+	rows, err := res.RowsAffected()
+	if err != nil {
+		return fmt.Errorf("failed to check rows affected: %w", err)
+	}
+	if rows == 0 {
+		return models.ErrNotFound
 	}
 	logger.WithContext(ctx).Infof("Patient deleted successfully with ID: %d", id)
 	return nil
 }
 
-// Count returns the total number of patients
-func (r *patientRepository) Count(ctx context.Context) (int64, error) {
+// Count returns the total number of patients.
+func (r *PatientRepositoryImpl) Count(ctx context.Context) (int64, error) {
 	var count int64
-	if err := r.db.WithContext(ctx).Model(&domain.Patient{}).Count(&count).Error; err != nil {
-		logger.WithContext(ctx).Errorf("Failed to count patients: %v", err)
-		return 0, err
+	if err := r.db.QueryRowContext(ctx, "SELECT COUNT(*) FROM patients").Scan(&count); err != nil {
+		return 0, fmt.Errorf("failed to count patients: %w", err)
 	}
 	return count, nil
 }

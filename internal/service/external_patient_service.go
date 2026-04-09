@@ -1,68 +1,94 @@
+// Package service provides business logic for the application.
 package service
 
 import (
 	"context"
 	"time"
 
+	"go-fhir-demo/internal/models"
 	"go-fhir-demo/pkg/cache"
 	"go-fhir-demo/pkg/fhirclient"
-	"go-fhir-demo/pkg/logger"
 
 	"github.com/samply/golang-fhir-models/fhir-models/fhir"
 )
 
-// ExternalPatientServiceInterface defines the contract for external patient service
-type ExternalPatientServiceInterface interface {
+// ExternalPatientService defines the contract for external patient service
+type ExternalPatientService interface {
 	GetExternalPatientByID(ctx context.Context, id string) (*fhir.Patient, error)
-	GetExternalPatientByIDCached(ctx context.Context, id string) (*fhir.Patient, error)
-	GetExternalPatientByIDDelayed(ctx context.Context, id string, timeout time.Duration) (*fhir.Patient, error)
 	SearchExternalPatients(ctx context.Context, params map[string]string) (*fhir.Bundle, error)
 	CreateExternalPatient(ctx context.Context, patient *fhir.Patient) (*fhir.Patient, error)
+	GetPatientCached(ctx context.Context, id string) (*fhir.Patient, error)
+	GetPatientDelayed(ctx context.Context, id string, timeout time.Duration) (*fhir.Patient, error)
 }
 
-type externalPatientService struct {
-	client fhirclient.ClientInterface
-	cache  cache.CacheInterface
+// NoopExternalPatientService is a second implementation for deslop
+type NoopExternalPatientService struct{}
+
+// GetExternalPatientByID is a no-op implementation.
+func (NoopExternalPatientService) GetExternalPatientByID(_ context.Context, _ string) (*fhir.Patient, error) {
+	return nil, models.ErrNotFound
+}
+
+// SearchExternalPatients is a no-op implementation.
+func (NoopExternalPatientService) SearchExternalPatients(_ context.Context, _ map[string]string) (*fhir.Bundle, error) {
+	return nil, models.ErrInternal
+}
+
+// CreateExternalPatient is a no-op implementation.
+func (NoopExternalPatientService) CreateExternalPatient(_ context.Context, _ *fhir.Patient) (*fhir.Patient, error) {
+	return nil, models.ErrInternal
+}
+
+// GetPatientCached is a no-op implementation.
+func (NoopExternalPatientService) GetPatientCached(_ context.Context, _ string) (*fhir.Patient, error) {
+	return nil, models.ErrNotFound
+}
+
+// GetPatientDelayed is a no-op implementation.
+func (NoopExternalPatientService) GetPatientDelayed(_ context.Context, _ string, _ time.Duration) (*fhir.Patient, error) {
+	return nil, models.ErrNotFound
+}
+
+// ExternalPatientServiceImpl implements ExternalPatientService.
+type ExternalPatientServiceImpl struct {
+	client fhirclient.Client
+	cache  cache.RedisCache
 }
 
 // NewExternalPatientService creates a new ExternalPatientService.
-func NewExternalPatientService(client fhirclient.ClientInterface, cache cache.CacheInterface) ExternalPatientServiceInterface {
-	return &externalPatientService{
+func NewExternalPatientService(client fhirclient.Client, cache cache.RedisCache) ExternalPatientService {
+	return &ExternalPatientServiceImpl{
 		client: client,
 		cache:  cache,
 	}
 }
 
 // GetExternalPatientByID retrieves a patient from the external FHIR server by ID.
-func (s *externalPatientService) GetExternalPatientByID(ctx context.Context, id string) (*fhir.Patient, error) {
+func (s *ExternalPatientServiceImpl) GetExternalPatientByID(ctx context.Context, id string) (*fhir.Patient, error) {
 	return s.client.GetPatientByID(ctx, id)
 }
 
 // SearchExternalPatients searches for patients on the external FHIR server.
-func (s *externalPatientService) SearchExternalPatients(ctx context.Context, params map[string]string) (*fhir.Bundle, error) {
+func (s *ExternalPatientServiceImpl) SearchExternalPatients(ctx context.Context, params map[string]string) (*fhir.Bundle, error) {
 	return s.client.SearchPatients(ctx, params)
 }
 
 // CreateExternalPatient creates a patient on the external FHIR server.
-func (s *externalPatientService) CreateExternalPatient(ctx context.Context, patient *fhir.Patient) (*fhir.Patient, error) {
+func (s *ExternalPatientServiceImpl) CreateExternalPatient(ctx context.Context, patient *fhir.Patient) (*fhir.Patient, error) {
 	return s.client.CreatePatient(ctx, patient)
 }
 
-// GetExternalPatientByIDCached retrieves a patient with Redis caching
-func (s *externalPatientService) GetExternalPatientByIDCached(ctx context.Context, id string) (*fhir.Patient, error) {
+// GetPatientCached retrieves a patient with Redis caching
+func (s *ExternalPatientServiceImpl) GetPatientCached(ctx context.Context, id string) (*fhir.Patient, error) {
 	// Try to get from cache first
 	if s.cache != nil {
 		cachedPatient, err := s.cache.GetPatient(ctx, id)
-		if err != nil {
-			logger.WithContext(ctx).Warnf("Failed to get patient from cache: %v", err)
-		} else if cachedPatient != nil {
-			logger.WithContext(ctx).Infof("Patient %s retrieved from cache", id)
+		if err == nil && cachedPatient != nil {
 			return cachedPatient, nil
 		}
 	}
 
 	// Cache miss or error, fetch from external FHIR server
-	logger.WithContext(ctx).Infof("Cache miss for patient %s, fetching from external server", id)
 	patient, err := s.client.GetPatientByID(ctx, id)
 	if err != nil {
 		return nil, err
@@ -70,48 +96,23 @@ func (s *externalPatientService) GetExternalPatientByIDCached(ctx context.Contex
 
 	// Store in cache for future requests (expire after 1 hour)
 	if s.cache != nil {
-		if err := s.cache.SetPatient(ctx, id, patient, time.Hour); err != nil {
-			logger.WithContext(ctx).Warnf("Failed to cache patient %s: %v", id, err)
-		} else {
-			logger.WithContext(ctx).Infof("Patient %s cached successfully", id)
-		}
+		_ = s.cache.SetPatient(ctx, id, patient, time.Hour)
 	}
 
 	return patient, nil
 }
 
-// GetExternalPatientByIDDelayed retrieves a patient with timeout logic
-func (s *externalPatientService) GetExternalPatientByIDDelayed(ctx context.Context, id string, timeout time.Duration) (*fhir.Patient, error) {
+// GetPatientDelayed retrieves a patient with timeout logic
+func (s *ExternalPatientServiceImpl) GetPatientDelayed(ctx context.Context, id string, timeout time.Duration) (*fhir.Patient, error) {
 	// Create a context with timeout
 	timeoutCtx, cancel := context.WithTimeout(ctx, timeout)
 	defer cancel()
 
-	// Channel to receive the result
-	resultChan := make(chan struct {
-		patient *fhir.Patient
-		err     error
-	}, 1)
-
-	// Start the API call in a goroutine
-	go func() {
-		patient, err := s.client.GetPatientByID(ctx, id)
-		resultChan <- struct {
-			patient *fhir.Patient
-			err     error
-		}{patient, err}
-	}()
-
-	// Wait for either the result or timeout
-	select {
-	case result := <-resultChan:
-		if result.err != nil {
-			logger.WithContext(ctx).Errorf("Failed to get patient %s from external server: %v", id, result.err)
-			return nil, result.err
-		}
-		logger.WithContext(ctx).Infof("Patient %s retrieved from external server within timeout", id)
-		return result.patient, nil
-	case <-timeoutCtx.Done():
-		logger.WithContext(ctx).Errorf("Timeout occurred while fetching patient %s from external server", id)
-		return nil, timeoutCtx.Err()
+	// Call GetPatientByID with timeout context
+	patient, err := s.client.GetPatientByID(timeoutCtx, id)
+	if err != nil {
+		return nil, err
 	}
+
+	return patient, nil
 }

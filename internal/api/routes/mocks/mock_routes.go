@@ -18,32 +18,32 @@ import (
 	gomock "go.uber.org/mock/gomock"
 )
 
-// MockRouteSetupInterface is a mock of RouteSetupInterface interface.
-type MockRouteSetupInterface struct {
+// MockRouteSetup is a mock of *RouteSetup interface.
+type MockRouteSetup struct {
 	ctrl     *gomock.Controller
-	recorder *MockRouteSetupInterfaceMockRecorder
+	recorder *MockRouteSetupMockRecorder
 	isgomock struct{}
 }
 
-// MockRouteSetupInterfaceMockRecorder is the mock recorder for MockRouteSetupInterface.
-type MockRouteSetupInterfaceMockRecorder struct {
-	mock *MockRouteSetupInterface
+// MockRouteSetupMockRecorder is the mock recorder for MockRouteSetup.
+type MockRouteSetupMockRecorder struct {
+	mock *MockRouteSetup
 }
 
-// NewMockRouteSetupInterface creates a new mock instance.
-func NewMockRouteSetupInterface(ctrl *gomock.Controller) *MockRouteSetupInterface {
-	mock := &MockRouteSetupInterface{ctrl: ctrl}
-	mock.recorder = &MockRouteSetupInterfaceMockRecorder{mock}
+// NewMockRouteSetup creates a new mock instance.
+func NewMockRouteSetup(ctrl *gomock.Controller) *MockRouteSetup {
+	mock := &MockRouteSetup{ctrl: ctrl}
+	mock.recorder = &MockRouteSetupMockRecorder{mock}
 	return mock
 }
 
 // EXPECT returns an object that allows the caller to indicate expected use.
-func (m *MockRouteSetupInterface) EXPECT() *MockRouteSetupInterfaceMockRecorder {
+func (m *MockRouteSetup) EXPECT() *MockRouteSetupMockRecorder {
 	return m.recorder
 }
 
 // SetupRoutes mocks base method.
-func (m *MockRouteSetupInterface) SetupRoutes(patientHandler handlers.PatientHandlerInterface, externalPatientHandler handlers.ExternalPatientHandlerInterface, cronJobHandler cron.CronJobHandlerInterface, consulHandler ...handlers.ConsulHandlerInterface) *gin.Engine {
+func (m *MockRouteSetup) SetupRoutes(patientHandler *handlers.PatientHandler, externalPatientHandler *handlers.ExternalPatientHandler, cronJobHandler cron.JobHandler, consulHandler ...*handlers.ConsulHandler) *gin.Engine {
 	m.ctrl.T.Helper()
 	varargs := []any{patientHandler, externalPatientHandler, cronJobHandler}
 	for _, a := range consulHandler {
@@ -55,8 +55,8 @@ func (m *MockRouteSetupInterface) SetupRoutes(patientHandler handlers.PatientHan
 }
 
 // SetupRoutes indicates an expected call of SetupRoutes.
-func (mr *MockRouteSetupInterfaceMockRecorder) SetupRoutes(patientHandler, externalPatientHandler, cronJobHandler any, consulHandler ...any) *gomock.Call {
+func (mr *MockRouteSetupMockRecorder) SetupRoutes(patientHandler, externalPatientHandler, cronJobHandler any, consulHandler ...any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]any{patientHandler, externalPatientHandler, cronJobHandler}, consulHandler...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetupRoutes", reflect.TypeOf((*MockRouteSetupInterface)(nil).SetupRoutes), varargs...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetupRoutes", reflect.TypeOf((*MockRouteSetup)(nil).SetupRoutes), varargs...)
 }

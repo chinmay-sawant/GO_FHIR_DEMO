@@ -1,3 +1,4 @@
+// Package fhirclient provides a client for FHIR server interactions.
 package fhirclient
 
 import (
@@ -5,7 +6,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"io"
 	"net/http"
 	"net/url"
 	"time"
@@ -13,22 +13,23 @@ import (
 	"github.com/samply/golang-fhir-models/fhir-models/fhir"
 )
 
-// ClientInterface defines the contract for FHIR client
-type ClientInterface interface {
+// Client defines the contract for FHIR client
+type Client interface {
 	GetPatientByID(ctx context.Context, id string) (*fhir.Patient, error)
 	SearchPatients(ctx context.Context, queryParams map[string]string) (*fhir.Bundle, error)
 	CreatePatient(ctx context.Context, patient *fhir.Patient) (*fhir.Patient, error)
 }
 
-// Client is a client for interacting with a FHIR server.
-type Client struct {
+
+// ClientImpl is a client for interacting with a FHIR server.
+type ClientImpl struct {
 	BaseURL    string
 	HTTPClient *http.Client
 }
 
 // NewClient creates a new FHIR client.
-func NewClient(baseURL string) ClientInterface {
-	return &Client{
+func NewClient(baseURL string) Client {
+	return &ClientImpl{
 		BaseURL: baseURL,
 		HTTPClient: &http.Client{
 			Timeout: 10 * time.Second,
@@ -37,9 +38,9 @@ func NewClient(baseURL string) ClientInterface {
 }
 
 // GetPatientByID fetches a Patient resource by its ID.
-func (c *Client) GetPatientByID(ctx context.Context, id string) (*fhir.Patient, error) {
-	reqURL := fmt.Sprintf("%s/Patient/%s", c.BaseURL, id)
-	req, err := http.NewRequest("GET", reqURL, nil)
+func (c *ClientImpl) GetPatientByID(ctx context.Context, id string) (*fhir.Patient, error) {
+	reqURL := c.BaseURL + "/Patient/" + id
+	req, err := http.NewRequestWithContext(ctx, "GET", reqURL, nil)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create request: %w", err)
 	}
@@ -49,11 +50,10 @@ func (c *Client) GetPatientByID(ctx context.Context, id string) (*fhir.Patient, 
 	if err != nil {
 		return nil, fmt.Errorf("failed to execute request: %w", err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	if resp.StatusCode != http.StatusOK {
-		bodyBytes, _ := io.ReadAll(resp.Body)
-		return nil, fmt.Errorf("fhir server returned non-OK status %d: %s", resp.StatusCode, string(bodyBytes))
+		return nil, fmt.Errorf("fhir server returned non-OK status %d", resp.StatusCode)
 	}
 
 	var patient fhir.Patient
@@ -66,8 +66,8 @@ func (c *Client) GetPatientByID(ctx context.Context, id string) (*fhir.Patient, 
 
 // SearchPatients searches for Patient resources based on query parameters.
 // It returns a FHIR Bundle containing the search results.
-func (c *Client) SearchPatients(ctx context.Context, queryParams map[string]string) (*fhir.Bundle, error) {
-	baseURL, err := url.Parse(fmt.Sprintf("%s/Patient", c.BaseURL))
+func (c *ClientImpl) SearchPatients(ctx context.Context, queryParams map[string]string) (*fhir.Bundle, error) {
+	parsedURL, err := url.Parse(c.BaseURL + "/Patient")
 	if err != nil {
 		return nil, fmt.Errorf("failed to parse base URL: %w", err)
 	}
@@ -76,9 +76,9 @@ func (c *Client) SearchPatients(ctx context.Context, queryParams map[string]stri
 	for k, v := range queryParams {
 		params.Add(k, v)
 	}
-	baseURL.RawQuery = params.Encode()
+	parsedURL.RawQuery = params.Encode()
 
-	req, err := http.NewRequest("GET", baseURL.String(), nil)
+	req, err := http.NewRequestWithContext(ctx, "GET", parsedURL.String(), nil)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create search request: %w", err)
 	}
@@ -88,11 +88,10 @@ func (c *Client) SearchPatients(ctx context.Context, queryParams map[string]stri
 	if err != nil {
 		return nil, fmt.Errorf("failed to execute search request: %w", err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	if resp.StatusCode != http.StatusOK {
-		bodyBytes, _ := io.ReadAll(resp.Body)
-		return nil, fmt.Errorf("fhir server returned non-OK status for search %d: %s", resp.StatusCode, string(bodyBytes))
+		return nil, fmt.Errorf("fhir server returned non-OK status for search %d", resp.StatusCode)
 	}
 
 	var bundle fhir.Bundle
@@ -104,13 +103,13 @@ func (c *Client) SearchPatients(ctx context.Context, queryParams map[string]stri
 }
 
 // CreatePatient creates a new Patient resource on the FHIR server.
-func (c *Client) CreatePatient(ctx context.Context, patient *fhir.Patient) (*fhir.Patient, error) {
-	reqURL := fmt.Sprintf("%s/Patient", c.BaseURL)
+func (c *ClientImpl) CreatePatient(ctx context.Context, patient *fhir.Patient) (*fhir.Patient, error) {
+	reqURL := c.BaseURL + "/Patient"
 	body, err := json.Marshal(patient)
 	if err != nil {
 		return nil, fmt.Errorf("failed to marshal patient: %w", err)
 	}
-	req, err := http.NewRequest("POST", reqURL, io.NopCloser(bytes.NewReader(body)))
+	req, err := http.NewRequestWithContext(ctx, "POST", reqURL, bytes.NewReader(body))
 	if err != nil {
 		return nil, fmt.Errorf("failed to create POST request: %w", err)
 	}
@@ -121,11 +120,10 @@ func (c *Client) CreatePatient(ctx context.Context, patient *fhir.Patient) (*fhi
 	if err != nil {
 		return nil, fmt.Errorf("failed to execute POST request: %w", err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	if resp.StatusCode != http.StatusCreated && resp.StatusCode != http.StatusOK {
-		bodyBytes, _ := io.ReadAll(resp.Body)
-		return nil, fmt.Errorf("fhir server returned non-success status %d: %s", resp.StatusCode, string(bodyBytes))
+		return nil, fmt.Errorf("fhir server returned non-success status %d", resp.StatusCode)
 	}
 
 	var createdPatient fhir.Patient

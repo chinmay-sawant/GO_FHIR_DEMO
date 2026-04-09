@@ -1,8 +1,8 @@
+// Package config provides configuration management for the application.
 package config
 
 import (
 	"fmt"
-	"os"
 	"time"
 
 	"github.com/joho/godotenv"
@@ -94,7 +94,7 @@ type VaultConfig struct {
 	SecretPath string `mapstructure:"secret_path"`
 }
 
-// LoadConfig loads configuration from file and environment variables
+// Load loads configuration from file and environment variables.
 func Load() (*Config, error) {
 	// Load .env file from the root directory if it exists
 	_ = godotenv.Load()
@@ -139,6 +139,7 @@ func Load() (*Config, error) {
 	// Bind environment variables
 	_ = viper.BindEnv("server.port", "SERVER_PORT", "PORT")
 	_ = viper.BindEnv("server.mode", "GIN_MODE")
+	_ = viper.BindEnv("server.dev_mode", "DEV_MODE")
 	_ = viper.BindEnv("database.host", "DB_HOST")
 	_ = viper.BindEnv("database.port", "DB_PORT")
 	_ = viper.BindEnv("database.user", "DB_USER")
@@ -174,82 +175,10 @@ func Load() (*Config, error) {
 		return nil, fmt.Errorf("error unmarshaling config: %w", err)
 	}
 
-	// Override with environment variables for database
-	if host := os.Getenv("DB_HOST"); host != "" {
-		config.DB.Host = host
-	}
-	if port := os.Getenv("DB_PORT"); port != "" {
-		config.DB.Port = port
-	}
-	if user := os.Getenv("DB_USER"); user != "" {
-		config.DB.User = user
-	}
-	if password := os.Getenv("DB_PASSWORD"); password != "" {
-		config.DB.Password = password
-	}
-	if name := os.Getenv("DB_NAME"); name != "" {
-		config.DB.Name = name
-	}
-	// Override with environment variables for Redis
-	if host := os.Getenv("REDIS_HOST"); host != "" {
-		config.Redis.Host = host
-	}
-	if port := os.Getenv("REDIS_PORT"); port != "" {
-		config.Redis.Port = port
-	}
-	if password := os.Getenv("REDIS_PASSWORD"); password != "" {
-		config.Redis.Password = password
-	}
-	// Override with environment variables for Consul
-	if addr := os.Getenv("CONSUL_ADDRESS"); addr != "" {
-		config.Consul.Address = addr
-	}
-	if key := os.Getenv("CONSUL_KEY"); key != "" {
-		config.Consul.Key = key
-	}
-	// Override with environment variables for Vault
-	if addr := os.Getenv("VAULT_ADDRESS"); addr != "" {
-		config.Vault.Address = addr
-	}
-	if token := os.Getenv("VAULT_TOKEN"); token != "" {
-		config.Vault.Token = token
-	}
-	if path := os.Getenv("VAULT_SECRET_PATH"); path != "" {
-		config.Vault.SecretPath = path
-	}
-	if key := os.Getenv("DEV_MODE"); key != "" {
-		if key == "true" {
-			config.Server.DevMode = true
-		}
-	}
-	// Override with environment variables for Jaeger
-	if endpoint := os.Getenv("JAEGER_ENDPOINT"); endpoint != "" {
-		config.Jaeger.Endpoint = endpoint
-	}
-	if serviceName := os.Getenv("JAEGER_SERVICE_NAME"); serviceName != "" {
-		config.Jaeger.ServiceName = serviceName
-	}
-	if environment := os.Getenv("JAEGER_ENVIRONMENT"); environment != "" {
-		config.Jaeger.Environment = environment
-	}
-	if enabled := os.Getenv("JAEGER_ENABLED"); enabled == "false" {
-		config.Jaeger.Enabled = false
-	}
-	// Override with environment variables for Kafka
-	if broker := os.Getenv("KAFKA_BROKER"); broker != "" {
-		config.Kafka.Broker = broker
-	}
-	if topic := os.Getenv("KAFKA_TOPIC"); topic != "" {
-		config.Kafka.Topic = topic
-	}
-	if groupID := os.Getenv("KAFKA_GROUP_ID"); groupID != "" {
-		config.Kafka.GroupID = groupID
-	}
-
 	return &config, nil
 }
 
+// DSN returns the data source name for the database connection.
 func (c *DatabaseConfig) DSN() string {
-	return fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=%s",
-		c.Host, c.Port, c.User, c.Password, c.Name, c.SSLMode)
+	return "host=" + c.Host + " port=" + c.Port + " user=" + c.User + " password=" + c.Password + " dbname=" + c.Name + " sslmode=" + c.SSLMode
 }

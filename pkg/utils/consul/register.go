@@ -1,15 +1,20 @@
+// Package consul provides utilities for Consul service registration.
 package consul
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 	"strconv"
+
+	"go-fhir-demo/pkg/utils"
 )
 
 // RegisterWithConsul registers this service with Consul agent
-func RegisterWithConsul(consulAddr, serviceName, serviceID, serviceHost, servicePort, checkHost string) error {
+func RegisterWithConsul(ctx context.Context, consulAddr, serviceName, serviceID, serviceHost, servicePort, checkHost string) error {
 	portInt, err := strconv.Atoi(servicePort)
 	if err != nil {
 		return fmt.Errorf("invalid service port: %w", err)
@@ -27,16 +32,19 @@ func RegisterWithConsul(consulAddr, serviceName, serviceID, serviceHost, service
 	}
 	body, _ := json.Marshal(reg)
 	url := fmt.Sprintf("%s/v1/agent/service/register", consulAddr)
-	req, err := http.NewRequest(http.MethodPut, url, bytes.NewReader(body))
+	req, err := http.NewRequestWithContext(ctx, http.MethodPut, url, bytes.NewReader(body))
 	if err != nil {
 		return fmt.Errorf("failed to create request: %w", err)
 	}
 	req.Header.Set("Content-Type", "application/json")
-	resp, err := http.DefaultClient.Do(req)
+	resp, err := utils.SharedClient.Do(req)
 	if err != nil {
 		return fmt.Errorf("failed to register with consul: %w", err)
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_, _ = io.Copy(io.Discard, resp.Body)
+		resp.Body.Close()
+	}()
 	if resp.StatusCode != http.StatusOK {
 		return fmt.Errorf("consul registration failed: %s", resp.Status)
 	}
