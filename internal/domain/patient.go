@@ -7,7 +7,7 @@ import (
 // Patient represents a FHIR Patient resource in the domain
 type Patient struct {
 	ID        uint
-	FHIRData  []byte
+	FHIRData  []byte `gorm:"type:jsonb"`
 	Active    *bool
 	Family    string
 	Given     string

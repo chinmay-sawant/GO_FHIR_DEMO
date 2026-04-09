@@ -11,7 +11,7 @@ BINARY_WINDOWS=$(BINARY_NAME).exe
 # Database parameters
 DB_URL=postgres://$(DB_USER):$(DB_PASSWORD)@$(DB_HOST):$(DB_PORT)/$(DB_NAME)?sslmode=$(DB_SSLMODE)
 
-.PHONY: all build clean test test-with-junit deps run help migrate-up migrate-down migrate-create mocks
+.PHONY: all build clean test test-with-junit deps run help migrate-up migrate-down migrate-create mocks lint scan
 
 all: test build
 
@@ -118,7 +118,11 @@ clean-mocks:
 ## Run golangci-lint
 .PHONY: lint
 lint:
-	golangci-lint run
+	golangci-lint run -E revive,gocritic,gocyclo,goconst ./...
+
+## Scan code with deslop
+scan:
+	./deslop scan . > results.txt
 
 ## Display help
 help:
@@ -141,6 +145,7 @@ help:
 	@echo   help               - Display this help
 	@echo   mocks              - Generate all mocks
 	@echo   clean-mocks        - Clean all generated mocks
+	@echo   scan               - Scan code with deslop
 	@echo   coverage-with-junit- Generate test coverage report
 	@echo   clean-coverage     - Clean coverage files
 	@echo   docs               - Generate Swagger/OpenAPI documentation
