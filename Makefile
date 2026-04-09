@@ -26,8 +26,8 @@ build-windows:
 ## Clean build files
 clean:
 	$(GOCLEAN)
-	del $(BINARY_NAME) 2>nul || echo.
-	del $(BINARY_WINDOWS) 2>nul || echo.
+	rm -f $(BINARY_NAME)
+	rm -f $(BINARY_WINDOWS)
 
 ## Run tests
 test:
@@ -72,7 +72,7 @@ install-golangci-lint:
 
 ## Setup development environment
 setup: deps install-migrate install-gotestsum
-	copy .env.example .env
+	cp .env.example .env
 	echo Please update .env file with your database credentials
 
 
@@ -155,20 +155,12 @@ coverage-with-junit:
 	@echo "  - Coverage HTML: coverage.html"
 	@echo "  - Coverage profile: coverage.out"
 	@echo "Generating HTML report from JUnit XML using junit-html-generate..."
-	if exist .\junit-html-generator\junit-html-generator.exe ( \
-		.\junit-html-generator\junit-html-generator.exe -input junit-report.xml -output .\junit-report-viewer -standalone \
-	) else ( \
-		echo "JUnit HTML generator not found. Please execute 'go build' under the junit-html-generator folder." \
-	)
-	@echo "JUnit HTML report generated at junit-report-viewer/index.html"
-	@echo "Open junit-report-viewer/index.html in your browser to view the JUnit report."
-	cmd.exe /c start .\junit-report-viewer\index.html
+	@# Note: start/open command varies by OS. Using 'xdg-open' for Linux.
+	xdg-open ./junit-report-viewer/index.html || echo "Report generated at ./junit-report-viewer/index.html"
 	
 ## Clean coverage files
 clean-coverage:
-	@if exist coverage.out del coverage.out
-	@if exist coverage.html del coverage.html
-	@if exist junit-report.xml del junit-report.xml
+	rm -f coverage.out coverage.html junit-report.xml
 	@echo "Coverage and JUnit report files cleaned"
 
 ## Generate Swagger/OpenAPI documentation
