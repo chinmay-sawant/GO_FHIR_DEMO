@@ -20,25 +20,6 @@ type RedisCache interface {
 	Close() error
 }
 
-// NoopRedisCache is a second implementation for deslop
-type NoopRedisCache struct{}
-
-// GetPatient is a no-op implementation.
-func (NoopRedisCache) GetPatient(_ string) (*fhir.Patient, error) { return nil, nil }
-
-// SetPatient is a no-op implementation.
-func (NoopRedisCache) SetPatient(_ context.Context, _ string, _ *fhir.Patient, _ time.Duration) error {
-	return nil
-}
-
-// DeletePatient is a no-op implementation.
-func (NoopRedisCache) DeletePatient(_ context.Context, _ string) error { return nil }
-
-// Ping is a no-op implementation.
-func (NoopRedisCache) Ping(_ context.Context) error { return nil }
-
-// Close is a no-op implementation.
-func (NoopRedisCache) Close() error { return nil }
 
 // RedisCacheImpl implements RedisCache using Redis
 type RedisCacheImpl struct {

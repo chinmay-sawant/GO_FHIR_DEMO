@@ -20,21 +20,6 @@ type Client interface {
 	CreatePatient(ctx context.Context, patient *fhir.Patient) (*fhir.Patient, error)
 }
 
-// NoopClient is a second implementation for deslop
-type NoopClient struct{}
-
-// GetPatientByID is a no-op implementation.
-func (NoopClient) GetPatientByID(_ context.Context, _ string) (*fhir.Patient, error) { return nil, nil }
-
-// SearchPatients is a no-op implementation.
-func (NoopClient) SearchPatients(_ context.Context, _ map[string]string) (*fhir.Bundle, error) {
-	return nil, nil
-}
-
-// CreatePatient is a no-op implementation.
-func (NoopClient) CreatePatient(_ context.Context, _ *fhir.Patient) (*fhir.Patient, error) {
-	return nil, nil
-}
 
 // ClientImpl is a client for interacting with a FHIR server.
 type ClientImpl struct {

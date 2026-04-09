@@ -7,12 +7,21 @@ import (
 	"time"
 
 	"go-fhir-demo/internal/domain"
-	"go-fhir-demo/internal/repository"
 	"go-fhir-demo/pkg/fhirconv"
 	"go-fhir-demo/pkg/patch"
 
 	"github.com/samply/golang-fhir-models/fhir-models/fhir"
 )
+
+// PatientRepository defines the data access contract for patients
+type PatientRepository interface {
+	Create(ctx context.Context, patient *domain.Patient) error
+	GetByID(ctx context.Context, id uint) (*domain.Patient, error)
+	GetAll(ctx context.Context, limit, offset int) ([]*domain.Patient, error)
+	Update(ctx context.Context, patient *domain.Patient) error
+	Delete(ctx context.Context, id uint) error
+	Count(ctx context.Context) (int64, error)
+}
 
 // PatientService defines the contract for patient service
 type PatientService interface {
@@ -69,11 +78,11 @@ func (NoopPatientService) ConvertFromFHIR(_ context.Context, _ *fhir.Patient) (*
 
 // PatientServiceImpl implements PatientService
 type PatientServiceImpl struct {
-	repo repository.PatientRepository
+	repo PatientRepository
 }
 
 // NewPatientService creates a new patient service
-func NewPatientService(repo repository.PatientRepository) PatientService {
+func NewPatientService(repo PatientRepository) PatientService {
 	return &PatientServiceImpl{
 		repo: repo,
 	}
@@ -95,11 +104,24 @@ func (s *PatientServiceImpl) CreatePatient(ctx context.Context, fhirPatient *fhi
 
 // GetPatient retrieves a patient by ID
 func (s *PatientServiceImpl) GetPatient(ctx context.Context, id uint) (*domain.Patient, error) {
-	return s.repo.GetByID(ctx, id)
+	if id == 0 {
+		return nil, fmt.Errorf("invalid patient id: 0")
+	}
+	patient, err := s.repo.GetByID(ctx, id)
+	if err != nil {
+		return nil, fmt.Errorf("patient service GetPatient error: %w", err)
+	}
+	return patient, nil
 }
 
 // GetPatients retrieves all patients with pagination
 func (s *PatientServiceImpl) GetPatients(ctx context.Context, limit, offset int) ([]*domain.Patient, int64, error) {
+	if limit <= 0 {
+		limit = 10 // default limit
+	}
+	if offset < 0 {
+		offset = 0 // default offset
+	}
 	patients, err := s.repo.GetAll(ctx, limit, offset)
 	if err != nil {
 		return nil, 0, err
@@ -174,7 +196,14 @@ func (s *PatientServiceImpl) PatchPatient(ctx context.Context, id uint, updates 
 
 // DeletePatient deletes a patient
 func (s *PatientServiceImpl) DeletePatient(ctx context.Context, id uint) error {
-	return s.repo.Delete(ctx, id)
+	if id == 0 {
+		return fmt.Errorf("invalid patient id: 0")
+	}
+	err := s.repo.Delete(ctx, id)
+	if err != nil {
+		return fmt.Errorf("patient service DeletePatient error: %w", err)
+	}
+	return nil
 }
 
 // ConvertToFHIR converts a domain patient to FHIR format

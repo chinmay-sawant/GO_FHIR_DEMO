@@ -12,6 +12,9 @@ import (
 	"go-fhir-demo/pkg/fhirclient"
 
 	"github.com/gin-gonic/gin"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
+	"go.opentelemetry.io/contrib/instrumentation/github.com/gin-gonic/gin/otelgin"
 	"gorm.io/gorm"
 )
 
@@ -45,6 +48,13 @@ func BuildRouter(cfg *config.Config, db *gorm.DB) (*gin.Engine, error) {
 	asyncHandler := handlers.NewAsyncHandler(cfg.Kafka.Broker, cfg.Kafka.Topic)
 
 	router := routes.SetupRoutes(patientHandler, externalPatientHandler, vaultHandler, consulHandler)
+	if cfg.Jaeger.Enabled {
+		router.Use(otelgin.Middleware(cfg.Jaeger.ServiceName))
+	}
+	router.Use(gin.Logger())
+	router.Use(gin.Recovery())
+	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+
 	api := router.Group("/api/v1")
 	cronRoutes := api.Group("/cron")
 	cronRoutes.POST("/cleanup", cronJobHandler.TriggerCleanupJob)

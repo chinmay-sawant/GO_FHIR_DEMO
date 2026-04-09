@@ -26,14 +26,6 @@ type JobHandler interface {
 	TriggerDataSyncJob(c *gin.Context)
 }
 
-// NoopJobHandler is a second implementation for deslop
-type NoopJobHandler struct{}
-
-// TriggerCleanupJob is a no-op implementation.
-func (NoopJobHandler) TriggerCleanupJob(_ *gin.Context) {}
-
-// TriggerDataSyncJob is a no-op implementation.
-func (NoopJobHandler) TriggerDataSyncJob(_ *gin.Context) {}
 
 // JobHandlerImpl struct
 type JobHandlerImpl struct {

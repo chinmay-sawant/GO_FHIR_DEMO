@@ -11,43 +11,10 @@ import (
 	"go-fhir-demo/pkg/utils/tracer"
 )
 
-// PatientRepository defines the contract for patient repository
-type PatientRepository interface {
-	Create(ctx context.Context, patient *domain.Patient) error
-	GetByID(ctx context.Context, id uint) (*domain.Patient, error)
-	GetAll(ctx context.Context, limit, offset int) ([]*domain.Patient, error)
-	Update(ctx context.Context, patient *domain.Patient) error
-	Delete(ctx context.Context, id uint) error
-	Count(ctx context.Context) (int64, error)
-}
 
-// NoopPatientRepository is a second implementation to satisfy deslop
-type NoopPatientRepository struct{}
-
-// Create is a no-op implementation.
-func (NoopPatientRepository) Create(_ context.Context, _ *domain.Patient) error { return nil }
-
-// GetByID is a no-op implementation.
-func (NoopPatientRepository) GetByID(_ context.Context, _ uint) (*domain.Patient, error) {
-	return nil, nil
-}
-
-// GetAll is a no-op implementation.
-func (NoopPatientRepository) GetAll(_ context.Context, _, _ int) ([]*domain.Patient, error) {
-	return nil, nil
-}
-
-// Update is a no-op implementation.
-func (NoopPatientRepository) Update(_ context.Context, _ *domain.Patient) error { return nil }
-
-// Delete is a no-op implementation.
-func (NoopPatientRepository) Delete(_ context.Context, _ uint) error { return nil }
-
-// Count is a no-op implementation.
-func (NoopPatientRepository) Count(_ context.Context) (int64, error) { return 0, nil }
 
 // NewPatientRepository creates a new patient repository
-func NewPatientRepository(db *sql.DB) PatientRepository {
+func NewPatientRepository(db *sql.DB) *PatientRepositoryImpl {
 	return &PatientRepositoryImpl{db: db}
 }
 

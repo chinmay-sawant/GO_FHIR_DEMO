@@ -25,7 +25,7 @@ import (
 type PatientRepositoryTestSuite struct {
 	suite.Suite
 	db         *gorm.DB
-	repository PatientRepository
+	repository *PatientRepositoryImpl
 	postgres   *embeddedpostgres.EmbeddedPostgres
 }
 

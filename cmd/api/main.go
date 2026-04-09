@@ -17,9 +17,6 @@ import (
 	"go-fhir-demo/pkg/utils/tracer"
 
 	"github.com/gin-gonic/gin"
-	swaggerFiles "github.com/swaggo/files"
-	ginSwagger "github.com/swaggo/gin-swagger"
-	"go.opentelemetry.io/contrib/instrumentation/github.com/gin-gonic/gin/otelgin"
 )
 
 import _ "go-fhir-demo/docs"
@@ -87,12 +84,7 @@ func run() error {
 		return fmt.Errorf("failed to build router: %w", err)
 	}
 
-	if cfg.Jaeger.Enabled {
-		router.Use(otelgin.Middleware(cfg.Jaeger.ServiceName))
-	}
-	router.Use(gin.Logger())
-	router.Use(gin.Recovery())
-	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+
 
 	server := &http.Server{
 		Addr:         ":" + cfg.Server.Port,

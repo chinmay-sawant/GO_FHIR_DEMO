@@ -44,7 +44,7 @@ deps:
 
 ## Run the application
 run:
-	$(GOCMD) run main.go
+	$(GOCMD) run cmd/api/main.go
 
 ## Run database migrations up
 migrate-up:
