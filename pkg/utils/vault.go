@@ -1,29 +1,23 @@
-package utils
+package utils //nolint:revive
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
-	"io"
+	"go-fhir-demo/pkg/vaultdto"
 	"net/http"
 	"time"
 )
 
-// VaultResponse represents the response from Vault API
-type VaultResponse struct {
-	Data struct {
-		Data map[string]interface{} `json:"data"`
-	} `json:"data"`
-}
-
-// GetVaultKV fetches a key-value secret from Vault
-func GetVaultKV(vaultAddr, token, secretPath string) (map[string]interface{}, error) {
+// GetVaultKV fetches a key-value secret from Vault.
+func GetVaultKV(ctx context.Context, vaultAddr, token, secretPath string) (map[string]string, error) {
 	client := &http.Client{
 		Timeout: 10 * time.Second,
 	}
 
-	url := fmt.Sprintf("%s/v1/%s", vaultAddr, secretPath)
+	reqURL := vaultAddr + "/v1/" + secretPath
 
-	req, err := http.NewRequest("GET", url, nil)
+	req, err := http.NewRequestWithContext(ctx, "GET", reqURL, nil)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create request: %w", err)
 	}
@@ -35,20 +29,17 @@ func GetVaultKV(vaultAddr, token, secretPath string) (map[string]interface{}, er
 	if err != nil {
 		return nil, fmt.Errorf("failed to make request to Vault: %w", err)
 	}
-	defer resp.Body.Close()
-
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return nil, fmt.Errorf("failed to read response body: %w", err)
-	}
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 
 	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("vault returned status %d: %s", resp.StatusCode, string(body))
+		return nil, fmt.Errorf("vault returned status %d", resp.StatusCode)
 	}
 
-	var vaultResp VaultResponse
-	if err := json.Unmarshal(body, &vaultResp); err != nil {
-		return nil, fmt.Errorf("failed to unmarshal response: %w", err)
+	var vaultResp vaultdto.Response
+	if err := json.NewDecoder(resp.Body).Decode(&vaultResp); err != nil {
+		return nil, fmt.Errorf("failed to decode response: %w", err)
 	}
 
 	return vaultResp.Data.Data, nil

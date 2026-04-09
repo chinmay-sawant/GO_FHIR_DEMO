@@ -16,98 +16,98 @@ import (
 	gomock "go.uber.org/mock/gomock"
 )
 
-// MockPatientHandlerInterface is a mock of PatientHandlerInterface interface.
-type MockPatientHandlerInterface struct {
+// MockPatientHandler is a mock of *PatientHandler interface.
+type MockPatientHandler struct {
 	ctrl     *gomock.Controller
-	recorder *MockPatientHandlerInterfaceMockRecorder
+	recorder *MockPatientHandlerMockRecorder
 	isgomock struct{}
 }
 
-// MockPatientHandlerInterfaceMockRecorder is the mock recorder for MockPatientHandlerInterface.
-type MockPatientHandlerInterfaceMockRecorder struct {
-	mock *MockPatientHandlerInterface
+// MockPatientHandlerMockRecorder is the mock recorder for MockPatientHandler.
+type MockPatientHandlerMockRecorder struct {
+	mock *MockPatientHandler
 }
 
-// NewMockPatientHandlerInterface creates a new mock instance.
-func NewMockPatientHandlerInterface(ctrl *gomock.Controller) *MockPatientHandlerInterface {
-	mock := &MockPatientHandlerInterface{ctrl: ctrl}
-	mock.recorder = &MockPatientHandlerInterfaceMockRecorder{mock}
+// NewMockPatientHandler creates a new mock instance.
+func NewMockPatientHandler(ctrl *gomock.Controller) *MockPatientHandler {
+	mock := &MockPatientHandler{ctrl: ctrl}
+	mock.recorder = &MockPatientHandlerMockRecorder{mock}
 	return mock
 }
 
 // EXPECT returns an object that allows the caller to indicate expected use.
-func (m *MockPatientHandlerInterface) EXPECT() *MockPatientHandlerInterfaceMockRecorder {
+func (m *MockPatientHandler) EXPECT() *MockPatientHandlerMockRecorder {
 	return m.recorder
 }
 
 // CreatePatient mocks base method.
-func (m *MockPatientHandlerInterface) CreatePatient(c *gin.Context) {
+func (m *MockPatientHandler) CreatePatient(c *gin.Context) {
 	m.ctrl.T.Helper()
 	m.ctrl.Call(m, "CreatePatient", c)
 }
 
 // CreatePatient indicates an expected call of CreatePatient.
-func (mr *MockPatientHandlerInterfaceMockRecorder) CreatePatient(c any) *gomock.Call {
+func (mr *MockPatientHandlerMockRecorder) CreatePatient(c any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreatePatient", reflect.TypeOf((*MockPatientHandlerInterface)(nil).CreatePatient), c)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreatePatient", reflect.TypeOf((*MockPatientHandler)(nil).CreatePatient), c)
 }
 
 // DeletePatient mocks base method.
-func (m *MockPatientHandlerInterface) DeletePatient(c *gin.Context) {
+func (m *MockPatientHandler) DeletePatient(c *gin.Context) {
 	m.ctrl.T.Helper()
 	m.ctrl.Call(m, "DeletePatient", c)
 }
 
 // DeletePatient indicates an expected call of DeletePatient.
-func (mr *MockPatientHandlerInterfaceMockRecorder) DeletePatient(c any) *gomock.Call {
+func (mr *MockPatientHandlerMockRecorder) DeletePatient(c any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeletePatient", reflect.TypeOf((*MockPatientHandlerInterface)(nil).DeletePatient), c)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeletePatient", reflect.TypeOf((*MockPatientHandler)(nil).DeletePatient), c)
 }
 
 // GetPatient mocks base method.
-func (m *MockPatientHandlerInterface) GetPatient(c *gin.Context) {
+func (m *MockPatientHandler) GetPatient(c *gin.Context) {
 	m.ctrl.T.Helper()
 	m.ctrl.Call(m, "GetPatient", c)
 }
 
 // GetPatient indicates an expected call of GetPatient.
-func (mr *MockPatientHandlerInterfaceMockRecorder) GetPatient(c any) *gomock.Call {
+func (mr *MockPatientHandlerMockRecorder) GetPatient(c any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPatient", reflect.TypeOf((*MockPatientHandlerInterface)(nil).GetPatient), c)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPatient", reflect.TypeOf((*MockPatientHandler)(nil).GetPatient), c)
 }
 
 // GetPatients mocks base method.
-func (m *MockPatientHandlerInterface) GetPatients(c *gin.Context) {
+func (m *MockPatientHandler) GetPatients(c *gin.Context) {
 	m.ctrl.T.Helper()
 	m.ctrl.Call(m, "GetPatients", c)
 }
 
 // GetPatients indicates an expected call of GetPatients.
-func (mr *MockPatientHandlerInterfaceMockRecorder) GetPatients(c any) *gomock.Call {
+func (mr *MockPatientHandlerMockRecorder) GetPatients(c any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPatients", reflect.TypeOf((*MockPatientHandlerInterface)(nil).GetPatients), c)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPatients", reflect.TypeOf((*MockPatientHandler)(nil).GetPatients), c)
 }
 
 // PatchPatient mocks base method.
-func (m *MockPatientHandlerInterface) PatchPatient(c *gin.Context) {
+func (m *MockPatientHandler) PatchPatient(c *gin.Context) {
 	m.ctrl.T.Helper()
 	m.ctrl.Call(m, "PatchPatient", c)
 }
 
 // PatchPatient indicates an expected call of PatchPatient.
-func (mr *MockPatientHandlerInterfaceMockRecorder) PatchPatient(c any) *gomock.Call {
+func (mr *MockPatientHandlerMockRecorder) PatchPatient(c any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "PatchPatient", reflect.TypeOf((*MockPatientHandlerInterface)(nil).PatchPatient), c)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "PatchPatient", reflect.TypeOf((*MockPatientHandler)(nil).PatchPatient), c)
 }
 
 // UpdatePatient mocks base method.
-func (m *MockPatientHandlerInterface) UpdatePatient(c *gin.Context) {
+func (m *MockPatientHandler) UpdatePatient(c *gin.Context) {
 	m.ctrl.T.Helper()
 	m.ctrl.Call(m, "UpdatePatient", c)
 }
 
 // UpdatePatient indicates an expected call of UpdatePatient.
-func (mr *MockPatientHandlerInterfaceMockRecorder) UpdatePatient(c any) *gomock.Call {
+func (mr *MockPatientHandlerMockRecorder) UpdatePatient(c any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdatePatient", reflect.TypeOf((*MockPatientHandlerInterface)(nil).UpdatePatient), c)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdatePatient", reflect.TypeOf((*MockPatientHandler)(nil).UpdatePatient), c)
 }

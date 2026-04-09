@@ -1,41 +1,79 @@
+// Package routes provides routing configuration for the application.
 package routes
 
 import (
 	"go-fhir-demo/internal/api/handlers"
-	"go-fhir-demo/internal/api/handlers/cron"
+	"go-fhir-demo/internal/domain"
 	"go-fhir-demo/internal/middleware"
 
 	"github.com/gin-gonic/gin"
 )
 
-// RouteSetupInterface defines the contract for route setup
-type RouteSetupInterface interface {
-	SetupRoutes(patientHandler handlers.PatientHandlerInterface, externalPatientHandler handlers.ExternalPatientHandlerInterface, cronJobHandler cron.CronJobHandlerInterface, vaultHandler handlers.VaultHandlerInterface, asyncHandler handlers.AsyncHandlerInterface, consulHandler ...handlers.ConsulHandlerInterface) *gin.Engine
+const (
+	healthPath   = "/health"
+	metadataPath = "/metadata"
+	patientID    = "/:id"
+)
+
+type healthResponse struct {
+	Status  string `json:"status"`
+	Service string `json:"service"`
+	Version string `json:"version"`
 }
 
-// RouteSetup implements RouteSetupInterface
+type capabilityStatement struct {
+	ResourceType string `json:"resourceType"`
+	Status       string `json:"status"`
+	Date         string `json:"date"`
+	Publisher    string `json:"publisher"`
+	Kind         string `json:"kind"`
+	Software     struct {
+		Name    string `json:"name"`
+		Version string `json:"version"`
+	} `json:"software"`
+	FHIRVersion string   `json:"fhirVersion"`
+	Format      []string `json:"format"`
+	Rest        []struct {
+		Mode     string `json:"mode"`
+		Resource []struct {
+			Type        string `json:"type"`
+			Interaction []struct {
+				Code string `json:"code"`
+			} `json:"interaction"`
+		} `json:"resource"`
+	} `json:"rest"`
+}
+
+var metadataPayload = capabilityStatement{
+	ResourceType: domain.CapabilityResource,
+	Status:       domain.CapabilityStatus,
+	Date:         domain.CapabilityDate,
+	Publisher:    "FHIR Demo",
+	Kind:         domain.CapabilityKind,
+	FHIRVersion:  domain.CapabilityVersion,
+	Format:       []string{domain.CapabilityFormat},
+}
+
+// RouteSetup implements *RouteSetup
 type RouteSetup struct{}
 
 // NewRouteSetup creates a new RouteSetup instance
-func NewRouteSetup() RouteSetupInterface {
+func NewRouteSetup() *RouteSetup {
 	return &RouteSetup{}
 }
 
-// Legacy function for backward compatibility
-func SetupRoutes(patientHandler handlers.PatientHandlerInterface, externalPatientHandler handlers.ExternalPatientHandlerInterface, cronJobHandler cron.CronJobHandlerInterface, vaultHandler handlers.VaultHandlerInterface, asyncHandler handlers.AsyncHandlerInterface, consulHandler ...handlers.ConsulHandlerInterface) *gin.Engine {
+// SetupRoutes is a legacy function for backward compatibility.
+func SetupRoutes(patientHandler *handlers.PatientHandler, externalPatientHandler *handlers.ExternalPatientHandler, vaultHandler *handlers.VaultHandler, consulHandler ...*handlers.ConsulHandler) *gin.Engine {
 	routeSetup := NewRouteSetup()
-	return routeSetup.SetupRoutes(patientHandler, externalPatientHandler, cronJobHandler, vaultHandler, asyncHandler, consulHandler...)
+	return routeSetup.SetupRoutes(patientHandler, externalPatientHandler, vaultHandler, consulHandler...)
 }
 
 // SetupRoutes configures all the routes for the application
 func (r *RouteSetup) SetupRoutes(
-	patientHandler handlers.PatientHandlerInterface,
-	externalPatientHandler handlers.ExternalPatientHandlerInterface,
-	cronJobHandler cron.CronJobHandlerInterface,
-	// Add optional handlers
-	vaultHandler handlers.VaultHandlerInterface,
-	asyncHandler handlers.AsyncHandlerInterface,
-	consulHandler ...handlers.ConsulHandlerInterface,
+	patientHandler *handlers.PatientHandler,
+	externalPatientHandler *handlers.ExternalPatientHandler,
+	vaultHandler *handlers.VaultHandler,
+	consulHandler ...*handlers.ConsulHandler,
 ) *gin.Engine {
 	router := gin.New()
 
@@ -47,13 +85,7 @@ func (r *RouteSetup) SetupRoutes(
 	router.Use(gin.Recovery())
 
 	// Health check endpoint
-	router.GET("/health", func(c *gin.Context) {
-		c.JSON(200, gin.H{
-			"status":  "healthy",
-			"service": "FHIR Patient API",
-			"version": "1.0.0",
-		})
-	})
+	router.GET(healthPath, healthHandler)
 
 	// API v1 routes
 	v1 := router.Group("/api/v1")
@@ -62,21 +94,21 @@ func (r *RouteSetup) SetupRoutes(
 		patients := v1.Group("/patients")
 		{
 			patients.GET("", patientHandler.GetPatients)
-			patients.POST("", patientHandler.CreatePatient)
-			patients.GET("/:id", patientHandler.GetPatient)
-			patients.PUT("/:id", patientHandler.UpdatePatient)
-			patients.PATCH("/:id", patientHandler.PatchPatient)
-			patients.DELETE("/:id", patientHandler.DeletePatient)
+			patients.POST("", middleware.CSRFProtection(), patientHandler.CreatePatient)
+			patients.GET(patientID, patientHandler.GetPatient)
+			patients.PUT(patientID, middleware.CSRFProtection(), patientHandler.UpdatePatient)
+			patients.PATCH(patientID, middleware.CSRFProtection(), patientHandler.PatchPatient)
+			patients.DELETE(patientID, middleware.CSRFProtection(), patientHandler.DeletePatient)
 		}
 
 		// External Patient routes
 		externalPatients := v1.Group("/external-patients")
 		{
-			externalPatients.GET("/:id", externalPatientHandler.GetExternalPatientByID)
-			externalPatients.GET("/:id/cached", externalPatientHandler.GetExternalPatientByIDCached)
-			externalPatients.GET("/:id/delayed", externalPatientHandler.GetExternalPatientByIDDelayed)
+			externalPatients.GET(patientID, externalPatientHandler.GetExternalPatientByID)
+			externalPatients.GET(patientID+"/cached", externalPatientHandler.GetPatientCached)
+			externalPatients.GET(patientID+"/delayed", externalPatientHandler.GetPatientDelayed)
 			externalPatients.GET("", externalPatientHandler.SearchExternalPatients)
-			externalPatients.POST("", externalPatientHandler.CreateExternalPatient)
+			externalPatients.POST("", middleware.CSRFProtection(), externalPatientHandler.CreateExternalPatient)
 		}
 
 		// Consul routes
@@ -87,56 +119,25 @@ func (r *RouteSetup) SetupRoutes(
 		// Vault routes
 		v1.GET("/vault/secret", vaultHandler.GetVaultSecret)
 
-		// Cron job routes
-		if cronJobHandler != nil {
-			cronJobs := v1.Group("/cron")
-			{
-				cronJobs.POST("/cleanup", cronJobHandler.TriggerCleanupJob)
-				cronJobs.POST("/sync", cronJobHandler.TriggerDataSyncJob)
-			}
-		}
-
-		// Register async publish endpoint if handler is initialized
-		if asyncHandler != nil {
-			v1.POST("/async/publish", asyncHandler.PublishAsync)
-		}
-
 	}
 
-	// FHIR metadata endpoint
-	router.GET("/metadata", func(c *gin.Context) {
-		c.JSON(200, gin.H{
-			"resourceType": "CapabilityStatement",
-			"status":       "active",
-			"date":         "2025-06-05",
-			"publisher":    "FHIR Demo",
-			"kind":         "instance",
-			"software": gin.H{
-				"name":    "FHIR Patient API",
-				"version": "1.0.0",
-			},
-			"fhirVersion": "4.0.1",
-			"format":      []string{"json"},
-			"rest": []gin.H{
-				{
-					"mode": "server",
-					"resource": []gin.H{
-						{
-							"type": "Patient",
-							"interaction": []gin.H{
-								{"code": "read"},
-								{"code": "create"},
-								{"code": "update"},
-								{"code": "patch"},
-								{"code": "delete"},
-								{"code": "search-type"},
-							},
-						},
-					},
-				},
-			},
-		})
-	})
+	router.GET(metadataPath, metadataHandler)
 
 	return router
+}
+
+func healthHandler(c *gin.Context) {
+	c.JSON(200, healthResponse{
+		Status:  domain.HealthStatus,
+		Service: domain.ServiceName,
+		Version: domain.ServiceVersion,
+	})
+}
+
+func metadataHandler(c *gin.Context) {
+	payload := metadataPayload
+	payload.Software.Name = domain.ServiceName
+	payload.Software.Version = domain.ServiceVersion
+
+	c.JSON(200, payload)
 }

@@ -1,32 +1,37 @@
-package utils
+// Package utils provides miscellaneous utilities for the FHIR demo.
+package utils //nolint:revive
 
 import (
-	"encoding/json"
+	"context"
 	"fmt"
 	"io"
 	"net/http"
 	"strings"
 )
 
-// GetConsulKV fetches a key from Consul's KV store and returns the decoded value.
-func GetConsulKV(consulAddr, key string) (map[string]interface{}, error) {
-	url := fmt.Sprintf("%s/v1/kv/%s?raw", strings.TrimRight(consulAddr, "/"), key)
-	resp, err := http.Get(url)
+// GetConsulKV fetches a key from Consul's KV store and returns the raw secret value.
+func GetConsulKV(ctx context.Context, consulAddr, key string) (string, error) {
+	addr := strings.TrimRight(consulAddr, "/")
+	reqURL := addr + "/v1/kv/" + key + "?raw"
+	req, err := http.NewRequestWithContext(ctx, "GET", reqURL, nil)
 	if err != nil {
-		return nil, fmt.Errorf("failed to contact consul: %w", err)
+		return "", fmt.Errorf("failed to create search request: %w", err)
 	}
-	defer resp.Body.Close()
+
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return "", fmt.Errorf("failed to contact consul: %w", err)
+	}
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("consul returned status %d", resp.StatusCode)
+		return "", fmt.Errorf("consul returned status %d", resp.StatusCode)
 	}
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return nil, fmt.Errorf("failed to read consul response: %w", err)
+
+	var builder strings.Builder
+	if _, err := io.Copy(&builder, resp.Body); err != nil {
+		return "", fmt.Errorf("failed to read consul response: %w", err)
 	}
-	var result map[string]interface{}
-	if err := json.Unmarshal(body, &result); err != nil {
-		// If not JSON, return as string
-		return map[string]interface{}{"value": string(body)}, nil
-	}
-	return result, nil
+	return builder.String(), nil
 }

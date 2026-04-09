@@ -17,32 +17,32 @@ import (
 	gomock "go.uber.org/mock/gomock"
 )
 
-// MockPatientRepositoryInterface is a mock of PatientRepositoryInterface interface.
-type MockPatientRepositoryInterface struct {
+// MockPatientRepository is a mock of *PatientRepository interface.
+type MockPatientRepository struct {
 	ctrl     *gomock.Controller
-	recorder *MockPatientRepositoryInterfaceMockRecorder
+	recorder *MockPatientRepositoryMockRecorder
 	isgomock struct{}
 }
 
-// MockPatientRepositoryInterfaceMockRecorder is the mock recorder for MockPatientRepositoryInterface.
-type MockPatientRepositoryInterfaceMockRecorder struct {
-	mock *MockPatientRepositoryInterface
+// MockPatientRepositoryMockRecorder is the mock recorder for MockPatientRepository.
+type MockPatientRepositoryMockRecorder struct {
+	mock *MockPatientRepository
 }
 
-// NewMockPatientRepositoryInterface creates a new mock instance.
-func NewMockPatientRepositoryInterface(ctrl *gomock.Controller) *MockPatientRepositoryInterface {
-	mock := &MockPatientRepositoryInterface{ctrl: ctrl}
-	mock.recorder = &MockPatientRepositoryInterfaceMockRecorder{mock}
+// NewMockPatientRepository creates a new mock instance.
+func NewMockPatientRepository(ctrl *gomock.Controller) *MockPatientRepository {
+	mock := &MockPatientRepository{ctrl: ctrl}
+	mock.recorder = &MockPatientRepositoryMockRecorder{mock}
 	return mock
 }
 
 // EXPECT returns an object that allows the caller to indicate expected use.
-func (m *MockPatientRepositoryInterface) EXPECT() *MockPatientRepositoryInterfaceMockRecorder {
+func (m *MockPatientRepository) EXPECT() *MockPatientRepositoryMockRecorder {
 	return m.recorder
 }
 
 // Count mocks base method.
-func (m *MockPatientRepositoryInterface) Count(ctx context.Context) (int64, error) {
+func (m *MockPatientRepository) Count(ctx context.Context) (int64, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Count", ctx)
 	ret0, _ := ret[0].(int64)
@@ -51,13 +51,13 @@ func (m *MockPatientRepositoryInterface) Count(ctx context.Context) (int64, erro
 }
 
 // Count indicates an expected call of Count.
-func (mr *MockPatientRepositoryInterfaceMockRecorder) Count(ctx any) *gomock.Call {
+func (mr *MockPatientRepositoryMockRecorder) Count(ctx any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Count", reflect.TypeOf((*MockPatientRepositoryInterface)(nil).Count), ctx)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Count", reflect.TypeOf((*MockPatientRepository)(nil).Count), ctx)
 }
 
 // Create mocks base method.
-func (m *MockPatientRepositoryInterface) Create(ctx context.Context, patient *domain.Patient) error {
+func (m *MockPatientRepository) Create(ctx context.Context, patient *domain.Patient) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Create", ctx, patient)
 	ret0, _ := ret[0].(error)
@@ -65,13 +65,13 @@ func (m *MockPatientRepositoryInterface) Create(ctx context.Context, patient *do
 }
 
 // Create indicates an expected call of Create.
-func (mr *MockPatientRepositoryInterfaceMockRecorder) Create(ctx, patient any) *gomock.Call {
+func (mr *MockPatientRepositoryMockRecorder) Create(ctx, patient any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*MockPatientRepositoryInterface)(nil).Create), ctx, patient)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*MockPatientRepository)(nil).Create), ctx, patient)
 }
 
 // Delete mocks base method.
-func (m *MockPatientRepositoryInterface) Delete(ctx context.Context, id uint) error {
+func (m *MockPatientRepository) Delete(ctx context.Context, id uint) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Delete", ctx, id)
 	ret0, _ := ret[0].(error)
@@ -79,13 +79,13 @@ func (m *MockPatientRepositoryInterface) Delete(ctx context.Context, id uint) er
 }
 
 // Delete indicates an expected call of Delete.
-func (mr *MockPatientRepositoryInterfaceMockRecorder) Delete(ctx, id any) *gomock.Call {
+func (mr *MockPatientRepositoryMockRecorder) Delete(ctx, id any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Delete", reflect.TypeOf((*MockPatientRepositoryInterface)(nil).Delete), ctx, id)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Delete", reflect.TypeOf((*MockPatientRepository)(nil).Delete), ctx, id)
 }
 
 // GetAll mocks base method.
-func (m *MockPatientRepositoryInterface) GetAll(ctx context.Context, limit, offset int) ([]*domain.Patient, error) {
+func (m *MockPatientRepository) GetAll(ctx context.Context, limit, offset int) ([]*domain.Patient, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetAll", ctx, limit, offset)
 	ret0, _ := ret[0].([]*domain.Patient)
@@ -94,13 +94,13 @@ func (m *MockPatientRepositoryInterface) GetAll(ctx context.Context, limit, offs
 }
 
 // GetAll indicates an expected call of GetAll.
-func (mr *MockPatientRepositoryInterfaceMockRecorder) GetAll(ctx, limit, offset any) *gomock.Call {
+func (mr *MockPatientRepositoryMockRecorder) GetAll(ctx, limit, offset any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAll", reflect.TypeOf((*MockPatientRepositoryInterface)(nil).GetAll), ctx, limit, offset)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAll", reflect.TypeOf((*MockPatientRepository)(nil).GetAll), ctx, limit, offset)
 }
 
 // GetByID mocks base method.
-func (m *MockPatientRepositoryInterface) GetByID(ctx context.Context, id uint) (*domain.Patient, error) {
+func (m *MockPatientRepository) GetByID(ctx context.Context, id uint) (*domain.Patient, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetByID", ctx, id)
 	ret0, _ := ret[0].(*domain.Patient)
@@ -109,13 +109,13 @@ func (m *MockPatientRepositoryInterface) GetByID(ctx context.Context, id uint) (
 }
 
 // GetByID indicates an expected call of GetByID.
-func (mr *MockPatientRepositoryInterfaceMockRecorder) GetByID(ctx, id any) *gomock.Call {
+func (mr *MockPatientRepositoryMockRecorder) GetByID(ctx, id any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetByID", reflect.TypeOf((*MockPatientRepositoryInterface)(nil).GetByID), ctx, id)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetByID", reflect.TypeOf((*MockPatientRepository)(nil).GetByID), ctx, id)
 }
 
 // Update mocks base method.
-func (m *MockPatientRepositoryInterface) Update(ctx context.Context, patient *domain.Patient) error {
+func (m *MockPatientRepository) Update(ctx context.Context, patient *domain.Patient) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Update", ctx, patient)
 	ret0, _ := ret[0].(error)
@@ -123,7 +123,7 @@ func (m *MockPatientRepositoryInterface) Update(ctx context.Context, patient *do
 }
 
 // Update indicates an expected call of Update.
-func (mr *MockPatientRepositoryInterfaceMockRecorder) Update(ctx, patient any) *gomock.Call {
+func (mr *MockPatientRepositoryMockRecorder) Update(ctx, patient any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Update", reflect.TypeOf((*MockPatientRepositoryInterface)(nil).Update), ctx, patient)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Update", reflect.TypeOf((*MockPatientRepository)(nil).Update), ctx, patient)
 }

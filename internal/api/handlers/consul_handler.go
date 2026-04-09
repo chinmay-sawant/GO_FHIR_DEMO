@@ -2,9 +2,9 @@ package handlers
 
 import (
 	"net/http"
+	"strings"
 
 	"go-fhir-demo/config"
-	"go-fhir-demo/pkg/logger"
 	"go-fhir-demo/pkg/utils"
 	"go-fhir-demo/pkg/utils/tracer"
 
@@ -12,15 +12,14 @@ import (
 )
 
 // ConsulHandlerInterface defines the contract for Consul handler
-type ConsulHandlerInterface interface {
-	GetConsulSecret(c *gin.Context)
-}
 
+// ConsulHandler handles requests for Consul KV secrets.
 type ConsulHandler struct {
 	cfg *config.ConsulConfig
 }
 
-func NewConsulHandler(cfg *config.ConsulConfig) ConsulHandlerInterface {
+// NewConsulHandler creates a new ConsulHandler.
+func NewConsulHandler(cfg *config.ConsulConfig) *ConsulHandler {
 	return &ConsulHandler{cfg: cfg}
 }
 
@@ -37,14 +36,17 @@ func (h *ConsulHandler) GetConsulSecret(c *gin.Context) {
 	ctx, span := tracer.StartSpan(c.Request.Context(), "GetConsulSecret")
 	defer span.End()
 
-	logger.WithContext(ctx).Infof("Fetching secret from Consul KV at %s with key %s", h.cfg.Address, h.cfg.Key)
-	data, err := utils.GetConsulKV(h.cfg.Address, h.cfg.Key)
+	secret, err := utils.GetConsulKV(ctx, h.cfg.Address, h.cfg.Key)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error":   "Failed to fetch from Consul",
-			"message": err.Error(),
-		})
+		c.Status(http.StatusInternalServerError)
 		return
 	}
-	c.JSON(http.StatusOK, data)
+	c.JSON(http.StatusOK, gin.H{"secret": maskSecret(secret)})
+}
+
+func maskSecret(value string) string {
+	if len(value) <= 4 {
+		return strings.Repeat("*", len(value))
+	}
+	return value[:2] + strings.Repeat("*", len(value)-4) + value[len(value)-2:]
 }

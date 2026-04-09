@@ -1,0 +1,8 @@
+deslop scan root: /home/chinmay/ChinmayPersonalProjects/GO_FHIR_DEMO
+Source files discovered: 58
+Source files analyzed: 43
+Functions fingerprinted: 216
+Findings: 0
+Index summary: packages=23 symbols=268 imports=266
+Parse failures: 0
+Timings: discover=1ms parse=27ms index=0ms heuristics=8ms total=38ms

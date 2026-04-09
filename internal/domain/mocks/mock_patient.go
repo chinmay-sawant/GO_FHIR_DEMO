@@ -15,6 +15,7 @@ import (
 	reflect "reflect"
 
 	fhir "github.com/samply/golang-fhir-models/fhir-models/fhir"
+	patch "go-fhir-demo/pkg/patch"
 	gomock "go.uber.org/mock/gomock"
 )
 
@@ -244,7 +245,7 @@ func (mr *MockPatientServiceMockRecorder) GetPatients(ctx, limit, offset any) *g
 }
 
 // PatchPatient mocks base method.
-func (m *MockPatientService) PatchPatient(ctx context.Context, id uint, updates map[string]any) (*domain.Patient, error) {
+func (m *MockPatientService) PatchPatient(ctx context.Context, id uint, updates patch.PatientPatch) (*domain.Patient, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "PatchPatient", ctx, id, updates)
 	ret0, _ := ret[0].(*domain.Patient)

@@ -16,50 +16,50 @@ import (
 	gomock "go.uber.org/mock/gomock"
 )
 
-// MockCronJobHandlerInterface is a mock of CronJobHandlerInterface interface.
-type MockCronJobHandlerInterface struct {
+// MockCronJobHandler is a mock of *CronJobHandler interface.
+type MockCronJobHandler struct {
 	ctrl     *gomock.Controller
-	recorder *MockCronJobHandlerInterfaceMockRecorder
+	recorder *MockCronJobHandlerMockRecorder
 	isgomock struct{}
 }
 
-// MockCronJobHandlerInterfaceMockRecorder is the mock recorder for MockCronJobHandlerInterface.
-type MockCronJobHandlerInterfaceMockRecorder struct {
-	mock *MockCronJobHandlerInterface
+// MockCronJobHandlerMockRecorder is the mock recorder for MockCronJobHandler.
+type MockCronJobHandlerMockRecorder struct {
+	mock *MockCronJobHandler
 }
 
-// NewMockCronJobHandlerInterface creates a new mock instance.
-func NewMockCronJobHandlerInterface(ctrl *gomock.Controller) *MockCronJobHandlerInterface {
-	mock := &MockCronJobHandlerInterface{ctrl: ctrl}
-	mock.recorder = &MockCronJobHandlerInterfaceMockRecorder{mock}
+// NewMockCronJobHandler creates a new mock instance.
+func NewMockCronJobHandler(ctrl *gomock.Controller) *MockCronJobHandler {
+	mock := &MockCronJobHandler{ctrl: ctrl}
+	mock.recorder = &MockCronJobHandlerMockRecorder{mock}
 	return mock
 }
 
 // EXPECT returns an object that allows the caller to indicate expected use.
-func (m *MockCronJobHandlerInterface) EXPECT() *MockCronJobHandlerInterfaceMockRecorder {
+func (m *MockCronJobHandler) EXPECT() *MockCronJobHandlerMockRecorder {
 	return m.recorder
 }
 
 // TriggerCleanupJob mocks base method.
-func (m *MockCronJobHandlerInterface) TriggerCleanupJob(c *gin.Context) {
+func (m *MockCronJobHandler) TriggerCleanupJob(c *gin.Context) {
 	m.ctrl.T.Helper()
 	m.ctrl.Call(m, "TriggerCleanupJob", c)
 }
 
 // TriggerCleanupJob indicates an expected call of TriggerCleanupJob.
-func (mr *MockCronJobHandlerInterfaceMockRecorder) TriggerCleanupJob(c any) *gomock.Call {
+func (mr *MockCronJobHandlerMockRecorder) TriggerCleanupJob(c any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "TriggerCleanupJob", reflect.TypeOf((*MockCronJobHandlerInterface)(nil).TriggerCleanupJob), c)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "TriggerCleanupJob", reflect.TypeOf((*MockCronJobHandler)(nil).TriggerCleanupJob), c)
 }
 
 // TriggerDataSyncJob mocks base method.
-func (m *MockCronJobHandlerInterface) TriggerDataSyncJob(c *gin.Context) {
+func (m *MockCronJobHandler) TriggerDataSyncJob(c *gin.Context) {
 	m.ctrl.T.Helper()
 	m.ctrl.Call(m, "TriggerDataSyncJob", c)
 }
 
 // TriggerDataSyncJob indicates an expected call of TriggerDataSyncJob.
-func (mr *MockCronJobHandlerInterfaceMockRecorder) TriggerDataSyncJob(c any) *gomock.Call {
+func (mr *MockCronJobHandlerMockRecorder) TriggerDataSyncJob(c any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "TriggerDataSyncJob", reflect.TypeOf((*MockCronJobHandlerInterface)(nil).TriggerDataSyncJob), c)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "TriggerDataSyncJob", reflect.TypeOf((*MockCronJobHandler)(nil).TriggerDataSyncJob), c)
 }

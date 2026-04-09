@@ -7,41 +7,83 @@ import (
 	"time"
 
 	"go-fhir-demo/internal/domain"
-	"go-fhir-demo/pkg/logger"
-	"go-fhir-demo/pkg/utils"
+	"go-fhir-demo/internal/repository"
+	"go-fhir-demo/pkg/fhirconv"
+	"go-fhir-demo/pkg/patch"
 
 	"github.com/samply/golang-fhir-models/fhir-models/fhir"
 )
 
-// PatientServiceInterface defines the contract for patient service
-type PatientServiceInterface interface {
-	CreatePatient(ctx context.Context, fhirPatient *fhir.Patient) (*domain.Patient, error)
+// PatientService defines the contract for patient service
+type PatientService interface {
+	CreatePatient(ctx context.Context, patient *fhir.Patient) (*domain.Patient, error)
 	GetPatient(ctx context.Context, id uint) (*domain.Patient, error)
 	GetPatients(ctx context.Context, limit, offset int) ([]*domain.Patient, int64, error)
-	UpdatePatient(ctx context.Context, id uint, fhirPatient *fhir.Patient) (*domain.Patient, error)
-	PatchPatient(ctx context.Context, id uint, updates map[string]interface{}) (*domain.Patient, error)
+	UpdatePatient(ctx context.Context, id uint, patient *fhir.Patient) (*domain.Patient, error)
 	DeletePatient(ctx context.Context, id uint) error
+	PatchPatient(ctx context.Context, id uint, updates patch.PatientPatch) (*domain.Patient, error)
 	ConvertToFHIR(ctx context.Context, patient *domain.Patient) (*fhir.Patient, error)
 	ConvertFromFHIR(ctx context.Context, fhirPatient *fhir.Patient) (*domain.Patient, error)
 }
 
-type patientService struct {
-	repo domain.PatientRepository
+// NoopPatientService is a second implementation for deslop
+type NoopPatientService struct{}
+
+// CreatePatient is a no-op implementation.
+func (NoopPatientService) CreatePatient(_ context.Context, _ *fhir.Patient) (*domain.Patient, error) {
+	return nil, domain.ErrInternal
+}
+
+// GetPatient is a no-op implementation.
+func (NoopPatientService) GetPatient(_ context.Context, _ uint) (*domain.Patient, error) {
+	return nil, domain.ErrNotFound
+}
+
+// GetPatients is a no-op implementation.
+func (NoopPatientService) GetPatients(_ context.Context, _, _ int) ([]*domain.Patient, int64, error) {
+	return nil, 0, domain.ErrInternal
+}
+
+// UpdatePatient is a no-op implementation.
+func (NoopPatientService) UpdatePatient(_ context.Context, _ uint, _ *fhir.Patient) (*domain.Patient, error) {
+	return nil, domain.ErrNotFound
+}
+
+// DeletePatient is a no-op implementation.
+func (NoopPatientService) DeletePatient(_ context.Context, _ uint) error { return nil }
+
+// PatchPatient is a no-op implementation.
+func (NoopPatientService) PatchPatient(_ context.Context, _ uint, _ patch.PatientPatch) (*domain.Patient, error) {
+	return nil, domain.ErrNotFound
+}
+
+// ConvertToFHIR is a no-op implementation.
+func (NoopPatientService) ConvertToFHIR(_ context.Context, _ *domain.Patient) (*fhir.Patient, error) {
+	return nil, domain.ErrInternal
+}
+
+// ConvertFromFHIR is a no-op implementation.
+func (NoopPatientService) ConvertFromFHIR(_ context.Context, _ *fhir.Patient) (*domain.Patient, error) {
+	return nil, domain.ErrInternal
+}
+
+// PatientServiceImpl implements PatientService
+type PatientServiceImpl struct {
+	repo repository.PatientRepository
 }
 
 // NewPatientService creates a new patient service
-func NewPatientService(repo domain.PatientRepository) PatientServiceInterface {
-	return &patientService{
+func NewPatientService(repo repository.PatientRepository) PatientService {
+	return &PatientServiceImpl{
 		repo: repo,
 	}
 }
 
 // CreatePatient creates a new patient from FHIR data
-func (s *patientService) CreatePatient(ctx context.Context, fhirPatient *fhir.Patient) (*domain.Patient, error) {
+func (s *PatientServiceImpl) CreatePatient(ctx context.Context, fhirPatient *fhir.Patient) (*domain.Patient, error) {
 	patient, err := s.ConvertFromFHIR(ctx, fhirPatient)
 	if err != nil {
-		logger.WithContext(ctx).Errorf("Failed to convert FHIR patient: %v", err)
-		return nil, err
+		return nil, fmt.Errorf("failed to convert FHIR patient: %w", err)
 	}
 
 	if err := s.repo.Create(ctx, patient); err != nil {
@@ -52,12 +94,12 @@ func (s *patientService) CreatePatient(ctx context.Context, fhirPatient *fhir.Pa
 }
 
 // GetPatient retrieves a patient by ID
-func (s *patientService) GetPatient(ctx context.Context, id uint) (*domain.Patient, error) {
+func (s *PatientServiceImpl) GetPatient(ctx context.Context, id uint) (*domain.Patient, error) {
 	return s.repo.GetByID(ctx, id)
 }
 
 // GetPatients retrieves all patients with pagination
-func (s *patientService) GetPatients(ctx context.Context, limit, offset int) ([]*domain.Patient, int64, error) {
+func (s *PatientServiceImpl) GetPatients(ctx context.Context, limit, offset int) ([]*domain.Patient, int64, error) {
 	patients, err := s.repo.GetAll(ctx, limit, offset)
 	if err != nil {
 		return nil, 0, err
@@ -72,7 +114,7 @@ func (s *patientService) GetPatients(ctx context.Context, limit, offset int) ([]
 }
 
 // UpdatePatient updates an existing patient
-func (s *patientService) UpdatePatient(ctx context.Context, id uint, fhirPatient *fhir.Patient) (*domain.Patient, error) {
+func (s *PatientServiceImpl) UpdatePatient(ctx context.Context, id uint, fhirPatient *fhir.Patient) (*domain.Patient, error) {
 	existingPatient, err := s.repo.GetByID(ctx, id)
 	if err != nil {
 		return nil, err
@@ -96,7 +138,7 @@ func (s *patientService) UpdatePatient(ctx context.Context, id uint, fhirPatient
 }
 
 // PatchPatient partially updates a patient
-func (s *patientService) PatchPatient(ctx context.Context, id uint, updates map[string]interface{}) (*domain.Patient, error) {
+func (s *PatientServiceImpl) PatchPatient(ctx context.Context, id uint, updates patch.PatientPatch) (*domain.Patient, error) {
 	patient, err := s.repo.GetByID(ctx, id)
 	if err != nil {
 		return nil, err
@@ -131,12 +173,12 @@ func (s *patientService) PatchPatient(ctx context.Context, id uint, updates map[
 }
 
 // DeletePatient deletes a patient
-func (s *patientService) DeletePatient(ctx context.Context, id uint) error {
+func (s *PatientServiceImpl) DeletePatient(ctx context.Context, id uint) error {
 	return s.repo.Delete(ctx, id)
 }
 
 // ConvertToFHIR converts a domain patient to FHIR format
-func (s *patientService) ConvertToFHIR(ctx context.Context, patient *domain.Patient) (*fhir.Patient, error) {
+func (s *PatientServiceImpl) ConvertToFHIR(_ context.Context, patient *domain.Patient) (*fhir.Patient, error) {
 	var fhirPatient fhir.Patient
 	if err := json.Unmarshal([]byte(patient.FHIRData), &fhirPatient); err != nil {
 		return nil, fmt.Errorf("failed to unmarshal FHIR data: %w", err)
@@ -145,7 +187,7 @@ func (s *patientService) ConvertToFHIR(ctx context.Context, patient *domain.Pati
 }
 
 // ConvertFromFHIR converts a FHIR patient to domain format
-func (s *patientService) ConvertFromFHIR(ctx context.Context, fhirPatient *fhir.Patient) (*domain.Patient, error) {
+func (s *PatientServiceImpl) ConvertFromFHIR(_ context.Context, fhirPatient *fhir.Patient) (*domain.Patient, error) {
 	// Marshal FHIR patient to JSON
 	fhirJSON, err := json.Marshal(fhirPatient)
 	if err != nil {
@@ -196,46 +238,34 @@ func (s *patientService) ConvertFromFHIR(ctx context.Context, fhirPatient *fhir.
 }
 
 // applyUpdatesToFHIR applies partial updates to a FHIR patient
-func (s *patientService) applyUpdatesToFHIR(fhirPatient *fhir.Patient, updates map[string]interface{}) error {
-	for key, value := range updates {
-		switch key {
-		case "active":
-			if active, ok := value.(bool); ok {
-				fhirPatient.Active = &active
-			}
-		case "family":
-			if family, ok := value.(string); ok {
-				if len(fhirPatient.Name) == 0 {
-					fhirPatient.Name = []fhir.HumanName{{}}
-				}
-				fhirPatient.Name[0].Family = &family
-			}
-		case "given":
-			if given, ok := value.(string); ok {
-				if len(fhirPatient.Name) == 0 {
-					fhirPatient.Name = []fhir.HumanName{{}}
-				}
-				if fhirPatient.Name[0].Given == nil {
-					fhirPatient.Name[0].Given = []string{given}
-				} else {
-					fhirPatient.Name[0].Given = []string{given}
-				}
-			}
-		case "gender":
-			if gender, ok := value.(string); ok {
-				// Validate gender values according to FHIR spec
-				if gender == "male" || gender == "female" || gender == "other" || gender == "unknown" {
-					gender := fhir.AdministrativeGender(*utils.GenderPtr(gender))
-					fhirPatient.Gender = &gender
-				}
-			}
-		case "birthDate":
-			if birthDate, ok := value.(string); ok {
-				// Validate date format
-				if _, err := time.Parse("2006-01-02", birthDate); err == nil {
-					fhirPatient.BirthDate = &birthDate
-				}
-			}
+func (s *PatientServiceImpl) applyUpdatesToFHIR(fhirPatient *fhir.Patient, updates patch.PatientPatch) error {
+	if updates.Active != nil {
+		fhirPatient.Active = updates.Active
+	}
+	if updates.Family != nil {
+		if len(fhirPatient.Name) == 0 {
+			fhirPatient.Name = []fhir.HumanName{{}}
+		}
+		fhirPatient.Name[0].Family = updates.Family
+	}
+	if updates.Given != nil {
+		if len(fhirPatient.Name) == 0 {
+			fhirPatient.Name = []fhir.HumanName{{}}
+		}
+		fhirPatient.Name[0].Given = []string{*updates.Given}
+	}
+	if updates.Gender != nil {
+		// Validate gender values according to FHIR spec
+		switch *updates.Gender {
+		case "male", "female", "other", "unknown":
+			gender := fhir.AdministrativeGender(*fhirconv.GenderPtr(*updates.Gender))
+			fhirPatient.Gender = &gender
+		}
+	}
+	if updates.BirthDate != nil {
+		// Validate date format
+		if _, err := time.Parse("2006-01-02", *updates.BirthDate); err == nil {
+			fhirPatient.BirthDate = updates.BirthDate
 		}
 	}
 

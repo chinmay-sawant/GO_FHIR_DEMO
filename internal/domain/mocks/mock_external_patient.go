@@ -72,32 +72,32 @@ func (mr *MockExternalPatientServiceMockRecorder) GetExternalPatientByID(id any)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetExternalPatientByID", reflect.TypeOf((*MockExternalPatientService)(nil).GetExternalPatientByID), id)
 }
 
-// GetExternalPatientByIDDelayed mocks base method.
-func (m *MockExternalPatientService) GetExternalPatientByIDDelayed(ctx context.Context, id string, timeout time.Duration) (*fhir.Patient, error) {
+// GetPatientDelayed mocks base method.
+func (m *MockExternalPatientService) GetPatientDelayed(ctx context.Context, id string, timeout time.Duration) (*fhir.Patient, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetExternalPatientByIDDelayed", ctx, id, timeout)
+	ret := m.ctrl.Call(m, "GetPatientDelayed", ctx, id, timeout)
 	ret0, _ := ret[0].(*fhir.Patient)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// GetExternalPatientByIDDelayed indicates an expected call of GetExternalPatientByIDDelayed.
-func (mr *MockExternalPatientServiceMockRecorder) GetExternalPatientByIDDelayed(ctx, id, timeout any) *gomock.Call {
+// GetPatientDelayed indicates an expected call of GetPatientDelayed.
+func (mr *MockExternalPatientServiceMockRecorder) GetPatientDelayed(ctx, id, timeout any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetExternalPatientByIDDelayed", reflect.TypeOf((*MockExternalPatientService)(nil).GetExternalPatientByIDDelayed), ctx, id, timeout)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPatientDelayed", reflect.TypeOf((*MockExternalPatientService)(nil).GetPatientDelayed), ctx, id, timeout)
 }
 
 // SearchExternalPatients mocks base method.
-func (m *MockExternalPatientService) SearchExternalPatients(params map[string]string) (*fhir.Bundle, error) {
+func (m *MockExternalPatientService) SearchExternalPatients(rawQuery string) (*fhir.Bundle, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "SearchExternalPatients", params)
+	ret := m.ctrl.Call(m, "SearchExternalPatients", rawQuery)
 	ret0, _ := ret[0].(*fhir.Bundle)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // SearchExternalPatients indicates an expected call of SearchExternalPatients.
-func (mr *MockExternalPatientServiceMockRecorder) SearchExternalPatients(params any) *gomock.Call {
+func (mr *MockExternalPatientServiceMockRecorder) SearchExternalPatients(rawQuery any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SearchExternalPatients", reflect.TypeOf((*MockExternalPatientService)(nil).SearchExternalPatients), params)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SearchExternalPatients", reflect.TypeOf((*MockExternalPatientService)(nil).SearchExternalPatients), rawQuery)
 }

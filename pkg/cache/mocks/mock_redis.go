@@ -18,32 +18,32 @@ import (
 	gomock "go.uber.org/mock/gomock"
 )
 
-// MockCacheInterface is a mock of CacheInterface interface.
-type MockCacheInterface struct {
+// MockRedisCache is a mock of *RedisCache interface.
+type MockRedisCache struct {
 	ctrl     *gomock.Controller
-	recorder *MockCacheInterfaceMockRecorder
+	recorder *MockRedisCacheMockRecorder
 	isgomock struct{}
 }
 
-// MockCacheInterfaceMockRecorder is the mock recorder for MockCacheInterface.
-type MockCacheInterfaceMockRecorder struct {
-	mock *MockCacheInterface
+// MockRedisCacheMockRecorder is the mock recorder for MockRedisCache.
+type MockRedisCacheMockRecorder struct {
+	mock *MockRedisCache
 }
 
-// NewMockCacheInterface creates a new mock instance.
-func NewMockCacheInterface(ctrl *gomock.Controller) *MockCacheInterface {
-	mock := &MockCacheInterface{ctrl: ctrl}
-	mock.recorder = &MockCacheInterfaceMockRecorder{mock}
+// NewMockRedisCache creates a new mock instance.
+func NewMockRedisCache(ctrl *gomock.Controller) *MockRedisCache {
+	mock := &MockRedisCache{ctrl: ctrl}
+	mock.recorder = &MockRedisCacheMockRecorder{mock}
 	return mock
 }
 
 // EXPECT returns an object that allows the caller to indicate expected use.
-func (m *MockCacheInterface) EXPECT() *MockCacheInterfaceMockRecorder {
+func (m *MockRedisCache) EXPECT() *MockRedisCacheMockRecorder {
 	return m.recorder
 }
 
 // DeletePatient mocks base method.
-func (m *MockCacheInterface) DeletePatient(ctx context.Context, id string) error {
+func (m *MockRedisCache) DeletePatient(ctx context.Context, id string) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "DeletePatient", ctx, id)
 	ret0, _ := ret[0].(error)
@@ -51,28 +51,28 @@ func (m *MockCacheInterface) DeletePatient(ctx context.Context, id string) error
 }
 
 // DeletePatient indicates an expected call of DeletePatient.
-func (mr *MockCacheInterfaceMockRecorder) DeletePatient(ctx, id any) *gomock.Call {
+func (mr *MockRedisCacheMockRecorder) DeletePatient(ctx, id any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeletePatient", reflect.TypeOf((*MockCacheInterface)(nil).DeletePatient), ctx, id)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeletePatient", reflect.TypeOf((*MockRedisCache)(nil).DeletePatient), ctx, id)
 }
 
 // GetPatient mocks base method.
-func (m *MockCacheInterface) GetPatient(ctx context.Context, id string) (*fhir.Patient, error) {
+func (m *MockRedisCache) GetPatient(id string) (*fhir.Patient, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetPatient", ctx, id)
+	ret := m.ctrl.Call(m, "GetPatient", id)
 	ret0, _ := ret[0].(*fhir.Patient)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // GetPatient indicates an expected call of GetPatient.
-func (mr *MockCacheInterfaceMockRecorder) GetPatient(ctx, id any) *gomock.Call {
+func (mr *MockRedisCacheMockRecorder) GetPatient(id any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPatient", reflect.TypeOf((*MockCacheInterface)(nil).GetPatient), ctx, id)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPatient", reflect.TypeOf((*MockRedisCache)(nil).GetPatient), id)
 }
 
 // Ping mocks base method.
-func (m *MockCacheInterface) Ping(ctx context.Context) error {
+func (m *MockRedisCache) Ping(ctx context.Context) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Ping", ctx)
 	ret0, _ := ret[0].(error)
@@ -80,13 +80,13 @@ func (m *MockCacheInterface) Ping(ctx context.Context) error {
 }
 
 // Ping indicates an expected call of Ping.
-func (mr *MockCacheInterfaceMockRecorder) Ping(ctx any) *gomock.Call {
+func (mr *MockRedisCacheMockRecorder) Ping(ctx any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Ping", reflect.TypeOf((*MockCacheInterface)(nil).Ping), ctx)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Ping", reflect.TypeOf((*MockRedisCache)(nil).Ping), ctx)
 }
 
 // SetPatient mocks base method.
-func (m *MockCacheInterface) SetPatient(ctx context.Context, id string, patient *fhir.Patient, expiration time.Duration) error {
+func (m *MockRedisCache) SetPatient(ctx context.Context, id string, patient *fhir.Patient, expiration time.Duration) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "SetPatient", ctx, id, patient, expiration)
 	ret0, _ := ret[0].(error)
@@ -94,7 +94,21 @@ func (m *MockCacheInterface) SetPatient(ctx context.Context, id string, patient 
 }
 
 // SetPatient indicates an expected call of SetPatient.
-func (mr *MockCacheInterfaceMockRecorder) SetPatient(ctx, id, patient, expiration any) *gomock.Call {
+func (mr *MockRedisCacheMockRecorder) SetPatient(ctx, id, patient, expiration any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetPatient", reflect.TypeOf((*MockCacheInterface)(nil).SetPatient), ctx, id, patient, expiration)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetPatient", reflect.TypeOf((*MockRedisCache)(nil).SetPatient), ctx, id, patient, expiration)
+}
+
+// Close mocks base method.
+func (m *MockRedisCache) Close() error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Close")
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// Close indicates an expected call of Close.
+func (mr *MockRedisCacheMockRecorder) Close() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Close", reflect.TypeOf((*MockRedisCache)(nil).Close))
 }

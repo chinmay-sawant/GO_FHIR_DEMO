@@ -1,3 +1,4 @@
+// Package tracer provides utilities for OpenTelemetry tracing.
 package tracer
 
 import (
@@ -23,17 +24,17 @@ type Config struct {
 	Enabled     bool
 }
 
-// TracerProvider holds the tracer provider
-type TracerProvider struct {
+// Provider holds the tracer provider
+type Provider struct {
 	provider *tracesdk.TracerProvider
 }
 
 // InitJaeger initializes Jaeger tracer
-func InitJaeger(cfg Config) (*TracerProvider, error) {
+func InitJaeger(cfg Config) (*Provider, error) {
 	if !cfg.Enabled {
 		// Return a no-op tracer provider
 		provider := tracesdk.NewTracerProvider()
-		return &TracerProvider{
+		return &Provider{
 			provider: provider,
 		}, nil
 	}
@@ -73,13 +74,13 @@ func InitJaeger(cfg Config) (*TracerProvider, error) {
 		propagation.Baggage{},
 	))
 
-	return &TracerProvider{
+	return &Provider{
 		provider: tp,
 	}, nil
 }
 
 // Shutdown gracefully shuts down the tracer provider
-func (tp *TracerProvider) Shutdown(ctx context.Context) error {
+func (tp *Provider) Shutdown(ctx context.Context) error {
 	if tp.provider != nil {
 		if err := tp.provider.Shutdown(ctx); err != nil {
 			return fmt.Errorf("failed to shutdown tracer provider: %w", err)
@@ -87,6 +88,8 @@ func (tp *TracerProvider) Shutdown(ctx context.Context) error {
 	}
 	return nil
 }
+
+// GetTracer returns a tracer with the given name
 func GetTracer(name string) opentrace.Tracer {
 	return otel.Tracer(name)
 }
@@ -104,6 +107,7 @@ func AddSpanAttributes(span opentrace.Span, attrs ...attribute.KeyValue) {
 
 // ...
 
+// SetSpanError records an error in the given span
 func SetSpanError(span opentrace.Span, err error) {
 	span.RecordError(err)
 	span.SetStatus(codes.Error, err.Error())

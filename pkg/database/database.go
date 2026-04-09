@@ -1,65 +1,53 @@
+// Package database provides utilities for database connection and management.
 package database
 
 import (
-	"context"
 	"fmt"
 
 	"go-fhir-demo/config"
-	"go-fhir-demo/pkg/logger"
-
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
+	gormlogger "gorm.io/gorm/logger"
 )
 
-var DB *gorm.DB
-
-// Initialize sets up the database connection
-func Initialize(cfg *config.DatabaseConfig) error {
+// Initialize sets up the database connection.
+func Initialize(cfg *config.DatabaseConfig) (*gorm.DB, error) {
 	dsn := cfg.DSN()
 
-	// Use context-aware GORM logger with trace/span injection
-	gormLoggerWithTrace := logger.GetGormLogger(context.Background())
-
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{
-		Logger: gormLoggerWithTrace,
+		Logger: gormlogger.Default.LogMode(gormlogger.Silent),
 	})
 	if err != nil {
-		return fmt.Errorf("failed to connect to database: %w", err)
+		return nil, fmt.Errorf("failed to connect to database: %w", err)
 	}
 
 	sqlDB, err := db.DB()
 	if err != nil {
-		return fmt.Errorf("failed to get database instance: %w", err)
+		return nil, fmt.Errorf("failed to get database instance: %w", err)
 	}
 
-	// Configure connection pool
+	// Configure connection pool.
 	sqlDB.SetMaxIdleConns(cfg.MaxIdleConns)
 	sqlDB.SetMaxOpenConns(cfg.MaxOpenConns)
 	sqlDB.SetConnMaxLifetime(cfg.ConnMaxLifetime)
 
-	// Test connection
+	// Test connection.
 	if err := sqlDB.Ping(); err != nil {
-		return fmt.Errorf("failed to ping database: %w", err)
+		return nil, fmt.Errorf("failed to ping database: %w", err)
 	}
 
-	DB = db
-	logger.Info("Database connection established successfully")
-	return nil
+	return db, nil
 }
 
-// GetDB returns the database instance
-func GetDB() *gorm.DB {
-	return DB
-}
-
-// Close closes the database connection
-func Close() error {
-	if DB != nil {
-		sqlDB, err := DB.DB()
-		if err != nil {
-			return err
-		}
-		return sqlDB.Close()
+// Close closes the database connection.
+func Close(db *gorm.DB) error {
+	if db == nil {
+		return nil
 	}
-	return nil
+
+	sqlDB, err := db.DB()
+	if err != nil {
+		return err
+	}
+	return sqlDB.Close()
 }

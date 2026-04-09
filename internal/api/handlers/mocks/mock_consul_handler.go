@@ -16,38 +16,38 @@ import (
 	gomock "go.uber.org/mock/gomock"
 )
 
-// MockConsulHandlerInterface is a mock of ConsulHandlerInterface interface.
-type MockConsulHandlerInterface struct {
+// MockConsulHandler is a mock of *ConsulHandler interface.
+type MockConsulHandler struct {
 	ctrl     *gomock.Controller
-	recorder *MockConsulHandlerInterfaceMockRecorder
+	recorder *MockConsulHandlerMockRecorder
 	isgomock struct{}
 }
 
-// MockConsulHandlerInterfaceMockRecorder is the mock recorder for MockConsulHandlerInterface.
-type MockConsulHandlerInterfaceMockRecorder struct {
-	mock *MockConsulHandlerInterface
+// MockConsulHandlerMockRecorder is the mock recorder for MockConsulHandler.
+type MockConsulHandlerMockRecorder struct {
+	mock *MockConsulHandler
 }
 
-// NewMockConsulHandlerInterface creates a new mock instance.
-func NewMockConsulHandlerInterface(ctrl *gomock.Controller) *MockConsulHandlerInterface {
-	mock := &MockConsulHandlerInterface{ctrl: ctrl}
-	mock.recorder = &MockConsulHandlerInterfaceMockRecorder{mock}
+// NewMockConsulHandler creates a new mock instance.
+func NewMockConsulHandler(ctrl *gomock.Controller) *MockConsulHandler {
+	mock := &MockConsulHandler{ctrl: ctrl}
+	mock.recorder = &MockConsulHandlerMockRecorder{mock}
 	return mock
 }
 
 // EXPECT returns an object that allows the caller to indicate expected use.
-func (m *MockConsulHandlerInterface) EXPECT() *MockConsulHandlerInterfaceMockRecorder {
+func (m *MockConsulHandler) EXPECT() *MockConsulHandlerMockRecorder {
 	return m.recorder
 }
 
 // GetConsulSecret mocks base method.
-func (m *MockConsulHandlerInterface) GetConsulSecret(c *gin.Context) {
+func (m *MockConsulHandler) GetConsulSecret(c *gin.Context) {
 	m.ctrl.T.Helper()
 	m.ctrl.Call(m, "GetConsulSecret", c)
 }
 
 // GetConsulSecret indicates an expected call of GetConsulSecret.
-func (mr *MockConsulHandlerInterfaceMockRecorder) GetConsulSecret(c any) *gomock.Call {
+func (mr *MockConsulHandlerMockRecorder) GetConsulSecret(c any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetConsulSecret", reflect.TypeOf((*MockConsulHandlerInterface)(nil).GetConsulSecret), c)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetConsulSecret", reflect.TypeOf((*MockConsulHandler)(nil).GetConsulSecret), c)
 }

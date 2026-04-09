@@ -1,26 +1,38 @@
+// Package handlers provides Gin handlers for the application.
 package handlers
 
 import (
+	"context"
+	"encoding/json"
 	"net/http"
 
-	"encoding/json"
-	"go-fhir-demo/internal/domain"
-	"go-fhir-demo/pkg/logger"
+	"go-fhir-demo/pkg/asyncdto"
 
 	"github.com/gin-gonic/gin"
 	"github.com/segmentio/kafka-go"
 )
 
-type AsyncHandlerInterface interface {
-	PublishAsync(c *gin.Context)
-}
-
+// AsyncHandler handles requests for asynchronous Kafka publishing.
 type AsyncHandler struct {
 	KafkaWriter *kafka.Writer
 	Topic       string
 }
 
-func NewAsyncHandler(broker, topic string) AsyncHandlerInterface {
+func (h *AsyncHandler) publishAsyncMessage(ctx context.Context, asyncData asyncdto.Message) error {
+	value, err := json.Marshal(asyncData)
+	if err != nil {
+		return err
+	}
+
+	msg := kafka.Message{
+		Value: value,
+	}
+
+	return h.KafkaWriter.WriteMessages(ctx, msg)
+}
+
+// NewAsyncHandler creates a new AsyncHandler.
+func NewAsyncHandler(broker, topic string) *AsyncHandler {
 	return &AsyncHandler{
 		KafkaWriter: &kafka.Writer{
 			Addr:     kafka.TCP(broker),
@@ -37,29 +49,26 @@ func NewAsyncHandler(broker, topic string) AsyncHandlerInterface {
 // @Tags Async
 // @Accept json
 // @Produce json
-// @Param async body domain.Async true "Async data"
+// @Param async body asyncdto.Message true "Async data"
 // @Success 202 {object} map[string]interface{}
 // @Failure 400 {object} map[string]interface{}
 // @Failure 500 {object} map[string]interface{}
 // @Router /async/publish [post]
 func (h *AsyncHandler) PublishAsync(c *gin.Context) {
-	var asyncData domain.Async
+	ctx := context.Background()
+	var asyncData asyncdto.Message
 	if err := c.ShouldBindJSON(&asyncData); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid JSON", "message": err.Error()})
+		c.Status(http.StatusInternalServerError)
 		return
 	}
-	value, err := json.Marshal(asyncData)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to marshal data"})
+	if err := h.publishAsyncMessage(ctx, asyncData); err != nil {
+		c.Status(http.StatusInternalServerError)
 		return
 	}
-	msg := kafka.Message{
-		Value: value,
-	}
-	if err := h.KafkaWriter.WriteMessages(c, msg); err != nil {
-		logger.Error("Failed to publish to Kafka: ", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to publish to Kafka"})
-		return
-	}
-	c.JSON(http.StatusAccepted, gin.H{"status": "published"})
+	c.JSON(http.StatusAccepted, StatusResponse{Status: "published"})
+}
+
+// StatusResponse represents an asynchronous operation status.
+type StatusResponse struct {
+	Status string `json:"status"`
 }

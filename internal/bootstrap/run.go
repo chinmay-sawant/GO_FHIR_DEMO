@@ -1,5 +1,4 @@
-// Package main is the entry point for the FHIR Patient API server.
-package main
+package bootstrap
 
 import (
 	"context"
@@ -7,11 +6,9 @@ import (
 	"log"
 	"net"
 	"net/http"
-	"os"
 	"time"
 
 	"go-fhir-demo/config"
-	"go-fhir-demo/internal/bootstrap"
 	"go-fhir-demo/pkg/database"
 	"go-fhir-demo/pkg/utils/consul"
 	"go-fhir-demo/pkg/utils/tracer"
@@ -22,29 +19,14 @@ import (
 	"go.opentelemetry.io/contrib/instrumentation/github.com/gin-gonic/gin/otelgin"
 )
 
-import _ "go-fhir-demo/docs"
-
-// @title Go FHIR Demo API
-// @version 1.0
-// @description This is a sample FHIR Patient API server in Go using Gin.
-// @BasePath /api/v1
-
 const localhost = "localhost"
 
-func main() {
-	if err := run(); err != nil {
-		log.Printf("Fatal error: %v", err)
-		os.Exit(1)
-	}
-}
-
-func run() error {
+// Run starts the application server and blocks until shutdown.
+func Run(ctx context.Context) error {
 	cfg, err := config.Load()
 	if err != nil {
 		return fmt.Errorf("failed to load config: %w", err)
 	}
-
-	ctx := context.Background()
 
 	tracerProvider, err := tracer.InitJaeger(tracer.Config{
 		Endpoint:    cfg.Jaeger.Endpoint,
@@ -56,9 +38,9 @@ func run() error {
 		return fmt.Errorf("failed to initialize Jaeger: %w", err)
 	}
 	defer func() {
-		shutdownCtx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+		ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
 		defer cancel()
-		if err := tracerProvider.Shutdown(shutdownCtx); err != nil {
+		if err := tracerProvider.Shutdown(ctx); err != nil {
 			log.Printf("Failed to shutdown tracer: %v", err)
 		}
 	}()
@@ -73,16 +55,16 @@ func run() error {
 		}
 	}()
 
-	if err := bootstrap.Migrate(db); err != nil {
+	if err := Migrate(db); err != nil {
 		return fmt.Errorf("failed to migrate database: %w", err)
 	}
 
-	if err := bootstrap.SeedDummyPatients(ctx, db); err != nil {
+	if err := SeedDummyPatients(ctx, db); err != nil {
 		log.Printf("Failed to seed dummy patients: %v", err)
 	}
 
 	gin.SetMode(cfg.Server.Mode)
-	router, err := bootstrap.BuildRouter(cfg, db)
+	router, err := BuildRouter(cfg, db)
 	if err != nil {
 		return fmt.Errorf("failed to build router: %w", err)
 	}
@@ -112,7 +94,9 @@ func run() error {
 		checkHost = appHost
 	}
 	if err := consul.RegisterWithConsul(ctx, cfg.Consul.Address, appName, appID, appHost, cfg.Server.Port, checkHost); err != nil {
-		return fmt.Errorf("consul registration failed: %w", err)
+		log.Printf("Consul registration failed: %v", err)
+	} else {
+		log.Printf("Registered service '%s' with Consul at %s", appName, cfg.Consul.Address)
 	}
 
 	log.Printf("Server starting on port %s", cfg.Server.Port)

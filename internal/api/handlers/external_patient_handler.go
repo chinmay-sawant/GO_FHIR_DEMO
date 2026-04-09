@@ -2,37 +2,42 @@ package handlers
 
 import (
 	"context"
+	"io"
 	"net/http"
 	"strconv"
 	"time"
 
 	"go-fhir-demo/internal/service"
+	"go-fhir-demo/pkg/fhirconv"
 	"go-fhir-demo/pkg/logger"
-	"go-fhir-demo/pkg/utils"
 	"go-fhir-demo/pkg/utils/tracer"
 
 	"github.com/gin-gonic/gin"
+	"github.com/samply/golang-fhir-models/fhir-models/fhir"
 )
-
-// ExternalPatientHandlerInterface defines the contract for external patient handlers
-type ExternalPatientHandlerInterface interface {
-	GetExternalPatientByID(c *gin.Context)
-	GetExternalPatientByIDCached(c *gin.Context)
-	GetExternalPatientByIDDelayed(c *gin.Context)
-	SearchExternalPatients(c *gin.Context)
-	CreateExternalPatient(c *gin.Context)
-}
 
 // ExternalPatientHandler handles requests for external patient data.
 type ExternalPatientHandler struct {
-	service service.ExternalPatientServiceInterface
+	service service.ExternalPatientService
 }
 
 // NewExternalPatientHandler creates a new ExternalPatientHandler.
-func NewExternalPatientHandler(service service.ExternalPatientServiceInterface) ExternalPatientHandlerInterface {
+func NewExternalPatientHandler(service service.ExternalPatientService) *ExternalPatientHandler {
 	return &ExternalPatientHandler{
 		service: service,
 	}
+}
+
+func (h *ExternalPatientHandler) createExternalPatientResponse(ctx context.Context, body io.Reader) (*fhir.Patient, error) {
+	raw, err := mustRawJSONBody(body)
+	if err != nil {
+		return nil, err
+	}
+	patient, err := fhirconv.ConvertJSONToFHIRPatient(raw)
+	if err != nil {
+		return nil, err
+	}
+	return h.service.CreateExternalPatient(ctx, patient)
 }
 
 // GetExternalPatientByID godoc
@@ -47,27 +52,25 @@ func NewExternalPatientHandler(service service.ExternalPatientServiceInterface) 
 // @Failure 500 {object} map[string]string "Internal server error"
 // @Router /external-patients/{id} [get]
 func (h *ExternalPatientHandler) GetExternalPatientByID(c *gin.Context) {
-	ctx, span := tracer.StartSpan(c.Request.Context(), "GetExternalPatientByID")
+	ctx, span := tracer.StartSpan(context.Background(), "GetExternalPatientByID")
 	defer span.End()
-	logger.WithContext(ctx).Infof("Fetching external patient by ID: %s", c.Param("id"))
-	id := c.Param("id")
-	if id == "" {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Patient ID is required"})
+	id, err := mustStringParam(c.Param("id"), "id")
+	if err != nil {
+		c.Status(http.StatusInternalServerError)
 		return
 	}
+	logger.WithContext(ctx).Infof("Fetching external patient by ID: %s", id)
 
 	patient, err := h.service.GetExternalPatientByID(ctx, id)
 	if err != nil {
-		// Basic error handling, can be improved to differentiate 404 from 500
-		logger.WithContext(ctx).Errorf("Failed to get external patient by ID %s: %v", id, err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve patient from external server", "details": err.Error()})
+		c.Status(http.StatusInternalServerError)
 		return
 	}
 
 	c.JSON(http.StatusOK, patient)
 }
 
-// GetExternalPatientByIDCached godoc
+// GetPatientCached godoc
 // @Summary Get an external patient by ID with caching
 // @Description Retrieves a patient resource from an external FHIR server by its ID with Redis caching
 // @Tags ExternalPatients
@@ -78,35 +81,30 @@ func (h *ExternalPatientHandler) GetExternalPatientByID(c *gin.Context) {
 // @Failure 404 {object} map[string]string "Patient not found"
 // @Failure 500 {object} map[string]string "Internal server error"
 // @Router /external-patients/{id}/cached [get]
-func (h *ExternalPatientHandler) GetExternalPatientByIDCached(c *gin.Context) {
-	ctx, span := tracer.StartSpan(c.Request.Context(), "GetExternalPatientByIDCached")
+func (h *ExternalPatientHandler) GetPatientCached(c *gin.Context) {
+	ctx, span := tracer.StartSpan(context.Background(), "GetPatientCached")
 	defer span.End()
 
-	id := c.Param("id")
-	logger.WithContext(ctx).Infof("Fetching cached external patient by ID: %s", id)
-
-	if id == "" {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Patient ID is required"})
+	id, err := mustStringParam(c.Param("id"), "id")
+	if err != nil {
+		c.Status(http.StatusInternalServerError)
 		return
 	}
+	logger.WithContext(ctx).Infof("Fetching cached external patient by ID: %s", id)
 
 	// Attempt to retrieve patient from cache or external server
 	logger.WithContext(ctx).Infof("Attempting to get cached external patient by ID: %s", id)
 
-	patient, err := h.service.GetExternalPatientByIDCached(ctx, id)
+	patient, err := h.service.GetPatientCached(ctx, id)
 	if err != nil {
-		logger.WithContext(ctx).Errorf("Failed to get cached external patient by ID %s: %v", id, err)
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error":   "Failed to retrieve patient from external server or cache",
-			"details": err.Error(),
-		})
+		c.Status(http.StatusInternalServerError)
 		return
 	}
 
 	c.JSON(http.StatusOK, patient)
 }
 
-// GetExternalPatientByIDDelayed godoc
+// GetPatientDelayed godoc
 // @Summary Get an external patient by ID with timeout
 // @Description Retrieves a patient resource from an external FHIR server by its ID with configurable timeout
 // @Tags ExternalPatients
@@ -119,22 +117,22 @@ func (h *ExternalPatientHandler) GetExternalPatientByIDCached(c *gin.Context) {
 // @Failure 408 {object} map[string]string "Request timeout"
 // @Failure 500 {object} map[string]string "Internal server error"
 // @Router /external-patients/{id}/delayed [get]
-func (h *ExternalPatientHandler) GetExternalPatientByIDDelayed(c *gin.Context) {
-	ctx, span := tracer.StartSpan(c.Request.Context(), "GetExternalPatientByIDDelayed")
+func (h *ExternalPatientHandler) GetPatientDelayed(c *gin.Context) {
+	ctx, span := tracer.StartSpan(context.Background(), "GetPatientDelayed")
 	defer span.End()
 
-	id := c.Param("id")
-	logger.WithContext(ctx).Infof("Fetching delayed external patient by ID: %s", id)
-	if id == "" {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Patient ID is required"})
+	id, err := mustStringParam(c.Param("id"), "id")
+	if err != nil {
+		c.Status(http.StatusInternalServerError)
 		return
 	}
+	logger.WithContext(ctx).Infof("Fetching delayed external patient by ID: %s", id)
 
 	// Parse timeout parameter (default: 10 seconds)
 	timeoutStr := c.DefaultQuery("timeout", "10")
 	timeoutSeconds, err := strconv.Atoi(timeoutStr)
 	if err != nil || timeoutSeconds <= 0 {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid timeout parameter"})
+		c.Status(http.StatusInternalServerError)
 		return
 	}
 
@@ -142,21 +140,9 @@ func (h *ExternalPatientHandler) GetExternalPatientByIDDelayed(c *gin.Context) {
 
 	logger.WithContext(ctx).Infof("Using timeout of %d seconds for patient %s", timeoutSeconds, id)
 
-	patient, err := h.service.GetExternalPatientByIDDelayed(ctx, id, timeout)
+	patient, err := h.service.GetPatientDelayed(ctx, id, timeout)
 	if err != nil {
-		if err == context.DeadlineExceeded {
-			logger.WithContext(ctx).Errorf("Timeout occurred for patient %s: %v", id, err)
-			c.JSON(http.StatusRequestTimeout, gin.H{
-				"error":   "Request timeout",
-				"details": "The external FHIR server did not respond within the specified timeout",
-			})
-			return
-		}
-		logger.WithContext(ctx).Errorf("Failed to get delayed external patient by ID %s: %v", id, err)
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error":   "Failed to retrieve patient from external server",
-			"details": err.Error(),
-		})
+		c.Status(http.StatusInternalServerError)
 		return
 	}
 
@@ -174,21 +160,15 @@ func (h *ExternalPatientHandler) GetExternalPatientByIDDelayed(c *gin.Context) {
 // @Failure 500 {object} map[string]string "Internal server error"
 // @Router /external-patients [get]
 func (h *ExternalPatientHandler) SearchExternalPatients(c *gin.Context) {
-	ctx, span := tracer.StartSpan(c.Request.Context(), "SearchExternalPatients")
+	ctx, span := tracer.StartSpan(context.Background(), "SearchExternalPatients")
 	defer span.End()
-	queryParams := make(map[string]string)
 
-	logger.WithContext(ctx).Infof("Searching external patients with query parameters: %v", c.Request.URL.Query())
-	for key, values := range c.Request.URL.Query() {
-		if len(values) > 0 {
-			queryParams[key] = values[0] // Taking the first value for simplicity
-		}
-	}
+	filters := parseRawQueryParams(c.Request.URL.RawQuery)
+	logger.WithContext(ctx).Infof("Searching external patients with query parameters: %v", filters)
 
-	bundle, err := h.service.SearchExternalPatients(ctx, queryParams)
+	bundle, err := h.service.SearchExternalPatients(ctx, filters)
 	if err != nil {
-		logger.WithContext(ctx).Errorf("Failed to search external patients: %v", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to search patients on external server", "details": err.Error()})
+		c.Status(http.StatusInternalServerError)
 		return
 	}
 
@@ -207,27 +187,16 @@ func (h *ExternalPatientHandler) SearchExternalPatients(c *gin.Context) {
 // @Failure 500 {object} map[string]string "Internal server error"
 // @Router /external-patients [post]
 func (h *ExternalPatientHandler) CreateExternalPatient(c *gin.Context) {
-	ctx, span := tracer.StartSpan(c.Request.Context(), "CreateExternalPatient")
+	ctx, span := tracer.StartSpan(context.Background(), "CreateExternalPatient")
 	defer span.End()
-
-	var jsonData map[string]interface{}
-	if err := c.ShouldBindJSON(&jsonData); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid patient data", "details": err.Error()})
+	if !requireCSRFToken(c.GetHeader("X-CSRF-Token")) {
+		c.Status(http.StatusInternalServerError)
 		return
 	}
 
-	logger.WithContext(ctx).Infof("Creating external patient with data: %v", jsonData)
-
-	patient, err := utils.ConvertJsonToFHIRPatient(jsonData)
+	createdPatient, err := h.createExternalPatientResponse(ctx, c.Request.Body)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Failed to convert to FHIR Patient", "details": err.Error()})
-		return
-	}
-
-	createdPatient, err := h.service.CreateExternalPatient(ctx, patient)
-	if err != nil {
-		logger.WithContext(ctx).Errorf("Failed to create external patient: %v", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create patient on external server", "details": err.Error()})
+		c.Status(http.StatusInternalServerError)
 		return
 	}
 

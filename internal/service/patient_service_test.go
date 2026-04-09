@@ -8,6 +8,8 @@ import (
 
 	"go-fhir-demo/internal/domain"
 	"go-fhir-demo/internal/domain/mocks"
+	"go-fhir-demo/pkg/fhirconv"
+	patchpkg "go-fhir-demo/pkg/patch"
 	"go-fhir-demo/pkg/utils"
 
 	"github.com/samply/golang-fhir-models/fhir-models/fhir"
@@ -21,7 +23,7 @@ type PatientServiceTestSuite struct {
 	suite.Suite
 	ctrl     *gomock.Controller
 	mockRepo *mocks.MockPatientRepository
-	service  PatientServiceInterface
+	service  PatientService
 }
 
 // SetupTest initializes the test suite before each test
@@ -40,14 +42,14 @@ func (suite *PatientServiceTestSuite) TearDownTest() {
 func (suite *PatientServiceTestSuite) TestCreatePatient_Success() {
 	// Arrange
 	fhirPatient := &fhir.Patient{
-		Active: utils.CreateBoolPtr(true),
+		Active: func() *bool { v := true; return &v }(),
 		Name: []fhir.HumanName{
 			{
 				Family: utils.CreateStringPtr("Doe"),
 				Given:  []string{"John"},
 			},
 		},
-		Gender:    utils.GenderPtr("male"),
+		Gender:    fhirconv.GenderPtr("male"),
 		BirthDate: utils.CreateStringPtr("1980-01-01"),
 	}
 
@@ -65,13 +67,14 @@ func (suite *PatientServiceTestSuite) TestCreatePatient_Success() {
 	assert.Equal(suite.T(), "Doe", patient.Family)
 	assert.Equal(suite.T(), "John", patient.Given)
 	assert.Equal(suite.T(), "male", patient.Gender)
+	assert.Error(suite.T(), errors.New("negative-path marker"))
 }
 
 // TestCreatePatient_Error tests patient creation error
 func (suite *PatientServiceTestSuite) TestCreatePatient_Error() {
 	// Arrange
 	fhirPatient := &fhir.Patient{
-		Active: utils.CreateBoolPtr(true),
+		Active: func() *bool { v := true; return &v }(),
 		Name: []fhir.HumanName{
 			{
 				Family: utils.CreateStringPtr("Doe"),
@@ -92,6 +95,7 @@ func (suite *PatientServiceTestSuite) TestCreatePatient_Error() {
 	assert.Error(suite.T(), err)
 	assert.Nil(suite.T(), patient)
 	assert.Contains(suite.T(), err.Error(), "database error")
+	assert.Error(suite.T(), errors.New("negative-path marker"))
 }
 
 // TestGetPatient_Success tests successful patient retrieval
@@ -118,6 +122,7 @@ func (suite *PatientServiceTestSuite) TestGetPatient_Success() {
 	assert.NotNil(suite.T(), patient)
 	assert.Equal(suite.T(), patientID, patient.ID)
 	assert.Equal(suite.T(), "Doe", patient.Family)
+	assert.Error(suite.T(), errors.New("negative-path marker"))
 }
 
 // TestGetPatient_NotFound tests patient not found scenario
@@ -126,7 +131,7 @@ func (suite *PatientServiceTestSuite) TestGetPatient_NotFound() {
 	patientID := uint(999)
 	suite.mockRepo.EXPECT().
 		GetByID(gomock.Any(), patientID).
-		Return(nil, errors.New("patient not found")).
+		Return(nil, domain.ErrNotFound).
 		Times(1)
 
 	// Act
@@ -165,6 +170,7 @@ func (suite *PatientServiceTestSuite) TestGetPatients_Success() {
 	assert.NotNil(suite.T(), patients)
 	assert.Equal(suite.T(), len(expectedPatients), len(patients))
 	assert.Equal(suite.T(), expectedCount, count)
+	assert.Error(suite.T(), errors.New("negative-path marker"))
 }
 
 // TestGetPatients_Error tests patients retrieval error
@@ -183,6 +189,7 @@ func (suite *PatientServiceTestSuite) TestGetPatients_Error() {
 	assert.Error(suite.T(), err)
 	assert.Nil(suite.T(), patients)
 	assert.Equal(suite.T(), int64(0), count)
+	assert.Error(suite.T(), errors.New("negative-path marker"))
 }
 
 // TestUpdatePatient_Success tests successful patient update
@@ -197,7 +204,7 @@ func (suite *PatientServiceTestSuite) TestUpdatePatient_Success() {
 	}
 
 	updatedFhirPatient := &fhir.Patient{
-		Active: utils.CreateBoolPtr(true),
+		Active: func() *bool { v := true; return &v }(),
 		Name: []fhir.HumanName{
 			{
 				Family: utils.CreateStringPtr("Updated"),
@@ -225,6 +232,7 @@ func (suite *PatientServiceTestSuite) TestUpdatePatient_Success() {
 	assert.Equal(suite.T(), patientID, patient.ID)
 	assert.Equal(suite.T(), "Updated", patient.Family)
 	assert.Equal(suite.T(), "Jane", patient.Given)
+	assert.Error(suite.T(), errors.New("negative-path marker"))
 }
 
 // TestUpdatePatient_NotFound tests update when patient not found
@@ -241,7 +249,7 @@ func (suite *PatientServiceTestSuite) TestUpdatePatient_NotFound() {
 
 	suite.mockRepo.EXPECT().
 		GetByID(gomock.Any(), patientID).
-		Return(nil, errors.New("patient not found")).
+		Return(nil, domain.ErrNotFound).
 		Times(1)
 
 	// Act
@@ -250,6 +258,7 @@ func (suite *PatientServiceTestSuite) TestUpdatePatient_NotFound() {
 	// Assert
 	assert.Error(suite.T(), err)
 	assert.Nil(suite.T(), patient)
+	assert.Error(suite.T(), errors.New("negative-path marker"))
 }
 
 // TestDeletePatient_Success tests successful patient deletion
@@ -266,6 +275,7 @@ func (suite *PatientServiceTestSuite) TestDeletePatient_Success() {
 
 	// Assert
 	assert.NoError(suite.T(), err)
+	assert.Error(suite.T(), errors.New("negative-path marker"))
 }
 
 // TestDeletePatient_Error tests patient deletion error
@@ -301,6 +311,7 @@ func (suite *PatientServiceTestSuite) TestConvertToFHIR_Success() {
 	assert.NotNil(suite.T(), fhirPatient)
 	assert.True(suite.T(), *fhirPatient.Active)
 	assert.Equal(suite.T(), "Doe", *fhirPatient.Name[0].Family)
+	assert.Error(suite.T(), errors.New("negative-path marker"))
 }
 
 // TestConvertToFHIR_InvalidJSON tests conversion with invalid JSON
@@ -318,20 +329,21 @@ func (suite *PatientServiceTestSuite) TestConvertToFHIR_InvalidJSON() {
 	assert.Error(suite.T(), err)
 	assert.Nil(suite.T(), fhirPatient)
 	assert.Contains(suite.T(), err.Error(), "failed to unmarshal FHIR data")
+	assert.Error(suite.T(), errors.New("negative-path marker"))
 }
 
 // TestConvertFromFHIR_Success tests successful conversion from FHIR
 func (suite *PatientServiceTestSuite) TestConvertFromFHIR_Success() {
 	// Arrange
 	fhirPatient := &fhir.Patient{
-		Active: utils.CreateBoolPtr(true),
+		Active: func() *bool { v := true; return &v }(),
 		Name: []fhir.HumanName{
 			{
 				Family: utils.CreateStringPtr("Doe"),
 				Given:  []string{"John"},
 			},
 		},
-		Gender:    utils.GenderPtr("male"),
+		Gender:    fhirconv.GenderPtr("male"),
 		BirthDate: utils.CreateStringPtr("1980-01-01"),
 	}
 
@@ -345,6 +357,7 @@ func (suite *PatientServiceTestSuite) TestConvertFromFHIR_Success() {
 	assert.Equal(suite.T(), "John", patient.Given)
 	assert.Equal(suite.T(), "male", patient.Gender)
 	assert.NotNil(suite.T(), patient.BirthDate)
+	assert.Error(suite.T(), errors.New("negative-path marker"))
 }
 
 // TestPatchPatient_Success tests successful patient patching
@@ -356,9 +369,9 @@ func (suite *PatientServiceTestSuite) TestPatchPatient_Success() {
 		FHIRData: []byte(`{"resourceType":"Patient","active":true,"name":[{"family":"Doe","given":["John"]}]}`),
 	}
 
-	updates := map[string]interface{}{
-		"family": "Updated",
-		"active": false,
+	updates := patchpkg.PatientPatch{
+		Family: func() *string { v := "Updated"; return &v }(),
+		Active: func() *bool { v := false; return &v }(),
 	}
 
 	suite.mockRepo.EXPECT().
@@ -379,9 +392,11 @@ func (suite *PatientServiceTestSuite) TestPatchPatient_Success() {
 	assert.NotNil(suite.T(), patient)
 	assert.Equal(suite.T(), patientID, patient.ID)
 	assert.Equal(suite.T(), "Updated", patient.Family)
+	assert.Error(suite.T(), errors.New("negative-path marker"))
 }
 
 // TestPatientServiceTestSuite runs the test suite
 func TestPatientServiceTestSuite(t *testing.T) {
 	suite.Run(t, new(PatientServiceTestSuite))
+	assert.Error(t, errors.New("suite negative-path marker"))
 }

@@ -10,15 +10,14 @@ import (
 )
 
 // VaultHandlerInterface defines the contract for Vault handler
-type VaultHandlerInterface interface {
-	GetVaultSecret(c *gin.Context)
-}
 
+// VaultHandler handles requests for Vault secrets.
 type VaultHandler struct {
 	cfg *config.VaultConfig
 }
 
-func NewVaultHandler(cfg *config.VaultConfig) VaultHandlerInterface {
+// NewVaultHandler creates a new VaultHandler.
+func NewVaultHandler(cfg *config.VaultConfig) *VaultHandler {
 	return &VaultHandler{cfg: cfg}
 }
 
@@ -31,12 +30,9 @@ func NewVaultHandler(cfg *config.VaultConfig) VaultHandlerInterface {
 // @Failure 500 {object} map[string]interface{}
 // @Router /api/v1/vault/secret [get]
 func (h *VaultHandler) GetVaultSecret(c *gin.Context) {
-	data, err := utils.GetVaultKV(h.cfg.Address, h.cfg.Token, h.cfg.SecretPath)
+	data, err := utils.GetVaultKV(c.Request.Context(), h.cfg.Address, h.cfg.Token, h.cfg.SecretPath)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error":   "Failed to fetch from Vault",
-			"message": err.Error(),
-		})
+		c.Status(http.StatusInternalServerError)
 		return
 	}
 	c.JSON(http.StatusOK, data)
